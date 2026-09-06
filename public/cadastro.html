@@ -163,46 +163,40 @@
           alert("Cadastro Não realizado")
         }else{
             alert("Cadastro Realizado com Sucesso")
-            // Enviando o valor da nova input
-            // fetch("/usuarios/cadastrar", {
-            //   method: "POST",
-            //   headers: {
-            //     "Content-Type": "application/json",
-            //   },
-            //   body: JSON.stringify({
-            //     // crie um atributo que recebe o valor recuperado aqui
-            //     // Agora vá para o arquivo routes/usuario.js
-            //     nomeServer: nomeVar,
-            //     emailServer: emailVar,
-            //     senhaServer: senhaVar,
-            //     idEmpresaVincularServer: idEmpresaVincular
-            //   }),
-            // })
-            //   .then(function (resposta) {
-            //     console.log("resposta: ", resposta);
+            fetch("/usuarios/cadastrar", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                // crie um atributo que recebe o valor recuperado aqui
+                // Agora vá para o arquivo routes/usuario.js
+                nomeServer: nome,
+                emailServer: email,
+                senhaServer: senha,
+                cargoServer: "Produtor",
+                idEmpresaVincularServer: 1
+              }),
+            })
+              .then(function (resposta) {
+                console.log("resposta: ", resposta);
         
-            //     if (resposta.ok) {
-            //       cardErro.style.display = "block";
+                if (resposta.ok) {
+                  
         
-            //       mensagem_erro.innerHTML =
-            //         "Cadastro realizado com sucesso! Redirecionando para tela de Login...";
         
-            //       setTimeout(() => {
-            //         window.location = "login.html";
-            //       }, "2000");
+                  setTimeout(() => {
+                    window.location = "login.html";
+                  }, "750");
         
-            //       limparFormulario();
-            //       finalizarAguardar();
-            //     } else {
-            //       throw "Houve um erro ao tentar realizar o cadastro!";
-            //     }
-            //   })
-            //   .catch(function (resposta) {
-            //     console.log(`#ERRO: ${resposta}`);
-            //     finalizarAguardar();
-            //   });
+                } else {
+                  console.log("Deu erro")
+                }
+              })
+              .catch(function (resposta) {
+                console.log(`#ERRO: ${resposta}`);
+              });
         
-            // return false;
         }
 
   }
