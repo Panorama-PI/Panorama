@@ -17,8 +17,8 @@
     </div>
 
     <div class="card-formulario">
-      <input type="email" placeholder="E-mail">
-      <input type="password" placeholder="Senha">
+      <input type="email"  id="ipt_email" placeholder="E-mail">
+      <input type="password" id="ipt_senha" placeholder="Senha">
     </div>
 
     <div class="card-mensagem-login">
@@ -27,7 +27,7 @@
 
     <div class="card-botao-cadastro">
       <button class="voltar botao"><a href="./index.html">Voltar</a></button>
-      <button class="botao cadastrar">Entrar</button>
+      <button class="botao cadastrar" onclick="entrar()">Entrar</button>
     </div>
 
   </div>
@@ -38,72 +38,56 @@
 
 
     function entrar() {
-        aguardar();
+        
 
-        var emailVar = email_input.value;
-        var senhaVar = senha_input.value;
+        let email = ipt_email.value;
+        let senha = ipt_senha.value;
 
-        if (emailVar == "" || senhaVar == "") {
-            cardErro.style.display = "block"
-            mensagem_erro.innerHTML = "(Mensagem de erro para todos os campos em branco)";
-            finalizarAguardar();
-            return false;
-        }
-        else {
-            setInterval(sumirMensagem, 5000)
-        }
+        if (email == "" || senha == "") {
+            alert("Preencha todos os campos")
+        }else{
 
-        console.log("FORM LOGIN: ", emailVar);
-        console.log("FORM SENHA: ", senhaVar);
-
-        fetch("/usuarios/autenticar", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                emailServer: emailVar,
-                senhaServer: senhaVar
+            fetch("/usuarios/autenticar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    emailServer: email,
+                    senhaServer: senha
+                })
+            }).then(function (resposta) {
+                console.log("ESTOU NO THEN DO entrar()!")
+    
+                if (resposta.ok) {
+                    console.log(resposta);
+    
+                    resposta.json().then(json => {
+                        alert("Login realizado com sucesso")
+                        setTimeout(function () {
+                            window.location = "/index.html";
+                        }, 750); 
+    
+                    });
+    
+                } else {
+    
+                    console.log("Houve um erro ao tentar realizar o login!");
+    
+                    resposta.text().then(texto => {
+                        console.error(texto);
+                    });
+                }
+    
+            }).catch(function (erro) {
+                console.log(erro);
             })
-        }).then(function (resposta) {
-            console.log("ESTOU NO THEN DO entrar()!")
+        }
+        
 
-            if (resposta.ok) {
-                console.log(resposta);
 
-                resposta.json().then(json => {
-                    console.log(json);
-                    console.log(JSON.stringify(json));
-                    sessionStorage.EMAIL_USUARIO = json.email;
-                    sessionStorage.NOME_USUARIO = json.nome;
-                    sessionStorage.ID_USUARIO = json.id;
-                    sessionStorage.AQUARIOS = JSON.stringify(json.aquarios)
-
-                    setTimeout(function () {
-                        window.location = "./dashboard/cards.html";
-                    }, 1000); // apenas para exibir o loading
-
-                });
-
-            } else {
-
-                console.log("Houve um erro ao tentar realizar o login!");
-
-                resposta.text().then(texto => {
-                    console.error(texto);
-                    finalizarAguardar(texto);
-                });
-            }
-
-        }).catch(function (erro) {
-            console.log(erro);
-        })
-
-        return false;
+        
     }
-
-    function sumirMensagem() {
-        cardErro.style.display = "none"
-    }
+    
 
 </script>
