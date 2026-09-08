@@ -8,6 +8,9 @@ CREATE TABLE empresa (
     telefone VARCHAR(15) NOT NULL
 );
 
+INSERT INTO empresa VALUE
+(1, "Warner Bros", "4.869.458/0001-44","(11) 99999-9999");
+
 CREATE TABLE usuario (
 	idUsuario INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
@@ -18,6 +21,7 @@ CREATE TABLE usuario (
 	fkEmpresa INT NOT NULL, 
 		CONSTRAINT fkEmpresa FOREIGN KEY (fkEmpresa) REFERENCES empresa(idEmpresa)
 );
+
 
 CREATE TABLE filme (
 	idFilme INT AUTO_INCREMENT PRIMARY KEY,
