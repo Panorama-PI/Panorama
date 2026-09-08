@@ -10,6 +10,7 @@ public class Menu {
     String nome = "usuario anonimo";
     Log logCreator = new Log();
     Scanner sc = new Scanner(System.in);
+    Scanner scNextLine = new Scanner(System.in);
 
     void iniciar(){
         menuPrincipal();
@@ -33,7 +34,7 @@ public class Menu {
               1) Login
               2) Cadastro
               3) Ver Logs
-              4) Sair
+              4) Sair do programa
               
               """,nome));
             opcao = sc.nextInt();
@@ -71,6 +72,12 @@ public class Menu {
                     break;
             }
         }while(!sair);
+
+        System.out.println("""
+                
+                Saindo...
+                
+                """);
     }
 
     void menuLogs(){
@@ -88,17 +95,17 @@ public class Menu {
                 
               1) Visualizar os ultimos logs
               2) Visualizar os primeiros logs
-              3) Sair
+              3) Voltar
               """,nome));
             opcao = sc.nextInt();
 
             switch (opcao){
                 case 1:
-                    logs.add(logCreator.criarLog("INFO",nome,"Vizualizou o menu de ultimos logs"));
+                    logs.add(logCreator.criarLog("INFO",nome,"vizualizou o menu de ultimos logs"));
                     menuQuantidadeLogs("ultimos");
                     break;
                 case 2:
-                    logs.add(logCreator.criarLog("INFO",nome,"Vizualizou o menu de primeiros logs"));
+                    logs.add(logCreator.criarLog("INFO",nome,"vizualizou o menu de primeiros logs"));
                     menuQuantidadeLogs("primeiros");
                     break;
                 case 3:
@@ -127,14 +134,14 @@ public class Menu {
                 
               1) Todos
               2) Quantidade de logs especifica
-              3) Sair
+              3) Voltar
               
               """,menuLog,nome));
             opcao = sc.nextInt();
 
             switch (opcao){
                 case 1:
-                    logs.add(logCreator.criarLog("INFO",nome,"Vizualizou os "+ menuLog +" logs"));
+                    logs.add(logCreator.criarLog("INFO",nome,"vizualizou os "+ menuLog +" logs"));
                     logCreator.visualizar(logs,menuLog);
                     break;
                 case 2:
@@ -161,7 +168,7 @@ public class Menu {
 
                     }while(!valido);
 
-                    logs.add(logCreator.criarLog("INFO",nome,"Vizualizou os "+ quantidade + " " + menuLog +" logs"));
+                    logs.add(logCreator.criarLog("INFO",nome,"vizualizou os "+ quantidade + " " + menuLog +" logs"));
                     logCreator.visualizar(logs,menuLog,quantidade);
                     break;
                 case 3:
@@ -186,9 +193,9 @@ public class Menu {
         do{
             System.out.println(menu);
             System.out.println("Digite seu nome de usuario");
-            usuario.nome = sc.nextLine();
+            usuario.nome = scNextLine.nextLine();
             System.out.println("Digite a senha do usuario");
-            usuario.senha = sc.nextLine();
+            usuario.senha = scNextLine.nextLine();
 
             Boolean valida = validarLoginCadastro(usuario);
             Boolean existe = validaExiste(usuario.nome, usuario.senha);
@@ -246,9 +253,9 @@ public class Menu {
             System.out.println(menu);
             System.out.println("CADASTRO");
             System.out.println("Digite seu nome de usuario");
-            usuario.nome = sc.next();
+            usuario.nome = scNextLine.next();
             System.out.println("Digite a senha do usuario");
-            usuario.senha = sc.next();
+            usuario.senha = scNextLine.next();
 
             Boolean valida = validarLoginCadastro(usuario);
 
