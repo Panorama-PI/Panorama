@@ -1,98 +1,39 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>AquaTech | Cadastro</title>
-
-  <script src="./js/sessao.js"></script>
-
-  <link rel="stylesheet" href="./css/estilo.css" />
-  <link rel="icon" href="./assets/icon/favicon2.ico" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tela de Cadastro</title>
+  <link rel="stylesheet" href="./css/cadastro.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
 </head>
+<body>
+  <div class="card">
 
-<body onload="listar()">
-  <!--header inicio-->
-  <div class="header">
-    <div class="container">
-      <h1 class="titulo">AquaTech</h1>
-      <ul class="navbar">
-        <li>
-          <a href="index.html">Inicial</a>
-        </li>
-        <li>
-          <a href="simulador.html">Simulador</a>
-        </li>
-        <li>|</li>
-        <li>
-          <a href="login.html">Login</a>
-        </li>
-        <li class="agora">
-          <a href="#">Cadastro</a>
-        </li>
-      </ul>
+    <div class="card-titulo">
+      <h1>Cadastrar</h1>
     </div>
+
+    <div class="card-formulario">
+      <input type="text"   id="ipt_nome" placeholder="Nome">
+      <input type="email"   id="ipt_email" placeholder="E-mail">
+      <input type="password"   id="ipt_senha" placeholder="Senha">
+      <input type="password"   id="ipt_confirmacao_senha" placeholder="Confirmação de senha">
+    </div>
+
+    <div class="card-mensagem-login">
+      <p>Já possui uma conta? <a href="login.html">Vá para a página de login!</a></p>
+    </div>
+
+    <div class="card-botao-cadastro">
+      <button class="voltar botao"><a href="./index.html">Voltar</a></button>
+      <button class="botao cadastrar" onclick="cadastrar()">Cadastrar</button>
+    </div>
+
   </div>
-  <!--header fim-->
-
-  <div class="login">
-    <div class="alerta_erro">
-      <div class="card_erro" id="cardErro">
-        <span id="mensagem_erro"></span>
-      </div>
-    </div>
-    <div class="container">
-      <div class="card card-cadastro">
-        <h2>Bem-vindo!</h2>
-        <div class="formulario">
-          <!--
-                         Para inserir mais um campo, copie uma das inputs abaixo.
-                         Assim que inserir vá para o script abaixo.
-                     -->
-          <div class="campo">
-            <span>Código de ativação:</span>
-            <input id="codigo_input" type="text" placeholder="Insira aqui seu código" />
-          </div>
-          <div class="campo">
-            <span>Nome:</span>
-            <input id="nome_input" type="text" placeholder="Seu nome" />
-          </div>
-          <div class="campo">
-            <span>E-mail:</span>
-            <input id="email_input" type="text" placeholder="meuemail@provedor.com" />
-          </div>
-          <div class="campo">
-            <span>Senha:</span>
-            <input id="senha_input" type="password" placeholder="******" />
-          </div>
-          <div class="campo">
-            <span>Confirmação da Senha:</span>
-            <input id="confirmacao_senha_input" type="password" placeholder="******" />
-          </div>
-          <button class="botao" onclick="cadastrar()">Cadastrar</button>
-        </div>
-        <div id="div_aguardar" class="loading-div">
-          <img src="./assets/circle-loading.gif" id="loading-gif" />
-        </div>
-
-        <div id="div_erros_login"></div>
-      </div>
-    </div>
-  </div>
-
-  <!--footer inicio-->
-  <div class="footer">
-    <div class="container">
-      <h4>Feito com amor por aluno &hearts; SPTech &copy; 2023-2026</h4>
-    </div>
-  </div>
-  <!--footer fim-->
 </body>
-
 </html>
 
 <script>
@@ -101,111 +42,186 @@
   let listaEmpresasCadastradas = [];
 
   function cadastrar() {
-    // aguardar();
-
-    //Recupere o valor da nova input pelo nome do id
-    // Agora vá para o método fetch logo abaixo
-    var nomeVar = nome_input.value;
-    var emailVar = email_input.value;
-    var senhaVar = senha_input.value;
-    var confirmacaoSenhaVar = confirmacao_senha_input.value;
-    var codigoVar = codigo_input.value;
-    var idEmpresaVincular
-
-    // Verificando se há algum campo em branco
+        let numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+        let charEspeciais = ["@", "!", "#", "$", "%", "&", "*", "_", "-"];
+        let nome = ipt_nome.value
+        let email = ipt_email.value
+        let senha = ipt_senha.value
+        let confirmacaoSenha = ipt_confirmacao_senha.value
+        let forca = 0
+        let temNumeros = false
+        let temEspeciais = false
+        let emailValido = false
+        let cadastroInvalido = 0;
     if (
-      nomeVar == "" ||
-      emailVar == "" ||
-      senhaVar == "" ||
-      confirmacaoSenhaVar == "" ||
-      codigoVar == ""
+      nome == "" ||
+      email == "" ||
+      senha == "" ||
+      confirmacaoSenha == ""
     ) {
-      cardErro.style.display = "block";
-      mensagem_erro.innerHTML =
-        "(Mensagem de erro para todos os campos em branco)";
-
-      finalizarAguardar();
-      return false;
-    } else {
-      setInterval(sumirMensagem, 5000);
+      cadastroInvalido ++
+      alert("Preencha todos os Campos")
     }
 
-    // Verificando se o código de ativação é de alguma empresa cadastrada
-    for (let i = 0; i < listaEmpresasCadastradas.length; i++) {
-      if (listaEmpresasCadastradas[i].codigo_ativacao == codigoVar) {
-        idEmpresaVincular = listaEmpresasCadastradas[i].id
-        console.log("Código de ativação válido.");
-        break;
-      } else {
-        cardErro.style.display = "block";
-        mensagem_erro.innerHTML = "(Mensagem de erro para código inválido)";
-        finalizarAguardar();
-      }
-    }
+    // Validações de Nome
 
-    // Enviando o valor da nova input
-    fetch("/usuarios/cadastrar", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        // crie um atributo que recebe o valor recuperado aqui
-        // Agora vá para o arquivo routes/usuario.js
-        nomeServer: nomeVar,
-        emailServer: emailVar,
-        senhaServer: senhaVar,
-        idEmpresaVincularServer: idEmpresaVincular
-      }),
-    })
-      .then(function (resposta) {
-        console.log("resposta: ", resposta);
+    // Valida se o nome tem números
+      for (let i = 0; i < numeros.length; i++) {
+            if (nome.includes(numeros[i])) {
+                cadastroInvalido++
+                alert("O nome não pode Incluir Números")
+                break;
+            }
+          }
+          //Valida se o nome possui caracteres especiais
+          for (let i = 0; i < charEspeciais.length; i++) {
+            if (nome.includes(charEspeciais[i])) {
+                cadastroInvalido++
+                alert("O nome não pode incluir caracteres Especiais")
+                break;
+            }
+          }
 
-        if (resposta.ok) {
-          cardErro.style.display = "block";
 
-          mensagem_erro.innerHTML =
-            "Cadastro realizado com sucesso! Redirecionando para tela de Login...";
+    // Valida se o email termina com .com e também se tem @
+     if(email.endsWith(".com") && email.includes("@")){
+                emailValido = true
+            }else{
+                alert("email inválido!")
+                cadastroInvalido ++
+            }
+            // Validações de Força da senha
 
-          setTimeout(() => {
-            window.location = "login.html";
-          }, "2000");
+            // Valida se a senha possui números
+            for (let i = 0; i < numeros.length; i++) {
+            if (senha.includes(numeros[i])) {
+                temNumeros = true;
+                break;
+            }
+          }
+            // Verifica a validação anterior
+            if (!temNumeros) {
+              cadastroInvalido ++
+            alert("Sua senha precisa Incluir números!")
+            }
 
-          limparFormulario();
-          finalizarAguardar();
-        } else {
-          throw "Houve um erro ao tentar realizar o cadastro!";
+            // Valida se a senha tem caracteres especiais
+            for (let i = 0; i < charEspeciais.length; i++) {
+            if (senha.includes(charEspeciais[i])) {
+                temEspeciais = true
+                break;
+            }
+          }
+
+            // Verifica a validação anterior
+             if (!temEspeciais) {
+               cadastroInvalido ++
+            alert("Sua senha precisa Incluir caracteres Especiais!")
         }
-      })
-      .catch(function (resposta) {
-        console.log(`#ERRO: ${resposta}`);
-        finalizarAguardar();
-      });
+        // Verifica se a senha possui entre 8 e 12 caracteres
+        if (senha.length < 8) {
+          cadastroInvalido ++
+          alert("Sua senha precisa ter no mínimo 8 caracteres!")
+        } else if(senha.length > 12){
+          cadastroInvalido ++
+          alert("Sua senha precisa ter no máximo 12 caracteres!")
+        }else{
+          forca++
+        }
 
-    return false;
+        // Verifica se a senha possui letras minúsculas e maiúsculas
+        if (senha.toLowerCase() !== senha) {
+            forca++
+        } else {
+          cadastroInvalido ++ 
+          alert("Sua senha precisa Incluir letras Maiúsculas!")
+        }
+        if (senha.toUpperCase() !== senha) {
+            forca++
+        } else {
+          cadastroInvalido ++
+            alert("Sua senha precisa Incluir letras Minúsculas!")
+        }
+
+        // Verifica a força da senha
+        if (forca <= 1) {
+            console.log("SENHA FRACA")
+            cadastroInvalido ++
+        } else if (forca == 2) {
+            console.log("SENHA MÉDIA")
+            cadastroInvalido ++
+        } else {
+            console.log("SENHA FORTE")
+        }
+
+        if(senha != confirmacaoSenha){
+          cadastroInvalido ++
+          alert("As senhas não conferem")
+        }
+
+        if(cadastroInvalido > 0){
+          alert("Cadastro Não realizado")
+        }else{
+            alert("Cadastro Realizado com Sucesso")
+            fetch("/usuarios/cadastrar", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                // crie um atributo que recebe o valor recuperado aqui
+                // Agora vá para o arquivo routes/usuario.js
+                nomeServer: nome,
+                emailServer: email,
+                senhaServer: senha,
+                cargoServer: "Produtor",
+                idEmpresaVincularServer: 1
+              }),
+            })
+              .then(function (resposta) {
+                console.log("resposta: ", resposta);
+        
+                if (resposta.ok) {
+                  
+        
+        
+                  setTimeout(() => {
+                    window.location = "login.html";
+                  }, "750");
+        
+                } else {
+                  console.log("Deu erro")
+                }
+              })
+              .catch(function (resposta) {
+                console.log(`#ERRO: ${resposta}`);
+              });
+        
+        }
+
   }
+
+  
 
   // Listando empresas cadastradas 
-  function listar() {
-    fetch("/empresas/listar", {
-      method: "GET",
-    })
-      .then(function (resposta) {
-        resposta.json().then((empresas) => {
-          empresas.forEach((empresa) => {
-            listaEmpresasCadastradas.push(empresa);
+  // function listar() {
+  //   fetch("/empresas/listar", {
+  //     method: "GET",
+  //   })
+  //     .then(function (resposta) {
+  //       resposta.json().then((empresas) => {
+  //         empresas.forEach((empresa) => {
+  //           listaEmpresasCadastradas.push(empresa);
 
-            console.log("listaEmpresasCadastradas")
-            console.log(listaEmpresasCadastradas[0].codigo_ativacao)
-          });
-        });
-      })
-      .catch(function (resposta) {
-        console.log(`#ERRO: ${resposta}`);
-      });
-  }
+  //           console.log("listaEmpresasCadastradas")
+  //           console.log(listaEmpresasCadastradas[0].codigo_ativacao)
+  //         });
+  //       });
+  //     })
+  //     .catch(function (resposta) {
+  //       console.log(`#ERRO: ${resposta}`);
+  //     });
+  // }
 
-  function sumirMensagem() {
-    cardErro.style.display = "none";
-  }
+
 </script>
