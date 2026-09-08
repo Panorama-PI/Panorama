@@ -253,9 +253,9 @@ public class Menu {
             System.out.println(menu);
             System.out.println("CADASTRO");
             System.out.println("Digite seu nome de usuario");
-            usuario.nome = scNextLine.next();
+            usuario.nome = scNextLine.nextLine();
             System.out.println("Digite a senha do usuario");
-            usuario.senha = scNextLine.next();
+            usuario.senha = scNextLine.nextLine();
 
             Boolean valida = validarLoginCadastro(usuario);
 
