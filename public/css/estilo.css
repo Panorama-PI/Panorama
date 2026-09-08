@@ -74,7 +74,7 @@ img {
 .header {
   display: flex;
   flex-direction: column;
-  background-image: url('./img/fundo-panorama.jpg');
+  background-image: url('../assets/imgs/fundo-panorama.jpg');
   background-size: cover;
   padding-bottom: 15%;
 }
@@ -235,11 +235,11 @@ li {
 }
 
 .icone-cartao-papel {
-  background-image: url('./img/paginas.webp');
+  background-image: url('../assets/imgs/paginas.webp');
 }
 
 .icone-cartao-pessoa {
-  background-image: url('./img/cameraMan.png');
+  background-image: url('../assets/imgs/cameraMan.png');
 }
 
 .texto-cartao {
