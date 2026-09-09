@@ -46,7 +46,6 @@
         if (email == "" || senha == "") {
             alert("Preencha todos os campos")
         }else{
-
             fetch("/usuarios/autenticar", {
                 method: "POST",
                 headers: {
@@ -73,7 +72,7 @@
                 } else {
     
                     console.log("Houve um erro ao tentar realizar o login!");
-    
+                    alert("Login Não Realizado! Credenciais não encontradas");
                     resposta.text().then(texto => {
                         console.error(texto);
                     });
