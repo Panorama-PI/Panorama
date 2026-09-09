@@ -39,6 +39,7 @@ body {
   color: #f5f5f5;
   font-size: 85px;
   text-align: center;
+  margin-bottom: 10px;
 }
 
 .card-formulario {
@@ -62,6 +63,20 @@ body {
 .card-formulario input::placeholder {
   color: #2b1616;
   font-size: 20px;
+}
+.selects{
+  display: flex;
+  flex-direction: row;
+  width: 85%;
+  justify-content: space-between
+}
+.selects select {
+  padding: 18px 60px;
+  border-radius: 8px;
+  border: 1px solid #110101;
+  background-color: #fffbfb;
+  color: #2c0c0c;
+  font-size: 17px;
 }
 
 .card-mensagem-login {
@@ -94,7 +109,7 @@ body {
   margin-top: 55px;
 }
 
-    .botao {
+  .botao {
         width: 30%;
         height: 60px;
         background-color: #8a2b2b;
@@ -104,7 +119,7 @@ body {
         font-size: 22px;
         box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.589);
         font-weight: bold;
-    }
+  }
 
     .cadastrar {
     background-color: #06234e;
@@ -115,10 +130,10 @@ body {
         transform: translateY(-5px);
     }
 
-    .card-botao-cadastro a{
+  .card-botao-cadastro a{
     text-decoration: none;
     color: #f5f5f5;
-    }
+  }
     .voltar{
     transition: 0.5s;
     }
@@ -190,5 +205,9 @@ body {
     height: 50px;
     font-size: 17px;
   }
-
+  .selects select {
+  width: 50%;
+  padding: 18px 14px;
+  font-size: 16px;
+  }
 }
