@@ -100,10 +100,10 @@ img {
   border-radius: 0 0 40px 0px;
 }
 
-.logo {
-  font-family: 'Fraunces', serif;
-  font-size: 25px;
-  color: #fff9f2;
+.logo{
+
+  width: 8vw;
+
 }
 
 .links-navegacao {
