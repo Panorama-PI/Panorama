@@ -10,7 +10,6 @@
 
     
     <link rel="stylesheet" href="./../css/dashboards.css">
-    <link rel="stylesheet" href="./../css/estilo.css" />
     <script src="../js/sessao.js"></script>
     <script src="./../js/alerta.js"></script>
 
@@ -30,39 +29,29 @@
 
 <body>
 
-    <div class="janela">
-        <div class="header-left">
-            <h1>AquaTech</h1>
+        <header class="header-left">
+            <div class="usuario-side">
+                <img src="../assets/imgs/matheus.jpg">
 
-            <div class="hello">
-                <h3>Olá, <span id="b_usuario">usuário</span>!</h3>
+                <h2 id="a_usuario">Usuário</h3>
+                <h3 id="b_produtor">Produtor</h3>
+                <h4 id="c_email">email@gmail.com</h3>
             </div>
 
-            <div class="btn-nav-white">
-                <a href="./cards.html">
-                    <h3>Aquários e Terrários</h3>
-                </a>
+            <div class="btns-side">
+                <button class="active"><img src="../assets/icon/chart-icon.png" alt="">Dashboard</button>
+                <button><img src="../assets/icon/settings-icon.png" alt="">Configurações</button>
+                <button><img src="../assets/icon/observacoes-icon.png" alt="">Observações</button>
             </div>
 
-            <div class="btn-nav">
-
-                <h3>Gráficos</h3>
-
+        
+            <div class="btns-side">
+                <button><img src="../assets/icon/sair-icon.png" alt="">Sair</button>
             </div>
 
-            <div class="btn-nav-white">
-                <a href="./mural.html">
-                    <h3>Mural de Avisos</h3>
-                </a>
-            </div>
+        </header>
 
-            <div class="btn-logout" onclick="limparSessao()">
-                <h3>Sair</h3>
-            </div>
-
-        </div>
-
-        <div class="dash">
+        <section class="dash">
             <div id="alerta">
             </div>
 
@@ -71,8 +60,9 @@
             </div>
             <div id="graficos">
             </div>
-        </div>
-    </div>
+        
+        </section>
+  
 
 
 </body>
