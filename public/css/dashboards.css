@@ -2,30 +2,44 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
+
+/* Variaveis de cor */
+:root{
+  --cor-fundo-escuro: #0B0B0C;
+  --cor-cinza-canto: #3C3C41;
+  --cor-fundo-side: #161616;
+  --cor-cinza-claro: #828282;
+  --cor-borda-card: #3C3C41;
+  --cor-fundo-card: #27272A;
+  --cor-verde-kpi: #34C759;
+  --cor-coral-kpi: #FF6B6B;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Barlow', 'Segoe UI', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #0B0B0C;
+  display: flex;
+  flex-direction: row;
+  background-color: var(--cor-fundo);
 }
 
-.header-left a {
+.aside-left a {
   text-decoration: none;
   color: white;
 }
 
-.header-left {
-  position: fixed;
+.aside-left {
   top: 0;
   left: 0;
   height: 100vh;
   width: 24rem;
   display: flex;
+  position: fixed;
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
-  border-right: 2px solid #3C3C41;
-  background-color: #161616;
+  border-right: 2px solid var(--cor-cinza-canto);
+  background-color: var(--cor-fundo-side);
 }
 
 .usuario-side{
@@ -46,7 +60,7 @@ body {
   margin: 0;
 }
 .usuario-side h3{
-  color: #828282;
+  color: var(--cor-cinza-claro);
   padding: 0;
   margin: 0;
 }
@@ -56,12 +70,12 @@ body {
   margin: 0;
 }
 
-.btns-side button {
+.btns-side a {
   box-sizing: border-box; 
   display: flex;
   align-items: center;
-  color: #828282;
-  background-color: #161616;
+  color: var(--cor-cinza-claro);
+  background-color: var(--cor-fundo-side);
   border: 1px solid transparent;
   border-radius: 20px;
   padding: 0.8rem;
@@ -77,20 +91,113 @@ body {
   }
 }
 
-.btns-side button.active {
+.btns-side a.active {
   background-color: #FF383C;
   color: #FFFFFF;
   border-color: #FF383C;
 }
 
-.btns-side button:not(.active):hover {
+.btns-side a:not(.active):hover {
   color: #FFFFFF;
   background-color: #222222;
-  border-color: #828282;
+  border-color: var(--cor-cinza-claro);
 }
 
-.btns-side button.active:hover {
+.btns-side a.active:hover {
   background-color: #f81e21;
   color: #FFFFFF;
   border-color: #850204;
 }
+
+.dash{
+  background-color: var(--cor-fundo-escuro);
+  width: 100vw;
+  flex: 1;
+  margin-left: 24.1rem;
+  padding: 2rem;
+  position: relative;
+}
+
+.card{
+  background-color: var(--cor-fundo-card);
+  border: 1px solid var(--cor-borda-card);
+  border-radius: 20px;
+}
+
+.filter{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+.filter h2{
+  color: white;
+}
+
+.filter select{
+  background-color: transparent;
+  border: none;
+  font-size: 15px;
+  color: white;
+}
+
+.filter label{
+  padding: 0.5rem;
+  color: var(--cor-cinza-claro);
+  font-size: 15px;
+}
+
+.kpi-cards{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.kpi-card{
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.kpi-card p{
+  color: white;
+}
+
+.kpi-card h2{
+  color: white;
+}
+
+.kpi-card span{
+  font-weight: bold;
+}
+
+#lucro-pais{
+  color: var(--cor-verde-kpi);
+}
+#aparicoes-ator{
+  color: var(--cor-coral-kpi);
+}
+
+.chart-lucro{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 30rem;
+}
+
+.charts{
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.charts .chart-card{
+  flex: 1;
+  height: 20rem;
+}
+
+
