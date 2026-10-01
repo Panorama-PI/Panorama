@@ -117,6 +117,14 @@ body {
   padding: 2rem;
   position: relative;
 }
+.home-pesquisa{
+  background-color: var(--cor-fundo-escuro);
+  width: 100vw;
+  flex: 1;
+  margin-left: 24.1rem;
+  padding: 2rem;
+  position: relative;
+}
 
 .card{
   background-color: var(--cor-fundo-card);
@@ -162,6 +170,45 @@ body {
   flex-direction: column;
   justify-content: center;
 }
+.pesquisa-cards{
+  display: flex;
+  flex-direction: row;
+  /* grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); */
+  gap: 1rem;
+  margin: 1.8rem 0;
+}
+
+.pesquisa-card{
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#buscar-bar{
+  /* padding: 2.6rem; */
+  color: white;
+  align-items: center;
+  background-color: #FF383C;
+  width: 4.5rem;
+  height: 0.3rem; 
+  margin-bottom: 3rem; 
+}
+#pesquisa-bar{
+  width: 40rem;
+  height: 0.1rem;
+  color: white;
+}
+#filtro-bar{
+  width: 4.5rem;
+  height: 0.1rem;
+}
+#pesquisa-bar p{
+  color:white;
+}
+#filtro-bar p{
+ color:white;
+}
 
 .kpi-card p{
   color: white;
@@ -197,7 +244,32 @@ body {
 
 .charts .chart-card{
   flex: 1;
-  height: 20rem;
+  display: flex;
+  flex-direction: column;
+  height: 18rem;
+  padding: 1rem;
 }
+.chart-card h4{
+  color: white;
+}
+.chart-card img{
+  width: 10rem;
+  height: 10rem;
+  display: flex;
+  align-self: center;
+  justify-self: center;
+}
+.table-pesquisa {
+    color: white;
+    padding: 3rem;
+    width: fit-content;
+    height: fit-content;
+
+}
+.table-pesquisa td, tr{
+    padding: 2rem;
+}
+
+
 
 
