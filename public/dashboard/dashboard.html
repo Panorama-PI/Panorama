@@ -58,10 +58,10 @@
 
                 <label class="card select-label" for="select_genero">
                     <p>Genero Escolhido: Nenhum</p>
-                    <select id="select_genero">
-                        <option value="">Selecione um genero</option>
-                        <option value=""></option>
-                        <option value=""></option>
+                    <select id="select_genero" onchange="mudarGenero()">
+                        <option value="Nenhum">Selecione um genero</option>
+                        <option value="Ficção Científica">Ficção Científica</option>
+                        <option value="Ação">Ação</option>
                     </select>
                 </label>
 
@@ -90,15 +90,23 @@
             </section>
 
             <section class="card chart-lucro">
-
+                <canvas id="chartLucroGenero"></canvas>
             </section>
             <section class="charts">
-                <div class="card chart-card"></div>
-                <div class="card chart-card" ></div>
+                <div class="card chart-card">
+                    <canvas id="chartPaisLucro"></canvas>
+                </div>
+                <div class="card chart-card" >
+                    <canvas id="chartAtoresAparicoes"></canvas>
+                </div>
             </section>
             <section class="charts">
-                <div class="card chart-card"></div>
-                <div class="card chart-card"></div>
+                <div class="card chart-card">
+                    <canvas id="chartPeriodoLucro"></canvas>
+                </div>
+                <div class="card chart-card">
+                    <canvas id="chartAtoresLucro"></canvas>
+                </div>
             </section>
         
         </main>
@@ -110,6 +118,270 @@
 </html>
 
 <script>
+    let nomeGenero = document.getElementById("select_genero");
+    
+        Chart.defaults.color = '#828282';
+        Chart.defaults.font.family = "'Barlow', sans-serif";
+
+        const COR_ROSA_BARRA = '#FF6B6B';
+        const COR_LINHA_GRID = '#2B2B2E';
+        
+
+        new Chart(document.getElementById('chartLucroGenero'), {
+        type: 'bar',
+        data: {
+            labels: ['Drama', 'Comédia', 'Romance', 'Ficção', 'Ação', 'Terror'],
+            datasets: [{
+            data: [2.4, 3.6, 4.8, 4.2, 3.0, 1.8],
+            backgroundColor: COR_ROSA_BARRA,
+            borderRadius: 12,
+            borderSkipped: false,
+            barThickness: 50
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Lucro x Gênero',
+                color: '#FFFFFF',
+                font: { size: 16, weight: 'bold' },
+                align: 'start'
+            },
+            datalabels: {
+                anchor: 'end',
+                align: 'top',
+                color: '#FFFFFF',
+                font: { weight: 'bold', size: 11 },
+                formatter: (value) => `R$ ${value.toFixed(1)}B`
+            }
+            },
+            scales: {
+            y: {
+                max: 5.5,
+                grid: { color: COR_LINHA_GRID },
+                ticks: {
+                callback: (value) => value === 0 ? '0' : `R$ ${value}B`
+                }
+            },
+            x: { grid: { display: false } }
+            }
+        }
+        });
+
+
+        let chartPaisLucro = new Chart(document.getElementById('chartPaisLucro'), {
+        type: 'bar',
+        data: {
+            labels: ['Brasil', 'França', 'China', 'Reino Unido', 'Estados Unidos'],
+            datasets: [{
+            data: [2, 3.2, 4.8, 5.2, 7.2],
+            backgroundColor: COR_ROSA_BARRA,
+            borderRadius: 12,
+            borderSkipped: false,
+            barThickness: 20
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'País de origem x Lucro',
+                color: '#FFFFFF',
+                font: { size: 16, weight: 'bold' },
+                align: 'start'
+            },
+            subtitle: {
+                display: true,
+                text: nomeGenero.value,
+                color: '#34C759',
+                align: 'start',
+                font: { size: 12 }
+            },
+            datalabels: { display: false }
+            },
+            scales: {
+            x: {
+                grid: { color: COR_LINHA_GRID },
+                ticks: { stepSize: 2 },
+                title: { display: true, text: 'Em bilhões', color: '#828282', font: { size: 10 } }
+            },
+            y: { grid: { display: false } }
+            }
+        }
+        });
+
+
+        let chartAtoresAparicoes = new Chart(document.getElementById('chartAtoresAparicoes'), {
+        type: 'bar',
+        data: {
+            labels: ['Robert Downey Jr', 'Leonardo DiCaprio', 'Adam Sandler', 'Scarlett Johansson', 'Tom Cruise'],
+            datasets: [{
+            data: [20, 16, 14, 12, 10],
+            backgroundColor: COR_ROSA_BARRA,
+            borderRadius: 12,
+            borderSkipped: false,
+            barThickness: 16
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Atores x Aparições em Produções mais lucrativas',
+                color: '#FFFFFF',
+                font: { size: 16, weight: 'bold' },
+                align: 'start'
+            },
+            subtitle: {
+                display: true,
+                text: nomeGenero.value,
+                color: '#34C759',
+                align: 'start',
+                font: { size: 12 }
+            },
+            datalabels: {
+                anchor: 'end',
+                align: 'right',
+                color: '#FF6B6B',
+                font: { weight: 'bold' },
+                formatter: (val, ctx) => ctx.dataIndex === 0 ? val : '' 
+            }
+            },
+            scales: {
+            x: { display: false },
+            y: { grid: { display: false } }
+            }
+        }
+        });
+
+
+        let chartPeriodoLucro = new Chart(document.getElementById('chartPeriodoLucro'), {
+        type: 'line',
+        data: {
+            labels: ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV'],
+            datasets: [{
+            data: [2800000000, 2400000000, 1600000000, 1800000000, 1200000000, 3200000000, 2800000000, 2400000000, 2800000000, 2000000000, 2400000000],
+            borderColor: COR_ROSA_BARRA,
+            backgroundColor: COR_ROSA_BARRA,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#FFFFFF',
+            borderWidth: 2,
+            tension: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Período x Lucro x Gênero (Média Anual)',
+                color: '#FFFFFF',
+                font: { size: 16, weight: 'bold' },
+                align: 'start'
+            },
+            subtitle: {
+                display: true,
+                text: nomeGenero.value,
+                color: '#34C759',
+                align: 'start',
+                font: { size: 12 },
+                padding: {
+                    bottom: 15
+                }
+            },
+            datalabels: { display: false }
+            },
+            scales: {
+            y: {
+                min: 0,
+                max: 4000000000,
+                grid: { color: COR_LINHA_GRID },
+                ticks: {
+                stepSize: 1000000000,
+                callback: (val) => val.toLocaleString('pt-BR')
+                }
+            },
+            x: { grid: { display: false } }
+            }
+        }
+        });
+
+
+        let chartAtoresLucro = new Chart(document.getElementById('chartAtoresLucro'), {
+        type: 'bar',
+        data: {
+            labels: ['Will Smith', 'Leonardo DiCaprio', 'Adam Sandler', 'Scarlett Johansson', 'Tom Cruise'],
+            datasets: [{
+            data: [980, 765, 680, 500, 390],
+            backgroundColor: COR_ROSA_BARRA,
+            borderRadius: 50,
+            borderSkipped: false,
+            barThickness: 45
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'atores x gênero x lucro',
+                color: '#FFFFFF',
+                font: { size: 16, weight: 'bold'},
+                align: 'start'
+            },
+            subtitle: {
+                display: true,
+                text: nomeGenero.value,
+                color: '#34C759',
+                align: 'start',
+                font: { size: 12 },
+                padding: {
+                    bottom: 15
+                }
+            },
+            datalabels: {
+                anchor: 'center',
+                align: 'center',
+                color: '#2B2B2E',
+                font: { weight: 'bold', size: 11 }
+            }
+            },
+            scales: {
+            y: {
+                max: 1000,
+                grid: { color: COR_LINHA_GRID },
+                ticks: {
+                stepSize: 200,
+                callback: (val) => val === 0 ? '0' : `${val}M`
+                }
+            },
+            x: { grid: { display: false } }
+            }
+        }
+        });
+
+
+
+
+
+
     b_usuario.innerHTML = sessionStorage.NOME_USUARIO;
 
     let proximaAtualizacao;
