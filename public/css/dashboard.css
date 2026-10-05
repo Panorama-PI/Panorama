@@ -214,7 +214,7 @@ body {
 
 /* Spans das KPIs da Visão Geral (mesmas cores já usadas nas outras KPIs) */
 #roi-genero,
-#taxa-sucesso{
+#melhor-mes-lucro{
   color: var(--cor-verde-kpi);
 }
 #risco-genero{

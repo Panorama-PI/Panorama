@@ -8,7 +8,6 @@ const COR_LINHA_GRID = '#2B2B2E';
 
 // Título padrão dos gráficos (branco, negrito, alinhado à esquerda).
 // comSubtitulo = true quando o gráfico tem o subtítulo verde logo abaixo:
-// aí o título fica colado no subtítulo e o espaço grande vai depois do subtítulo.
 function tituloGrafico(texto, comSubtitulo) {
     return {
         display: true,
