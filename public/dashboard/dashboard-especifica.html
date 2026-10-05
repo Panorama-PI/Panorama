@@ -8,9 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panorama | Visão Específica</title>
 
-    <link rel="stylesheet" href="./../css/dashboards.css">
+    <link rel="stylesheet" href="./../css/dashboard.css">
     <script src="../js/sessao.js"></script>
-    <script src="./../js/alerta.js"></script>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link
@@ -19,7 +18,7 @@
 
     <!-- scripts do Chart.js - 2022-1 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../js/dash-comum.js"></script>
+    <script src="../js/dashboard.js"></script>
 
     <!--FONT AWESOME-->
     <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
@@ -37,16 +36,15 @@
         </div>
 
         <div class="btns-side">
-            <a href="./visao-geral.html"><img src="../assets/icon/chart-icon.png" alt="">Dashboard</a>
-            <a href="./visao-geral.html"><img src="../assets/icon/chart-icon.png" alt="">Visão Geral</a>
-            <a href="./visao-especifica.html" class="active"><img src="../assets/icon/chart-icon.png" alt="">Visão Específica</a>
+            <a href="./dashboard-geral.html"><img src="../assets/icon/chart-icon.png" alt="">Visão Geral</a>
+            <a href="./dashboard-especifica.html" class="active"><img src="../assets/icon/chart-icon.png" alt="">Visão Específica</a>
             <a href="#"><img src="../assets/icon/settings-icon.png" alt="">Configurações</a>
             <a href="#"><img src="../assets/icon/observacoes-icon.png" alt="">Observações</a>
             <a href="#"><img src="../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
         </div>
 
         <div class="btns-side">
-            <a href="#"><img src="../assets/icon/sair-icon.png" alt="">Sair</a>
+            <a href="#" onclick="limparSessao(); return false;"><img src="../assets/icon/sair-icon.png" alt="">Sair</a>
         </div>
 
     </aside>
@@ -110,7 +108,21 @@
 
     const selectGenero = document.getElementById('select_genero');
 
+    // ATENÇÃO: os valores abaixo ainda estão mockados.
+    // Todos os gráficos desta tela são FILTRADOS pelo gênero escolhido no select.
+    // Nas consultas, troque 'Ação' pelo gênero escolhido. No backend, use parâmetro (?)
+    // em vez de concatenar o texto: genero LIKE CONCAT('%', ?, '%')
+    // (a coluna genero pode guardar mais de um gênero no mesmo texto, por isso o LIKE).
+    // Lucro = receita - orcamento.
 
+
+    // País de origem x Lucro (Em quais países o gênero escolhido mais lucra - Top 5)
+    // SQL: SELECT paisOrigem, SUM(receita - orcamento) / 1000000000 AS lucro_bilhoes
+    //      FROM filme
+    //      WHERE genero LIKE '%Ação%' AND orcamento > 0
+    //      GROUP BY paisOrigem ORDER BY lucro_bilhoes DESC LIMIT 5;
+    // Obs.: o gráfico mostra do menor para o maior (de cima para baixo), então inverta a lista
+    // ao montar os dados. Se paisOrigem vier como sigla (ex.: US), traduzir para o nome no JS.
     let chartPaisLucro = new Chart(document.getElementById('chartPaisLucro'), {
         type: 'bar',
         data: {
@@ -118,7 +130,7 @@
             datasets: [{
                 data: [2, 3.2, 4.8, 5.2, 7.2],
                 backgroundColor: COR_ROSA_BARRA,
-                borderRadius: 12,
+                borderRadius: { topRight: 12, bottomRight: 12 },
                 borderSkipped: false,
                 barThickness: 20
             }]
@@ -129,7 +141,7 @@
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('País de origem x Lucro'),
+                title: tituloGrafico('País de origem x Lucro', true),
                 subtitle: subtituloGrafico(selectGenero.value),
                 datalabels: { display: false }
             },
@@ -145,6 +157,16 @@
     });
 
 
+    // Atores x Aparições em Produções mais lucrativas (Quais atores mais aparecem em filmes que deram lucro no gênero - Top 5)
+    // A coluna atores é um texto único com os nomes separados por vírgula, então é preciso
+    // separar os nomes antes de contar (precisa de MySQL 8 ou superior por causa do JSON_TABLE).
+    // SQL: SELECT TRIM(a.ator) AS ator, COUNT(*) AS aparicoes
+    //      FROM filme f,
+    //           JSON_TABLE(CONCAT('["', REPLACE(f.atores, ',', '","'), '"]'),
+    //                      '$[*]' COLUMNS (ator VARCHAR(100) PATH '$')) AS a
+    //      WHERE f.genero LIKE '%Ação%' AND f.receita > f.orcamento
+    //      GROUP BY TRIM(a.ator) ORDER BY aparicoes DESC LIMIT 5;
+    // Obs.: a mesma consulta (sem o LIMIT 5, com LIMIT 1) alimenta a KPI "Ator com Mais Aparições".
     let chartAtoresAparicoes = new Chart(document.getElementById('chartAtoresAparicoes'), {
         type: 'bar',
         data: {
@@ -163,7 +185,7 @@
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Atores x Aparições em Produções mais lucrativas'),
+                title: tituloGrafico('Atores x Aparições em Produções mais lucrativas', true),
                 subtitle: subtituloGrafico(selectGenero.value),
                 datalabels: {
                     anchor: 'end',
@@ -181,12 +203,18 @@
     });
 
 
+    // Período x Lucro x Gênero (Em quais meses do ano o gênero escolhido lucra mais, na média de todos os anos)
+    // SQL: SELECT MONTH(dtLancamento) AS mes, AVG(receita - orcamento) AS lucro_medio
+    //      FROM filme
+    //      WHERE genero LIKE '%Ação%' AND orcamento > 0
+    //      GROUP BY MONTH(dtLancamento) ORDER BY mes;
+    // Obs.: meses sem nenhum filme não aparecem no resultado.
     let chartPeriodoLucro = new Chart(document.getElementById('chartPeriodoLucro'), {
         type: 'line',
         data: {
-            labels: ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV'],
+            labels: ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'],
             datasets: [{
-                data: [2800000000, 2400000000, 1600000000, 1800000000, 1200000000, 3200000000, 2800000000, 2400000000, 2800000000, 2000000000, 2400000000],
+                data: [2800000000, 2400000000, 1600000000, 1800000000, 1200000000, 3200000000, 2800000000, 2400000000, 2800000000, 2000000000, 2400000000, 3000000000],
                 borderColor: COR_ROSA_BARRA,
                 backgroundColor: COR_ROSA_BARRA,
                 pointRadius: 4,
@@ -201,8 +229,8 @@
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Período x Lucro x Gênero (Média Anual)'),
-                subtitle: subtituloGrafico(selectGenero.value, 15),
+                title: tituloGrafico('Período x Lucro x Gênero (Média Anual)', true),
+                subtitle: subtituloGrafico(selectGenero.value),
                 datalabels: { display: false }
             },
             scales: {
@@ -221,6 +249,14 @@
     });
 
 
+    // Atores x Gênero x Lucro (Quais atores mais geraram lucro no gênero escolhido, em milhões - Top 5)
+    // Usa a mesma separação de nomes do gráfico de aparições.
+    // SQL: SELECT TRIM(a.ator) AS ator, SUM(f.receita - f.orcamento) / 1000000 AS lucro_milhoes
+    //      FROM filme f,
+    //           JSON_TABLE(CONCAT('["', REPLACE(f.atores, ',', '","'), '"]'),
+    //                      '$[*]' COLUMNS (ator VARCHAR(100) PATH '$')) AS a
+    //      WHERE f.genero LIKE '%Ação%' AND f.orcamento > 0
+    //      GROUP BY TRIM(a.ator) ORDER BY lucro_milhoes DESC LIMIT 5;
     let chartAtoresLucro = new Chart(document.getElementById('chartAtoresLucro'), {
         type: 'bar',
         data: {
@@ -228,7 +264,7 @@
             datasets: [{
                 data: [980, 765, 680, 500, 390],
                 backgroundColor: COR_ROSA_BARRA,
-                borderRadius: 50,
+                borderRadius: 0,
                 borderSkipped: false,
                 barThickness: 45
             }]
@@ -238,8 +274,8 @@
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('atores x gênero x lucro'),
-                subtitle: subtituloGrafico(selectGenero.value, 15),
+                title: tituloGrafico('atores x gênero x lucro', true),
+                subtitle: subtituloGrafico(selectGenero.value),
                 datalabels: {
                     anchor: 'center',
                     align: 'center',
@@ -262,10 +298,8 @@
     });
 
 
-    // Chamada pelo select de gênero (antes essa função não existia, então o filtro não fazia nada).
+    // Chamada pelo select de gênero.
     // Por enquanto atualiza o texto do filtro e o subtítulo verde de cada gráfico.
-    // Para filtrar os dados de verdade: buscar na API pelo gênero escolhido, trocar
-    // grafico.data.datasets[0].data e os cards KPI dentro do forEach abaixo.
     const graficosFiltrados = [chartPaisLucro, chartAtoresAparicoes, chartPeriodoLucro, chartAtoresLucro];
 
     function mudarGenero() {

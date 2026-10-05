@@ -8,9 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panorama | Visão Geral</title>
 
-    <link rel="stylesheet" href="./../css/dashboards.css">
+    <link rel="stylesheet" href="./../css/dashboard.css">
     <script src="../js/sessao.js"></script>
-    <script src="./../js/alerta.js"></script>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link
@@ -19,7 +18,7 @@
 
     <!-- scripts do Chart.js - 2022-1 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../js/dash-comum.js"></script>
+    <script src="../js/dashboard.js"></script>
 
     <!--FONT AWESOME-->
     <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
@@ -37,16 +36,15 @@
         </div>
 
         <div class="btns-side">
-            <a href="./visao-geral.html"><img src="../assets/icon/chart-icon.png" alt="">Dashboard</a>
-            <a href="./visao-geral.html" class="active"><img src="../assets/icon/chart-icon.png" alt="">Visão Geral</a>
-            <a href="./visao-especifica.html"><img src="../assets/icon/chart-icon.png" alt="">Visão Específica</a>
+            <a href="./dashboard-geral.html" class="active"><img src="../assets/icon/chart-icon.png" alt="">Visão Geral</a>
+            <a href="./dashboard-especifica.html"><img src="../assets/icon/chart-icon.png" alt="">Visão Específica</a>
             <a href="#"><img src="../assets/icon/settings-icon.png" alt="">Configurações</a>
             <a href="#"><img src="../assets/icon/observacoes-icon.png" alt="">Observações</a>
             <a href="#"><img src="../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
         </div>
 
         <div class="btns-side">
-            <a href="#"><img src="../assets/icon/sair-icon.png" alt="">Sair</a>
+            <a href="#" onclick="limparSessao(); return false;"><img src="../assets/icon/sair-icon.png" alt="">Sair</a>
         </div>
 
     </aside>
@@ -109,11 +107,11 @@
 <script>
     preencherUsuario();
 
-    // ATENÇÃO: os valores abaixo ainda são de exemplo (mesmo padrão do restante da dashboard).
+    // ATENÇÃO: os valores abaixo ainda estão mockados.
     // Quando for ligar ao banco, cada gráfico/KPI desta tela usa dados de TODOS os gêneros,
     // sem filtro. Ver as consultas sugeridas no comentário de cada gráfico.
 
-    // Lucro x Gênero (único gráfico sem filtro que já existia)
+    // Lucro x Gênero (Quais gêneros estão lucrando mais)
     new Chart(document.getElementById('chartLucroGenero'), {
         type: 'bar',
         data: {
@@ -121,7 +119,7 @@
             datasets: [{
                 data: [2.4, 3.6, 4.8, 4.2, 3.0, 1.8],
                 backgroundColor: COR_ROSA_BARRA,
-                borderRadius: 12,
+                borderRadius: { topLeft: 12, topRight: 12 },
                 borderSkipped: false,
                 barThickness: 50
             }]
@@ -129,6 +127,7 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: { top: 20, left: 24, right: 24, bottom: 16 } },
             plugins: {
                 legend: { display: false },
                 title: tituloGrafico('Lucro x Gênero'),
@@ -154,17 +153,20 @@
     });
 
 
-    // NOVO - ROI por gênero (quantas vezes a receita cobre o orçamento)
+    const formatarRoi = (valor) => `${valor.toFixed(1).replace('.', ',')}x`;
+
+    // ROI por gênero (quantas vezes a receita cobre o orçamento)
     // SQL: SELECT genero, SUM(receita) / SUM(orcamento) AS roi
     //      FROM filme WHERE orcamento > 0 GROUP BY genero ORDER BY roi DESC;
     new Chart(document.getElementById('chartRoiGenero'), {
         type: 'bar',
+        plugins: [pluginRotuloFimBarra(formatarRoi)],
         data: {
             labels: ['Ação', 'Drama', 'Ficção', 'Comédia', 'Romance', 'Terror'],
             datasets: [{
                 data: [1.9, 2.1, 2.4, 2.8, 3.0, 4.2],
                 backgroundColor: COR_ROSA_BARRA,
-                borderRadius: 12,
+                borderRadius: 0,
                 borderSkipped: false,
                 barThickness: 20
             }]
@@ -176,13 +178,19 @@
             plugins: {
                 legend: { display: false },
                 title: tituloGrafico('Gênero x Retorno sobre o Orçamento (ROI)'),
-                datalabels: { display: false }
+                datalabels: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` ${formatarRoi(ctx.parsed.x)} o orçamento`
+                    }
+                }
             },
             scales: {
                 x: {
+                    max: 5,
                     grid: { color: COR_LINHA_GRID },
-                    ticks: { stepSize: 1 },
-                    title: { display: true, text: 'Vezes o orçamento', color: '#828282', font: { size: 10 } }
+                    ticks: { stepSize: 1, callback: (val) => `${val}x` },
+                    title: { display: true, text: 'ROI: quantas vezes a receita cobre o orçamento (receita ÷ orçamento)', color: '#828282', font: { size: 10 } }
                 },
                 y: { grid: { display: false } }
             }
@@ -190,7 +198,7 @@
     });
 
 
-    // NOVO - % de filmes que deram lucro, por gênero (mede risco)
+    // % de filmes que deram lucro, por gênero (mede risco)
     // SQL: SELECT genero, ROUND(100 * SUM(receita > orcamento) / COUNT(*), 1) AS pct_lucro
     //      FROM filme WHERE orcamento > 0 GROUP BY genero ORDER BY pct_lucro DESC;
     new Chart(document.getElementById('chartTaxaSucesso'), {
@@ -200,7 +208,7 @@
             datasets: [{
                 data: [55, 58, 61, 64, 67, 72],
                 backgroundColor: COR_ROSA_BARRA,
-                borderRadius: 12,
+                borderRadius: 50,
                 borderSkipped: false,
                 barThickness: 20
             }]
@@ -227,7 +235,7 @@
     });
 
 
-    // NOVO - Orçamento médio por gênero (quanto é preciso investir para entrar no gênero)
+    // Orçamento médio por gênero (quanto é preciso investir para entrar no gênero)
     // SQL: SELECT genero, AVG(orcamento) / 1000000 AS orcamento_medio_mi
     //      FROM filme WHERE orcamento > 0 GROUP BY genero;
     new Chart(document.getElementById('chartOrcamentoGenero'), {
@@ -236,8 +244,10 @@
             labels: ['Drama', 'Comédia', 'Romance', 'Ficção', 'Ação', 'Terror'],
             datasets: [{
                 data: [22, 28, 25, 70, 85, 12],
-                backgroundColor: COR_ROSA_BARRA,
-                borderRadius: 50,
+                backgroundColor: 'rgba(255, 107, 107, 0.25)',
+                borderColor: COR_ROSA_BARRA,
+                borderWidth: 2,
+                borderRadius: 8,
                 borderSkipped: false,
                 barThickness: 45
             }]
@@ -270,7 +280,7 @@
     });
 
 
-    // NOVO - Melhor período de lançamento considerando todos os gêneros
+    // Melhor período de lançamento considerando todos os gêneros
     // SQL: SELECT MONTH(dtLancamento) AS mes, AVG(receita - orcamento) AS lucro_medio
     //      FROM filme WHERE orcamento > 0 GROUP BY mes ORDER BY mes;
     new Chart(document.getElementById('chartPeriodoGeral'), {
@@ -293,15 +303,8 @@
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Período de Lançamento x Lucro (Todos os Gêneros)'),
-                subtitle: {
-                    display: true,
-                    text: 'Média Anual',
-                    color: '#34C759',
-                    align: 'start',
-                    font: { size: 12 },
-                    padding: { bottom: 15 }
-                },
+                title: tituloGrafico('Período de Lançamento x Lucro (Todos os Gêneros)', true),
+                subtitle: subtituloGrafico('Média Anual'),
                 datalabels: { display: false }
             },
             scales: {

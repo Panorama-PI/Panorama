@@ -151,13 +151,13 @@ body {
 
 .kpi-cards{
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin: 1.5rem 0;
 }
 
 .kpi-card{
-  padding: 2rem;
+  padding: 1rem 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -165,14 +165,20 @@ body {
 
 .kpi-card p{
   color: white;
+  font-size: 1.1rem;
+  margin: 0 0 0.3rem 0;
 }
 
 .kpi-card h2{
   color: white;
+  font-size: 1.8rem;
+  margin: 0;
 }
 
 .kpi-card span{
   font-weight: bold;
+  font-size: 1.1rem;
+  margin-top: 0.3rem;
 }
 
 #lucro-pais{
