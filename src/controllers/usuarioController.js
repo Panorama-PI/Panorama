@@ -1,63 +1,16 @@
 var usuarioModel = require("../models/usuarioModel");
 
-function autenticar(req, res) {
-    var email = req.body.emailServer;
-    var senha = req.body.senhaServer;
-
-    if (email == undefined) {
-        res.status(400).send("Seu email está undefined!");
-    } else if (senha == undefined) {
-        res.status(400).send("Sua senha está indefinida!");
-    } else {
-
-        usuarioModel.autenticar(email, senha)
-            .then(
-                function (resultadoAutenticar) {
-                    console.log(`\nResultados encontrados: ${resultadoAutenticar.length}`);
-                    console.log(`Resultados: ${JSON.stringify(resultadoAutenticar)}`); // transforma JSON em String
-
-                    if (resultadoAutenticar.length == 1) {
-                        console.log(resultadoAutenticar);
-
-                         usuarioModel.buscarUsuariosPorEmpresa(resultadoAutenticar[0].empresaId)
-                             .then((resultadoUsuarios) => {
-                                 if (resultadoUsuarios.length > 0) {
-                                     res.json({
-                                         id: resultadoAutenticar[0].id,
-                                         email: resultadoAutenticar[0].email,
-                                         nome: resultadoAutenticar[0].nome,
-                                         senha: resultadoAutenticar[0].senha,
-                                     });
-                                 } else {
-                                     res.status(204).json({ usuarios: [] });
-                                 }
-                             })
-                    } else if (resultadoAutenticar.length == 0) {
-                        res.status(403).send("Email e/ou senha inválido(s)");
-                    } else {
-                        res.status(403).send("Mais de um usuário com o mesmo login e senha!");
-                    }
-                }
-            ).catch(
-                function (erro) {
-                    console.log(erro);
-                    console.log("\nHouve um erro ao realizar o login! Erro: ", erro.sqlMessage);
-                    res.status(500).json(erro.sqlMessage);
-                }
-            );
-    }
-
-}
-
+// Cadastra um novo usuário.
+// Recebe os dados enviados pela requisição, valida os campos obrigatórios
+// e encaminha as informações para o model realizar o cadastro.
 function cadastrar(req, res) {
-    // Crie uma variável que vá recuperar os valores do arquivo cadastro.html
     var nome = req.body.nomeServer;
     var email = req.body.emailServer;
     var senha = req.body.senhaServer;
     var cargo = req.body.cargoServer;
     var fkEmpresa = req.body.idEmpresaVincularServer;
 
-    // Faça as validações dos valores
+    // Verifica se todos os campos necessários foram preenchidos.
     if (nome == undefined) {
         res.status(400).send("Seu nome está undefined!");
     } else if (email == undefined) {
@@ -70,7 +23,7 @@ function cadastrar(req, res) {
         res.status(400).send("Sua empresa a vincular está undefined!");
     } else {
 
-        // Passe os valores como parâmetro e vá para o arquivo usuarioModel.js
+        // Envia os dados validados para o model realizar o cadastro.
         usuarioModel.cadastrar(nome, email, senha, cargo, fkEmpresa)
             .then(
                 function (resultado) {
@@ -89,10 +42,78 @@ function cadastrar(req, res) {
     }
 }
 
+
+// Realiza a autenticação do usuário.
+// Verifica os dados de login e retorna as informações do usuário
+// quando o email e a senha são válidos.
+function autenticar(req, res) {
+    var email = req.body.emailServer;
+    var senha = req.body.senhaServer;
+
+    // Verifica se email e senha foram informados.
+    if (email == undefined) {
+        res.status(400).send("Seu email está undefined!");
+    } else if (senha == undefined) {
+        res.status(400).send("Sua senha está indefinida!");
+    } else {
+
+        // Envia os dados de login para o model realizar a autenticação.
+        usuarioModel.autenticar(email, senha)
+            .then(
+                function (resultadoAutenticar) {
+                    console.log(`\nResultados encontrados: ${resultadoAutenticar.length}`);
+                    console.log(`Resultados: ${JSON.stringify(resultadoAutenticar)}`); // transforma JSON em String
+
+                    // Verifica se foi encontrado exatamente um usuário.
+                    if (resultadoAutenticar.length == 1) {
+                        console.log(resultadoAutenticar);
+
+                         usuarioModel.buscarUsuariosPorEmpresa(resultadoAutenticar[0].empresaId)
+                             .then((resultadoUsuarios) => {
+
+                                // Retorna os dados do usuário quando ele está vinculado
+                                // a uma empresa que possui usuários cadastrados.
+                                 if (resultadoUsuarios.length > 0) {
+                                     res.json({
+                                         id: resultadoAutenticar[0].id,
+                                         email: resultadoAutenticar[0].email,
+                                         nome: resultadoAutenticar[0].nome,
+                                         senha: resultadoAutenticar[0].senha,
+                                     });
+                                 } else {
+                                     res.status(204).json({ usuarios: [] });
+                                 }
+                             })
+
+                    // Informa quando nenhum usuário foi encontrado com os dados informados.
+                    } else if (resultadoAutenticar.length == 0) {
+                        res.status(403).send("Email e/ou senha inválido(s)");
+                    
+                    // Informa quando existem vários usuários com os mesmos dados de login.
+                    } else {
+                        res.status(403).send("Mais de um usuário com o mesmo login e senha!");
+                    }
+                }
+            ).catch(
+                function (erro) {
+                    console.log(erro);
+                    console.log("\nHouve um erro ao realizar o login! Erro: ", erro.sqlMessage);
+                    res.status(500).json(erro.sqlMessage);
+                }
+            );
+    }
+
+}
+
+
+// Busca os usuários vinculados a uma determinada empresa.
+// O ID recebido na URL é enviado para o model realizar a consulta.
 function buscarUsuariosPorEmpresa(req, res) {
   var idUsuario = req.params.idUsuario;
 
   usuarioModel.buscarUsuariosPorEmpresa(idUsuario).then((resultado) => {
+
+    // Retorna os usuários encontrados ou informa que não existem resultados.
     if (resultado.length > 0) {
       res.status(200).json(resultado);
     } else {
@@ -105,8 +126,9 @@ function buscarUsuariosPorEmpresa(req, res) {
   });
 }
 
+
 module.exports = {
-    autenticar,
     cadastrar,
+    autenticar,
     buscarUsuariosPorEmpresa
 }
