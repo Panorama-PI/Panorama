@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <link rel="shortcut icon" href="../../assets/icon/favicon2.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panorama | Roteirista - Visão Específica</title>
+
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <script src="../../js/sessao.js"></script>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../../js/dashboard.js"></script>
+
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <aside class="aside-left">
+
+        <div class="usuario-side">
+            <img src="../../assets/imgs/matheus.jpg" alt="Foto do usuário">
+            <h2 id="a_usuario">Usuário</h2>
+            <h3 id="b_produtor">Roteirista</h3>
+            <h4 id="c_email">email@gmail.com</h4>
+        </div>
+
+        <div class="btns-side">
+
+            <a href="./dashboard-geral.html">
+                <img src="../../assets/icon/chart-icon.png" alt="">Visão Geral
+            </a>
+
+            <a href="./dashboard-especifica.html" class="active">
+                <img src="../../assets/icon/chart-icon.png" alt="">Visão Específica
+            </a>
+
+            <a href="#">
+                <img src="../../assets/icon/settings-icon.png" alt="">Configurações
+            </a>
+
+            <a href="#">
+                <img src="../../assets/icon/observacoes-icon.png" alt="">Observações
+            </a>
+
+            <a href="#">
+                <img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa
+            </a>
+
+        </div>
+
+        <div class="btns-side">
+            <a href="#" onclick="limparSessao(); return false;">
+                <img src="../../assets/icon/sair-icon.png" alt="">Sair
+            </a>
+        </div>
+
+    </aside>
+
+    <main class="dash">
+
+        <section class="filter">
+
+            <h2>Dashboard de Roteirista</h2>
+
+            <label for="select_genero">
+                Gênero selecionado:
+                <select id="select_genero">
+                    <option value="Ficção Científica">Ficção Científica</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Aventura">Aventura</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Comédia">Comédia</option>
+                    <option value="Ação">Ação</option>
+                    <option value="Terror">Terror</option>
+                </select>
+            </label>
+
+        </section>
+
+        <!-- KPIs específicas -->
+
+        <section class="kpi-cards">
+
+            <div class="card kpi-card">
+                <p>Percentual de avaliações positivas</p>
+                <h2>72%</h2>
+                <span>avaliação acima de 80%</span>
+            </div>
+
+            <div class="card kpi-card">
+                <p>País com melhor média de avaliações</p>
+                <h2>Estados Unidos</h2>
+                <span>Nota média: 8,7</span>
+            </div>
+
+            <div class="card kpi-card">
+                <p>Palavra mais recorrente nas sinopses</p>
+                <h2>Genialidade</h2>
+                <span>15 aparições</span>
+            </div>
+
+            <div class="card kpi-card">
+                <p>Gênero mais associado</p>
+                <h2>Aventura</h2>
+                <span id="kpi-relacionado">Relacionado a Ficção Científica</span>
+            </div>
+
+        </section>
+
+        <!-- Gráficos específicos -->
+
+        <section class="charts">
+
+            <div class="card chart-card">
+                <canvas id="chartPaisAvaliacao"></canvas>
+            </div>
+
+            <div class="card chart-card">
+                <canvas id="chartGenerosRelacionados"></canvas>
+            </div>
+
+        </section>
+
+        <section class="charts">
+
+            <div class="card chart-card">
+                <canvas id="chartElementosSinopse"></canvas>
+            </div>
+
+            <div class="card chart-card">
+                <canvas id="chartDistribuicaoAvaliacoes"></canvas>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
+
+<script>
+
+    preencherUsuario();
+
+    const selectGenero = document.getElementById('select_genero');
+    const kpiGenero = document.getElementById('kpi-genero');
+    const kpiRelacionado = document.getElementById('kpi-relacionado');
+
+
+    /*
+     * ============================================================
+     * GRÁFICO 1 - AVALIAÇÃO MÉDIA POR PAÍS
+     * ============================================================
+     *
+     * Mostra a avaliação média dos filmes do gênero selecionado,
+     * agrupada pelo país de origem.
+     *
+     *
+     * SQL:
+     *
+     * SELECT pais_origem, AVG(avaliacao) AS media_avaliacao
+     * FROM filme
+     * WHERE genero = ?
+     * GROUP BY pais_origem
+     * ORDER BY media_avaliacao DESC
+     * LIMIT 5;
+     */
+
+    const chartPaisAvaliacao = new Chart(document.getElementById('chartPaisAvaliacao'), {
+        type: 'bar',
+
+        data: {
+            labels: ['Brasil', 'Canadá', 'Reino Unido', 'Japão', 'Estados Unidos'],
+            datasets: [{
+                data: [7.2, 7.6, 8.0, 8.3, 8.7],
+                backgroundColor: COR_ROSA_BARRA,
+                borderRadius: { topLeft: 8, topRight: 8 },
+                borderSkipped: false,
+                barThickness: 28
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: { display: false },
+                title: tituloGrafico('Avaliação média por país de origem'),
+                subtitle: subtituloGrafico(selectGenero.value),
+
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` Nota média: ${ctx.parsed.y.toFixed(1).replace('.', ',')}/10`
+                    }
+                }
+            },
+
+            scales: {
+                y: {
+                    min: 0,
+                    max: 10,
+                    grid: { color: COR_LINHA_GRID },
+                    ticks: { stepSize: 2 }
+                },
+
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+
+    /*
+     * ============================================================
+     * GRÁFICO 2 - GÊNEROS RELACIONADOS
+     * ============================================================
+     *
+     * Mostra quais gêneros aparecem associados ao gênero escolhido.
+     *
+     * SQL:
+     *
+     * SELECT genero_relacionado, COUNT(*) AS quantidade
+     * FROM genero_relacionamento
+     * WHERE genero = ?
+     * GROUP BY genero_relacionado
+     * ORDER BY quantidade DESC
+     * LIMIT 5;
+     */
+
+    const chartGenerosRelacionados = new Chart(document.getElementById('chartGenerosRelacionados'), {
+        type: 'bar',
+
+        data: {
+            labels: ['Drama', 'Comédia', 'Terror', 'Ação', 'Aventura'],
+            datasets: [{
+                data: [35, 47, 63, 72, 80],
+                backgroundColor: COR_ROSA_BARRA,
+                borderRadius: { topRight: 8, bottomRight: 8 },
+                borderSkipped: false,
+                barThickness: 18
+            }]
+        },
+
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: { display: false },
+                title: tituloGrafico('Gêneros relacionados'),
+                subtitle: subtituloGrafico(selectGenero.value),
+
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` ${ctx.parsed.x}% de associação`
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: { color: COR_LINHA_GRID },
+                    ticks: {
+                        stepSize: 20,
+                        callback: (value) => `${value}%`
+                    }
+                },
+
+                y: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+
+    /*
+     * ============================================================
+     * GRÁFICO 3 - ELEMENTOS DAS SINOPSES
+     * ============================================================
+     *
+     * Mostra os elementos mais frequentes encontrados nas
+     * sinopses dos filmes do gênero selecionado.
+     *
+     * SQL:
+     *
+     * SELECT elemento, COUNT(*) AS quantidade
+     * FROM elemento_sinopse
+     * WHERE genero = ?
+     * GROUP BY elemento
+     * ORDER BY quantidade DESC
+     * LIMIT 5;
+     */
+
+    const chartElementosSinopse = new Chart(document.getElementById('chartElementosSinopse'), {
+        type: 'bar',
+
+        data: {
+            labels: ['Curiosidade', 'Investigação', 'Passado', 'Surpresa', 'Genialidade'],
+            datasets: [{
+                data: [35, 42, 55, 70, 80],
+                backgroundColor: COR_ROSA_BARRA,
+                borderRadius: 5,
+                borderSkipped: false,
+                barThickness: 18
+            }]
+        },
+
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: { display: false },
+                title: tituloGrafico('Elementos mais frequentes nas sinopses'),
+                subtitle: subtituloGrafico(selectGenero.value),
+
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` ${ctx.parsed.x} ocorrências`
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { color: COR_LINHA_GRID },
+                    ticks: { precision: 0 }
+                },
+
+                y: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+
+    /*
+     * ============================================================
+     * GRÁFICO 4 - DISTRIBUIÇÃO DAS AVALIAÇÕES
+     * ============================================================
+     *
+     * Mostra como as avaliações dos filmes estão distribuídas
+     * em diferentes faixas de nota.
+     *
+     * Este gráfico é um gráfico de rosca.
+     *
+     * SQL:
+     * SELECT
+     *     CASE
+     *         WHEN avaliacao < 2 THEN '0–2'
+     *         WHEN avaliacao < 4 THEN '2–4'
+     *         WHEN avaliacao < 6 THEN '4–6'
+     *         WHEN avaliacao < 8 THEN '6–8'
+     *         ELSE '8–10'
+     *     END AS faixa_avaliacao,
+     *     COUNT(*) AS quantidade
+     * FROM filme
+     * WHERE genero = ?
+     * GROUP BY faixa_avaliacao
+     * ORDER BY faixa_avaliacao;
+     */
+
+    const chartDistribuicaoAvaliacoes = new Chart(document.getElementById('chartDistribuicaoAvaliacoes'), {
+        type: 'doughnut',
+
+        data: {
+            labels: ['0–20', '21–40', '41–60', '61–80', '81–100'],
+            datasets: [{
+                data: [12, 25, 31, 26, 6],
+                backgroundColor: ['#7C2D35', '#C94F58', COR_ROSA_BARRA, '#FF8585', '#f1a37f'],
+                borderColor: '#27272A',
+                borderWidth: 3
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '62%',
+
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#D4D4D8',
+                        padding: 12
+                    }
+                },
+
+                title: tituloGrafico('Distribuição das avaliações'),
+                subtitle: subtituloGrafico(selectGenero.value),
+
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` ${ctx.label}: ${ctx.parsed}%`
+                    }
+                }
+            }
+        }
+    });
+
+
+    /*
+     * ============================================================
+     * ALTERAÇÃO DO GÊNERO
+     * ============================================================
+     *
+     * Os dados continuam MOCKADOS.
+     * Só são alteradps o texto da KPI e o subtitulo dos graficos
+     */
+
+    const graficosFiltrados = [
+        chartPaisAvaliacao,
+        chartGenerosRelacionados,
+        chartElementosSinopse,
+        chartDistribuicaoAvaliacoes
+    ];
+
+    function mudarGenero() {
+        const genero = selectGenero.value;
+
+        kpiGenero.innerText = genero;
+        kpiRelacionado.innerText = `Relacionado a ${genero}`;
+
+        graficosFiltrados.forEach(grafico => {
+            grafico.options.plugins.subtitle.text = genero;
+            grafico.update();
+        });
+    }
+
+    selectGenero.addEventListener('change', mudarGenero);
+
+</script>

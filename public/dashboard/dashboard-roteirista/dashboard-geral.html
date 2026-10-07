@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <link rel="shortcut icon" href="../../assets/icon/favicon2.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panorama | Roteirista - Visão Geral</title>
+
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <script src="../../js/sessao.js"></script>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../../js/dashboard.js"></script>
+
+    <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <aside class="aside-left">
+
+        <div class="usuario-side">
+            <img src="../../assets/imgs/matheus.jpg" alt="Foto do usuário">
+            <h2 id="a_usuario">Usuário</h2>
+            <h3 id="b_produtor">Roteirista</h3>
+            <h4 id="c_email">email@gmail.com</h4>
+        </div>
+
+        <div class="btns-side">
+            <a href="./dashboard-geral.html" class="active"><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
+            <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
+            <a href="#"><img src="../../assets/icon/settings-icon.png" alt="">Configurações</a>
+            <a href="#"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
+            <a href="#"><img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
+        </div>
+
+        <div class="btns-side">
+            <a href="#" onclick="limparSessao(); return false;"><img src="../../assets/icon/sair-icon.png" alt="">Sair</a>
+        </div>
+
+    </aside>
+
+    <main class="dash">
+
+        <section class="filter">
+            <h2>Dashboard de Roteirista - Visão Geral</h2>
+        </section>
+
+        <!-- KPIs gerais -->
+
+        <section class="kpi-cards">
+
+            <div class="card kpi-card">
+                <p>Gênero com melhor média de avaliações</p>
+                <h2>Romance</h2>
+                <span id="melhor-genero">Nota média: 8,4</span>
+            </div>
+
+            <div class="card kpi-card">
+                <p>País com melhor média de avaliações</p>
+                <h2>Estados Unidos</h2>
+                <span id="melhor-pais">Nota média: 8,2</span>
+            </div>
+
+            <div class="card kpi-card">
+                <p>Palavra mais recorrente nas sinopses</p>
+                <h2>Genialidade</h2>
+                <span id="palavra-recorrente">15 aparições</span>
+            </div>
+
+            <div class="card kpi-card">
+                <p>Gênero mais associado a outros gêneros</p>
+                <h2>Aventura</h2>
+                <span id="genero-associado">Maior recorrência de associações</span>
+            </div>
+
+        </section>
+
+        <!-- Gráfico principal -->
+
+        <section class="card chart-lucro">
+            <canvas id="chartAvaliacaoGenero"></canvas>
+        </section>
+
+        <!-- Gráficos secundários -->
+
+        <section class="charts">
+
+            <div class="card chart-card">
+                <canvas id="chartAvaliacaoPaisGeral"></canvas>
+            </div>
+
+            <div class="card chart-card">
+                <canvas id="chartElementosGeral"></canvas>
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
+
+<script>
+
+    preencherUsuario();
+
+    /*
+     * ============================================================
+     * AVALIAÇÃO MÉDIA POR GÊNERO
+     * ============================================================
+     *
+     * Mostra a média das avaliações dos filmes agrupada por gênero.
+     *
+     * SELECT genero, AVG(avaliacao) AS media_avaliacao
+     * FROM filme
+     * GROUP BY genero
+     * ORDER BY media_avaliacao DESC;
+     */
+
+    new Chart(document.getElementById('chartAvaliacaoGenero'), {
+        type: 'bar',
+
+        data: {
+            labels: ['Drama', 'Comédia', 'Romance', 'Ficção', 'Ação', 'Terror', 'Aventura'],
+            datasets: [{
+                data: [7.1, 7.8, 8.4, 8.1, 7.3, 6.8, 7.9],
+                backgroundColor: COR_ROSA_BARRA,
+                borderRadius: { topLeft: 8, topRight: 8 },
+                borderSkipped: false,
+                barThickness: 34
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            layout: {
+                padding: {
+                    top: 20,
+                    left: 20,
+                    right: 20,
+                    bottom: 10
+                }
+            },
+
+            plugins: {
+                legend: { display: false },
+
+                title: {
+                    display: true,
+                    text: 'Avaliação média por gênero',
+                    color: '#FFFFFF',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    align: 'start',
+                    padding: {
+                        top: 5,
+                        bottom: 28
+                    }
+                },
+
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` Nota média: ${ctx.parsed.y.toFixed(1).replace('.', ',')}/10`
+                    }
+                }
+            },
+
+            scales: {
+                y: {
+                    min: 0,
+                    max: 10,
+                    grid: { color: COR_LINHA_GRID },
+                    ticks: { stepSize: 2 }
+                },
+
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+
+    /*
+     * ============================================================
+     * AVALIAÇÃO MÉDIA POR PAÍS
+     * ============================================================
+     *
+     * Mostra os países que apresentam as maiores médias
+     * de avaliação.
+     *
+     * SELECT pais_origem, AVG(avaliacao) AS media_avaliacao
+     * FROM filme
+     * GROUP BY pais_origem
+     * ORDER BY media_avaliacao DESC
+     * LIMIT 5;
+     */
+
+    new Chart(document.getElementById('chartAvaliacaoPaisGeral'), {
+        type: 'bar',
+
+        data: {
+            labels: ['Brasil', 'França', 'Reino Unido', 'Coreia do Sul', 'Estados Unidos'],
+
+            datasets: [{
+                data: [7.2, 7.5, 7.7, 8.0, 8.2],
+
+                backgroundColor: 'rgba(255, 107, 107, 0.16)',
+                borderColor: COR_ROSA_BARRA,
+                borderWidth: 2,
+                borderRadius: 6,
+                borderSkipped: false,
+                barThickness: 18
+            }]
+        },
+
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: { display: false },
+                title: tituloGrafico('Avaliação média por país de origem'),
+
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` ${ctx.parsed.x.toFixed(1).replace('.', ',')}/10`
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    min: 0,
+                    max: 10,
+                    grid: { color: COR_LINHA_GRID },
+                    ticks: { stepSize: 2 }
+                },
+
+                y: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+
+    /*
+     * ============================================================
+     * ELEMENTOS MAIS FREQUENTES NAS SINOPSES
+     * ============================================================
+     *
+     * Mostra os elementos que mais aparecem nas sinopses.
+     *
+     * SELECT elemento, COUNT(*) AS quantidade
+     * FROM elemento_sinopse
+     * GROUP BY elemento
+     * ORDER BY quantidade DESC
+     * LIMIT 6;
+     *
+     * Caso os elementos estejam dentro do texto da sinopse,
+     * será necessário tratar o texto antes da consulta.
+     */
+
+    new Chart(document.getElementById('chartElementosGeral'), {
+        type: 'bar',
+
+        data: {
+            labels: ['Família', 'Segredo', 'Vingança', 'Amizade', 'Destino', 'Genialidade'],
+
+            datasets: [{
+                data: [42, 48, 53, 58, 61, 76],
+
+                /* Barra com fundo fosco e borda */
+                backgroundColor: 'rgba(255, 107, 107, 0.10)',
+                borderColor: COR_ROSA_BARRA,
+                borderWidth: 2,
+                borderRadius: 4,
+                borderSkipped: false,
+                barThickness: 17
+            }]
+        },
+
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: { display: false },
+                title: tituloGrafico('Elementos mais frequentes nas sinopses'),
+
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => ` ${ctx.parsed.x} aparições`
+                    }
+                }
+            },
+
+            scales: {
+                x: {
+                    grid: { color: COR_LINHA_GRID },
+                    ticks: { precision: 0 }
+                },
+
+                y: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+
+</script>
