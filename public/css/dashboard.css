@@ -209,9 +209,20 @@ body {
   padding: 1rem;
   height: 20rem;
 }
+    .chart-lucro canvas { width: 100% !important; height: 100% !important; }
+        .chart-card canvas { width: 100% !important; height: 100% !important; }
+        .kpi-card span { color: var(--cor-verde-kpi); }
+        .chart-lucro { min-height: 28rem; }
+        @media (max-width: 900px) { .dash { margin-left: 0; max-width: 100%; padding: 1rem; } .aside-left { position: relative; width: 100%; height: auto; } body { flex-direction: column; } }
 
 
-
+.chart-card canvas { width: 100% !important; height: 100% !important; }
+        .kpi-card span { color: var(--cor-verde-kpi); }
+        .filter .select-label { display: flex; flex-direction: column; gap: .35rem; padding: .6rem .9rem; margin: 0; }
+        .filter .select-label p { margin: 0; color: #FFFFFF; font-size: .9rem; }
+        .filter select { min-width: 10rem; padding: .25rem; background-color: #27272A; border-radius: 6px; }
+        @media (max-width: 900px) { .dash { margin-left: 0; max-width: 100%; padding: 1rem; } .aside-left { position: relative; width: 100%; height: auto; } body { flex-direction: column; } }
+        
 /* Spans das KPIs da Visão Geral (mesmas cores já usadas nas outras KPIs) */
 #roi-genero,
 #melhor-mes-lucro{
