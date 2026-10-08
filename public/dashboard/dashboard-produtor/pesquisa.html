@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <link rel="shortcut icon" href="../assets/icon/favicon2.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panorama | Dashboards</title>
+
+    
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <!-- scripts do Chart.js - 2022-1 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!--FONT AWESOME-->
+    <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
+</head>
+
+<!-- <body onload=" atualizarFeed()"> -->
+
+<body style="background-color: black;">
+
+        <aside class="aside-left">
+            <div class="usuario-side">
+                <img src="../../assets/imgs/matheus.jpg">
+
+                <h2 id="a_usuario">Usuário</h3>
+                <h3 id="b_produtor">Produtor</h3>
+                <h4 id="c_email">email@gmail.com</h3>
+            </div>
+
+            <div class="btns-side">
+            <a href="./dashboard-geral.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
+            <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
+            <a href="#"><img src="../../assets/icon/settings-icon.png" alt="">Configurações</a>
+            <a href="../anotacoes.html"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
+            <a href="" class="active"><img src="../../assets/icon/pesquisa-icon.png" alt="" id="limpar_pesquisa">Pesquisa</a>
+        </div>
+
+        
+            <div class="btns-side">
+                <a href="#" ><img src="../assets/icon/sair-icon.png" alt="">Sair</a>
+            </div>
+
+        </aside>
+
+        <main class="home-pesquisa">
+            <section class="filter">
+                <h2>Pesquisar</h2>
+            </section>
+
+            <section class="pesquisa-cards">
+                <input id="pesquisa-bar" class="card pesquisa-card" placeholder="🔍"></input>
+                <div id="filtro-bar"  class="card pesquisa-card">
+                    <p>Filtros Avançados</p>
+                </div>
+
+                <button id="buscar-bar" class=" card pesquisa-card" onclick="buscar()">
+                    Buscar
+                </button>
+            </section>
+             <section id="tabela_filmes" class="table-pesquisa">
+                <h1 id="titulo">TOP 10 FILMES MAIS LUCRATIVOS</h1>
+               <div class = "tabela">
+                <table>
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Ator Principal</th>
+                <th>Gênero</th>
+                <th>País</th>
+                <th>Lucro</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Interestelar</td>
+                <td>Matthew McConaughey</td>
+                <td>Ficção científica</td>
+                <td>EUA</td>
+                <td>300M</td>
+            </tr>
+            <tr>
+                <td>O Poderoso Chefão</td>
+                <td>Al Pacino</td>
+                <td>Crime</td>
+                <td>EUA</td>
+                <td>200M</td>
+            </tr>
+            <tr>
+                <td>Parasita</td>
+                <td>Song Kang-ho</td>
+                <td>Suspense</td>
+                <td>Coreia do Sul</td>
+                <td>148M</td>
+            </tr>
+            <tr>
+                <td>Oppenheimer</td>
+                <td>Cillian Murphy</td>
+                <td>Drama</td>
+                <td>EUA</td>
+                <td>100M</td>
+            </tr>
+            <tr>
+                <td>Batman: O Cavaleiro das Trevas</td>
+                <td>Christian Bale</td>
+                <td>Ação</td>
+                <td>EUA</td>
+                <td>97M</td>
+            </tr>
+            <tr>
+                <td>O Senhor dos Anéis</td>
+                <td>Elijah Wood</td>
+                <td>Fantasia</td>
+                <td>Nova Zelândia</td>
+                <td>90M</td>
+            </tr>
+            <tr>
+                <td>Interestelar</td>
+                <td>Anne Hathaway</td>
+                <td>Ficção científica</td>
+                <td>EUA</td>
+                <td>88M</td>
+            </tr>
+            <tr>
+                <td>Forrest Gump</td>
+                <td>Tom Hanks</td>
+                <td>Drama</td>
+                <td>EUA</td>
+                <td>80M</td>
+            </tr>
+            <tr>
+                <td>Gladiador</td>
+                <td>Russell Crowe</td>
+                <td>Ação</td>
+                <td>EUA</td>
+                <td>67M</td>
+            </tr>
+            <tr>
+                <td>Vingadores: Ultimato</td>
+                <td>Robert Downey Jr.</td>
+                <td>Ação</td>
+                <td>EUA</td>
+                <td>41M</td>
+            </tr>
+        </tbody>
+    </table>
+
+            </div>
+            </section>
+        </main>
+  
+
+
+</body>
+
+</html>
+
+<script>
+    
+    var tabela = document.getElementById("tabela_filmes");
+    var titulo = document.getElementById("titulo");
+    tabela.style.display = "";
+    
+    let proximaAtualizacao;
+    
+    function buscar(){
+
+        tabela.style.display = "";
+        titulo.style.display = "none";
+        
+    }
+    function limpar_pesquisa(){
+        titulo.style.display = "";
+        tabela.style.display = "";
+        
+    }
+    
+   
+</script>
