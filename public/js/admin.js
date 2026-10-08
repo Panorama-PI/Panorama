@@ -1,3 +1,14 @@
+const btnInfo = document.querySelector(".btn-info-codigo");
+const modalCodigo = document.getElementById("modal-codigo");
+const btnFechar = document.querySelector(".fechar-modal");
+btnInfo.onmouseenter = function () {
+    modalCodigo.style.display = "flex";
+};
+
+btnInfo.onmouseleave = function () {
+    modalCodigo.style.display = "none";
+};
+
 const usuarios = [
     {
         nome: "João Silva",

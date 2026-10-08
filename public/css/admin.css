@@ -230,6 +230,16 @@ body {
     object-fit: contain;
 }
 
+.btn-info-codigo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
 .codigo-empresa p {
     margin: 0;
 
@@ -237,6 +247,79 @@ body {
     font-size: 1.3rem;
 }
 
+/* =========================
+   MODAL CÓDIGO DA EMPRESA
+========================= */
+.modal-codigo {
+    display: none;
+    position: absolute;
+    top: 13rem;
+    right: 17rem;
+    width: 23rem;
+    background-color: #434349;
+    border-radius: 12px;
+    padding: 1rem;
+    z-index: 100;
+}
+
+.btn-info-codigo:hover + .modal-codigo {
+    display: flex;
+}
+
+.conteudo-modal {
+    width: 25rem;
+    padding: 1.2rem;
+    border-radius: 12px;
+}
+
+.titulo-modal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 1.5rem;
+}
+
+.titulo-modal h2 {
+    margin: 0;
+
+    color: var(--cor-texto);
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+
+.passo-modal {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+
+    margin-bottom: 1rem;
+}
+
+.passo-modal span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 1.8rem;
+    height: 1.8rem;
+
+    background-color: var(--cor-vermelho);
+    color: white;
+
+    border-radius: 50%;
+
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.passo-modal p {
+    margin: 0;
+
+    color: var(--cor-texto);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
 
 /* BOTÃO E-MAIL */
 
