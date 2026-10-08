@@ -51,7 +51,7 @@
 
     </aside>
 
-    <main>
+    <main class="admin-content">
         <h1>Administração da Empresa</h1>
 
         <p>
@@ -61,14 +61,103 @@
         <div class="cards-superiores">
 
             <div class="card-codigo">
+                <h2>
+                    <img src="assets/icon/pesquisa-icon.png" alt="">
+                    Código da Empresa
+                </h2>
 
+                <div class="codigo-empresa">
+                    <img src="assets/icon/recarregar-icon.png" alt="">
+                    <p>7F3A-9C2D</p>
+                    <img src="assets/icon/info-icon.png" alt="">
+                </div>
+
+                <button class="btn-email">
+                    <img src="assets/icon/mail-icon.png" alt="">
+                    Enviar por e-mail
+                </button>
             </div>
 
-            <div class="card-empresa">
+            <div class="card-informacoes">
+                <div class="titulo-informacoes">
+                    <h2>
+                        <img src="assets/icon/empresa-icon.png" alt="">
+                        Informações da Empresa
+                    </h2>
+                    <button>
+                        <img src="assets/icon/lapis-icon.png" alt="">
+                        Editar
+                    </button>
+                </div>
 
+                <div class="informacoes">
+
+                    <div class="informacao-empresa">
+                        <span>Nome da Empresa</span>
+                        <strong>Exemplo Filmes Ltda.</strong>
+                    </div>
+
+                    <div class="informacao-empresa">
+                        <span>CNPJ</span>
+                        <strong>12.345.678/0001-90</strong>
+                    </div>
+
+                    <div class="informacao-empresa">
+                        <span>E-mail de contato</span>
+                        <strong>contato@exemplofilmes.com</strong>
+                    </div>
+
+                    <div class="informacao-empresa">
+                        <span>Telefone</span>
+                        <strong>(11) 98765-4321</strong>
+                    </div>
+
+                </div>
             </div>
+
 
         </div>
+
+        <section class="funcionarios">
+
+            <h2>Funcionários cadastrados</h2>
+
+            <div class="filtros-funcionarios">
+                <input type="text" placeholder="Pesquisar funcionário...">
+
+                <select>
+                    <option value="">Todos</option>
+                    <option value="Produtor">Produtor</option>
+                    <option value="Roteirista">Roteirista</option>
+                    <option value="Roteirista">Ativo</option>
+                    <option value="Roteirista">Inativo</option>
+                </select>
+
+                <select>
+                    <option value="">Ordenar por</option>
+                    <option value="nome">Nome (A-Z)</option>
+                    <option value="nome-desc">Nome (Z-A)</option>
+                    <option value="data">Data mais recente</option>
+                    <option value="data-antiga">Data mais antiga</option>
+                </select>
+            </div>
+
+            <div class="cabecalho-funcionarios">
+                <span>Funcionário</span>
+                <span>E-mail</span>
+                <span>Cargo</span>
+                <span>Data de cadastro</span>
+                <span>Status</span>
+                <span>Ações</span>
+            </div>
+
+            <div id="lista-funcionarios">
+
+            </div>
+
+        </section>
+
+        <script src="./js/admin.js"></script>
     </main>
 
 </body>
