@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panorama | Tela Administrativa</title>
+
+    <link rel="stylesheet" href="./css/admin.css">
+
+</head>
+
+<body>
+
+
+    <aside class="sidebar">
+
+        <div class="usuario-side">
+
+            <img src="assets/imgs/nathan.jpg" alt="Foto do administrador">
+
+            <h2>Nathan Fioravanti</h2>
+            <h3>Administrador</h3>
+            <h4>admin@exemplo.com</h4>
+
+        </div>
+
+        <div class="btns-side menu-principal">
+
+            <a href="#" class="active">
+                <img src="assets/icon/home-icon.png" alt="">
+                Painel
+            </a>
+
+            <a href="#">
+                <img src="assets/icon/settings-icon.png" alt="">
+                Configurações
+            </a>
+
+        </div>
+
+        <div class="btns-side menu-sair">
+
+            <a href="#" onclick="limparSessao(); return false;">
+                <img src="assets/icon/sair-icon.png" alt="">
+                Sair
+            </a>
+
+        </div>
+
+    </aside>
+
+    <main class="admin-content">
+        <h1>Administração da Empresa</h1>
+
+        <p>
+            Gerencie os usuários, o código da empresa e as informações da sua equipe.
+        </p>
+
+        <div class="cards-superiores">
+
+            <div class="card-codigo">
+                <h2>
+                    <img src="assets/icon/pesquisa-icon.png" alt="">
+                    Código da Empresa
+                </h2>
+
+                <div class="codigo-empresa">
+                    <img src="assets/icon/recarregar-icon.png" alt="">
+                    <p>7F3A-9C2D</p>
+                    <button class="btn-info-codigo">
+                        <img src="assets/icon/info-icon.png" alt="">
+                    </button>
+                </div>
+
+                <button class="btn-email">
+                    <img src="assets/icon/mail-icon.png" alt="">
+                    Enviar por e-mail
+                </button>
+            </div>
+
+            <div class="card-informacoes">
+                <div class="titulo-informacoes">
+                    <h2>
+                        <img src="assets/icon/empresa-icon.png" alt="">
+                        Informações da Empresa
+                    </h2>
+                    <button>
+                        <img src="assets/icon/lapis-icon.png" alt="">
+                        Editar
+                    </button>
+                </div>
+
+                <div class="informacoes">
+
+                    <div class="informacao-empresa">
+                        <span>Nome da Empresa</span>
+                        <strong>Exemplo Filmes Ltda.</strong>
+                    </div>
+
+                    <div class="informacao-empresa">
+                        <span>CNPJ</span>
+                        <strong>12.345.678/0001-90</strong>
+                    </div>
+
+                    <div class="informacao-empresa">
+                        <span>E-mail de contato</span>
+                        <strong>contato@exemplofilmes.com</strong>
+                    </div>
+
+                    <div class="informacao-empresa">
+                        <span>Telefone</span>
+                        <strong>(11) 98765-4321</strong>
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+
+        <section class="funcionarios">
+
+            <h2>Funcionários cadastrados</h2>
+
+            <div class="filtros-funcionarios">
+                <input type="text" placeholder="Pesquisar funcionário...">
+
+                <select>
+                    <option value="">Todos</option>
+                    <option value="Produtor">Produtor</option>
+                    <option value="Roteirista">Roteirista</option>
+                    <option value="Roteirista">Ativo</option>
+                    <option value="Roteirista">Inativo</option>
+                </select>
+
+                <select>
+                    <option value="">Ordenar por</option>
+                    <option value="nome">Nome (A-Z)</option>
+                    <option value="nome-desc">Nome (Z-A)</option>
+                    <option value="data">Data mais recente</option>
+                    <option value="data-antiga">Data mais antiga</option>
+                </select>
+            </div>
+
+            <div class="cabecalho-funcionarios">
+                <span>Funcionário</span>
+                <span>E-mail</span>
+                <span>Cargo</span>
+                <span>Data de cadastro</span>
+                <span>Status</span>
+                <span>Ações</span>
+            </div>
+
+            <div id="lista-funcionarios">
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <div id="modal-codigo" class="modal-codigo">
+
+        <div class="conteudo-modal">
+
+            <div class="titulo-modal">
+                <h2>Como funciona o Código da Empresa</h2>
+            </div>
+
+            <div class="passo-modal">
+                <span>1</span>
+                <p>
+                    Compartilhe o código da empresa com seus funcionários.
+                </p>
+            </div>
+
+            <div class="passo-modal">
+                <span>2</span>
+                <p>
+                    Eles se cadastram na plataforma como produtores ou roteiristas,
+                    utilizando o código.
+                </p>
+            </div>
+
+            <div class="passo-modal">
+                <span>3</span>
+                <p>
+                    Após o cadastro, o usuário aparece na lista de funcionários
+                    desta tela.
+                </p>
+            </div>
+
+            <div class="passo-modal">
+                <span>4</span>
+                <p>
+                    Você pode editar as informações ou remover o usuário,
+                    se necessário.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="./js/admin.js"></script>
+
+</body>
+
+</html>
