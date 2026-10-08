@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <link rel="shortcut icon" href="../assets/icon/favicon2.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panorama | Visão Específica</title>
+
+    <link rel="stylesheet" href="./../../css/dashboard.css">
+    <script src="../../js/sessao.js"></script>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <!-- scripts do Chart.js - 2022-1 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../../js/dashboard.js"></script>
+
+    <!--FONT AWESOME-->
+    <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <aside class="aside-left">
+        <div class="usuario-side">
+            <img src="../../assets/imgs/matheus.jpg">
+            <h2 id="a_usuario">Usuário</h2>
+            <h3 id="b_produtor">Produtor</h3>
+            <h4 id="c_email">email@gmail.com</h4>
+        </div>
+
+        <div class="btns-side">
+            <a href="./dashboard-geral.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
+            <a href="./dashboard-especifica.html" class="active"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
+            <a href="#"><img src="../../assets/icon/settings-icon.png" alt="">Configurações</a>
+            <a href="#"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
+            <a href="#"><img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
+        </div>
+
+        <div class="btns-side">
+            <a href="#" onclick="limparSessao(); return false;"><img src="../../assets/icon/sair-icon.png" alt="">Sair</a>
+        </div>
+
+    </aside>
+
+    <main class="dash">
+        <section class="filter">
+            <h2>Dashboard Produtor - Visão Específica</h2>
+
+            <label for="select_genero">
+                Gênero selecionado:
+                <select id="select_genero">
+                    <option value="Ficção Científica">Ficção Científica</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Aventura">Aventura</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Comédia">Comédia</option>
+                    <option value="Ação">Ação</option>
+                    <option value="Terror">Terror</option>
+                </select>
+            </label>
+        </section>
+
+        <section class="kpi-cards">
+            <div class="card kpi-card">
+                <p>País Mais Lucrativo</p>
+                <h2>Estados Unidos</h2>
+                <span id="lucro-pais">+R$5.200.000.000</span>
+            </div>
+            <div class="card kpi-card">
+                <p>Ator com Mais Aparições em Filmes Lucrativos</p>
+                <h2>Robert Downey Jr</h2>
+                <span id="aparicoes-ator">20 aparições</span>
+            </div>
+            <div class="card kpi-card">
+                <p>Período de Pico de Lucro</p>
+                <h2>Junho a Agosto</h2>
+            </div>
+        </section>
+
+        <section class="charts">
+            <div class="card chart-card">
+                <canvas id="chartPaisLucro"></canvas>
+            </div>
+            <div class="card chart-card">
+                <canvas id="chartAtoresAparicoes"></canvas>
+            </div>
+        </section>
+        <section class="charts">
+            <div class="card chart-card">
+                <canvas id="chartPeriodoLucro"></canvas>
+            </div>
+            <div class="card chart-card">
+                <canvas id="chartAtoresLucro"></canvas>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+
+</html>
+
+<script>
+    preencherUsuario();
+
+    const selectGenero = document.getElementById('select_genero');
+
+    // ATENÇÃO: os valores abaixo ainda estão mockados.
+    // Todos os gráficos desta tela são FILTRADOS pelo gênero escolhido no select.
+    // Nas consultas, troque 'Ação' pelo gênero escolhido. No backend, use parâmetro (?)
+    // em vez de concatenar o texto: genero LIKE CONCAT('%', ?, '%')
+    // (a coluna genero pode guardar mais de um gênero no mesmo texto, por isso o LIKE).
+    // Lucro = receita - orcamento.
+
+
+    // País de origem x Lucro (Em quais países o gênero escolhido mais lucra - Top 5)
+    // SQL: SELECT paisOrigem, SUM(receita - orcamento) / 1000000000 AS lucro_bilhoes
+    //      FROM filme
+    //      WHERE genero LIKE '%Ação%' AND orcamento > 0
+    //      GROUP BY paisOrigem ORDER BY lucro_bilhoes DESC LIMIT 5;
+    // Obs.: o gráfico mostra do menor para o maior (de cima para baixo), então inverta a lista
+    // ao montar os dados. Se paisOrigem vier como sigla (ex.: US), traduzir para o nome no JS.
+    let chartPaisLucro = new Chart(document.getElementById('chartPaisLucro'), {
+        type: 'bar',
+        data: {
+            labels: ['Brasil', 'França', 'China', 'Reino Unido', 'Estados Unidos'],
+            datasets: [{
+                data: [2, 3.2, 4.8, 5.2, 7.2],
+                backgroundColor: COR_ROSA_BARRA,
+                borderRadius: { topRight: 12, bottomRight: 12 },
+                borderSkipped: false,
+                barThickness: 20
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: tituloGrafico('País de origem x Lucro', true),
+                subtitle: subtituloGrafico(selectGenero.value),
+                datalabels: { display: false }
+            },
+            scales: {
+                x: {
+                    grid: { color: COR_LINHA_GRID },
+                    ticks: { stepSize: 2 },
+                    title: { display: true, text: 'Em bilhões', color: '#828282', font: { size: 10 } }
+                },
+                y: { grid: { display: false } }
+            }
+        }
+    });
+
+
+    // Atores x Aparições em Produções mais lucrativas (Quais atores mais aparecem em filmes que deram lucro no gênero - Top 5)
+    // A coluna atores é um texto único com os nomes separados por vírgula, então é preciso
+    // separar os nomes antes de contar (precisa de MySQL 8 ou superior por causa do JSON_TABLE).
+    // SQL: SELECT TRIM(a.ator) AS ator, COUNT(*) AS aparicoes
+    //      FROM filme f,
+    //           JSON_TABLE(CONCAT('["', REPLACE(f.atores, ',', '","'), '"]'),
+    //                      '$[*]' COLUMNS (ator VARCHAR(100) PATH '$')) AS a
+    //      WHERE f.genero LIKE '%Ação%' AND f.receita > f.orcamento
+    //      GROUP BY TRIM(a.ator) ORDER BY aparicoes DESC LIMIT 5;
+    // Obs.: a mesma consulta (sem o LIMIT 5, com LIMIT 1) alimenta a KPI "Ator com Mais Aparições".
+    let chartAtoresAparicoes = new Chart(document.getElementById('chartAtoresAparicoes'), {
+        type: 'bar',
+        data: {
+            labels: ['Robert Downey Jr', 'Leonardo DiCaprio', 'Adam Sandler', 'Scarlett Johansson', 'Tom Cruise'],
+            datasets: [{
+                data: [20, 16, 14, 12, 10],
+                backgroundColor: COR_ROSA_BARRA,
+                borderRadius: 12,
+                borderSkipped: false,
+                barThickness: 16
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: tituloGrafico('Atores x Aparições em Produções mais lucrativas', true),
+                subtitle: subtituloGrafico(selectGenero.value),
+                datalabels: {
+                    anchor: 'end',
+                    align: 'right',
+                    color: '#FF6B6B',
+                    font: { weight: 'bold' },
+                    formatter: (val, ctx) => ctx.dataIndex === 0 ? val : ''
+                }
+            },
+            scales: {
+                x: { display: false },
+                y: { grid: { display: false } }
+            }
+        }
+    });
+
+
+    // Período x Lucro x Gênero (Em quais meses do ano o gênero escolhido lucra mais, na média de todos os anos)
+    // SQL: SELECT MONTH(dtLancamento) AS mes, AVG(receita - orcamento) AS lucro_medio
+    //      FROM filme
+    //      WHERE genero LIKE '%Ação%' AND orcamento > 0
+    //      GROUP BY MONTH(dtLancamento) ORDER BY mes;
+    // Obs.: meses sem nenhum filme não aparecem no resultado.
+    let chartPeriodoLucro = new Chart(document.getElementById('chartPeriodoLucro'), {
+        type: 'line',
+        data: {
+            labels: ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'],
+            datasets: [{
+                data: [2800000000, 2400000000, 1600000000, 1800000000, 1200000000, 3200000000, 2800000000, 2400000000, 2800000000, 2000000000, 2400000000, 3000000000],
+                borderColor: COR_ROSA_BARRA,
+                backgroundColor: COR_ROSA_BARRA,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: '#FFFFFF',
+                borderWidth: 2,
+                tension: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: tituloGrafico('Período x Lucro x Gênero (Média Anual)', true),
+                subtitle: subtituloGrafico(selectGenero.value),
+                datalabels: { display: false }
+            },
+            scales: {
+                y: {
+                    min: 0,
+                    max: 4000000000,
+                    grid: { color: COR_LINHA_GRID },
+                    ticks: {
+                        stepSize: 1000000000,
+                        callback: (val) => val.toLocaleString('pt-BR')
+                    }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+
+    // Atores x Gênero x Lucro (Quais atores mais geraram lucro no gênero escolhido, em milhões - Top 5)
+    // Usa a mesma separação de nomes do gráfico de aparições.
+    // SQL: SELECT TRIM(a.ator) AS ator, SUM(f.receita - f.orcamento) / 1000000 AS lucro_milhoes
+    //      FROM filme f,
+    //           JSON_TABLE(CONCAT('["', REPLACE(f.atores, ',', '","'), '"]'),
+    //                      '$[*]' COLUMNS (ator VARCHAR(100) PATH '$')) AS a
+    //      WHERE f.genero LIKE '%Ação%' AND f.orcamento > 0
+    //      GROUP BY TRIM(a.ator) ORDER BY lucro_milhoes DESC LIMIT 5;
+    let chartAtoresLucro = new Chart(document.getElementById('chartAtoresLucro'), {
+        type: 'bar',
+        data: {
+            labels: ['Will Smith', 'Leonardo DiCaprio', 'Adam Sandler', 'Scarlett Johansson', 'Tom Cruise'],
+            datasets: [{
+                data: [980, 765, 680, 500, 390],
+                backgroundColor: COR_ROSA_BARRA,
+                borderRadius: 0,
+                borderSkipped: false,
+                barThickness: 45
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                title: tituloGrafico('atores x gênero x lucro', true),
+                subtitle: subtituloGrafico(selectGenero.value),
+                datalabels: {
+                    anchor: 'center',
+                    align: 'center',
+                    color: '#2B2B2E',
+                    font: { weight: 'bold', size: 11 }
+                }
+            },
+            scales: {
+                y: {
+                    max: 1000,
+                    grid: { color: COR_LINHA_GRID },
+                    ticks: {
+                        stepSize: 200,
+                        callback: (val) => val === 0 ? '0' : `${val}M`
+                    }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+
+    // Chamada pelo select de gênero.
+    // Por enquanto atualiza o texto do filtro e o subtítulo verde de cada gráfico.
+    const graficosFiltrados = [chartPaisLucro, chartAtoresAparicoes, chartPeriodoLucro, chartAtoresLucro];
+
+    function mudarGenero() {
+        const genero = selectGenero.value;
+
+        document.getElementById('genero_escolhido').innerText = `Genero Escolhido: ${genero}`;
+
+        graficosFiltrados.forEach(grafico => {
+            grafico.options.plugins.subtitle.text = genero;
+            grafico.update();
+        });
+    }
+</script>

@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tela de Cadastro</title>
+
   <link rel="stylesheet" href="./css/cadastro.css">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+    rel="stylesheet">
 </head>
-<body>
+
+<body onload="listar()">
+
   <div class="card">
 
     <div class="card-titulo">
@@ -17,211 +24,247 @@
     </div>
 
     <div class="card-formulario">
-      <input type="text"   id="ipt_nome" placeholder="Nome">
-      <input type="email"   id="ipt_email" placeholder="E-mail">
-      <input type="password"   id="ipt_senha" placeholder="Senha">
-      <input type="password"   id="ipt_confirmacao_senha" placeholder="Confirmação de senha">
+
+      <div class="selects">
+        <select name="" id="selectEmpresa">
+          <option value="">SELECIONE UMA EMPRESA</option>
+        </select>
+
+        <select name="" id="selectCargo">
+          <option value="">SELECIONE SEU CARGO</option>
+          <option value="Produtor">Produtor</option>
+          <option value="Roteirista">Roteirista</option>
+        </select>
+      </div>
+
+      <input type="text" id="ipt_nome" placeholder="Nome">
+      <input type="email" id="ipt_email" placeholder="E-mail">
+
+      <input type="password" id="ipt_senha" placeholder="Senha">
+      <input type="password" id="ipt_confirmacao_senha" placeholder="Confirmação de senha">
     </div>
 
     <div class="card-mensagem-login">
-      <p>Já possui uma conta? <a href="login.html">Vá para a página de login!</a></p>
+      <p>
+        Já possui uma conta?
+        <a href="./login.html">Vá para a página de login!</a>
+      </p>
     </div>
 
     <div class="card-botao-cadastro">
-      <button class="voltar botao"><a href="./index.html">Voltar</a></button>
-      <button class="botao cadastrar" onclick="cadastrar()">Cadastrar</button>
+      <button class="voltar botao">
+        <a href="./index.html">Voltar</a>
+      </button>
+
+      <button class="botao cadastrar" onclick="cadastrar()">
+        Cadastrar
+      </button>
     </div>
 
   </div>
+
 </body>
+
 </html>
+
 
 <script>
 
-  // Array para armazenar empresas cadastradas para validação de código de ativação 
+  // Armazena as empresas cadastradas para preencher o campo de seleção.
   let listaEmpresasCadastradas = [];
 
+  // Valida os dados informados pelo usuário e realiza o cadastro
+  // caso todas as informações estejam corretas.
   function cadastrar() {
-        let numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-        let charEspeciais = ["@", "!", "#", "$", "%", "&", "*", "_", "-"];
-        let nome = ipt_nome.value
-        let email = ipt_email.value
-        let senha = ipt_senha.value
-        let confirmacaoSenha = ipt_confirmacao_senha.value
-        let forca = 0
-        let temNumeros = false
-        let temEspeciais = false
-        let emailValido = false
-        let cadastroInvalido = 0;
+
+    let numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+    let charEspeciais = ["@", "!", "#", "$", "%", "&", "*", "_", "-"];
+
+    let nome = ipt_nome.value;
+    let email = ipt_email.value;
+    let senha = ipt_senha.value;
+    let confirmacaoSenha = ipt_confirmacao_senha.value;
+
+    let forca = 0;
+    let temNumeros = false;
+    let temEspeciais = false;
+    let emailValido = false;
+    let cadastroInvalido = 0;
+
+    // Verifica se todos os campos obrigatórios foram preenchidos.
     if (
       nome == "" ||
       email == "" ||
       senha == "" ||
       confirmacaoSenha == ""
     ) {
-      cadastroInvalido ++
-      alert("Preencha todos os Campos")
+      cadastroInvalido++;
+      alert("Preencha todos os Campos");
     }
 
-    // Validações de Nome
+    // Valida se o nome informado contém números.
+    for (let i = 0; i < numeros.length; i++) {
+      if (nome.includes(numeros[i])) {
+        cadastroInvalido++;
+        alert("O nome não pode Incluir Números");
+        break;
+      }
+    }
 
-    // Valida se o nome tem números
-      for (let i = 0; i < numeros.length; i++) {
-            if (nome.includes(numeros[i])) {
-                cadastroInvalido++
-                alert("O nome não pode Incluir Números")
-                break;
-            }
+    // Valida se o nome informado contém caracteres especiais.
+    for (let i = 0; i < charEspeciais.length; i++) {
+      if (nome.includes(charEspeciais[i])) {
+        cadastroInvalido++;
+        alert("O nome não pode incluir caracteres Especiais");
+        break;
+      }
+    }
+
+    // Verifica se o email possui o formato mínimo esperado.
+    if (email.endsWith(".com") && email.includes("@")) {
+      emailValido = true;
+    } else {
+      alert("email inválido!");
+      cadastroInvalido++;
+    }
+
+    // Verifica se a senha possui pelo menos um número.
+    for (let i = 0; i < numeros.length; i++) {
+      if (senha.includes(numeros[i])) {
+        temNumeros = true;
+        break;
+      }
+    }
+    if (!temNumeros) {
+      cadastroInvalido++;
+      alert("Sua senha precisa Incluir números!");
+    }
+
+    // Verifica se a senha possui pelo menos um caractere especial.
+    for (let i = 0; i < charEspeciais.length; i++) {
+      if (senha.includes(charEspeciais[i])) {
+        temEspeciais = true;
+        break;
+      }
+    }
+    if (!temEspeciais) {
+      cadastroInvalido++;
+      alert("Sua senha precisa Incluir caracteres Especiais!");
+    }
+
+    // Verifica se a senha possui entre 8 e 12 caracteres.
+    if (senha.length < 8) {
+      cadastroInvalido++;
+      alert("Sua senha precisa ter no mínimo 8 caracteres!");
+    } else if (senha.length > 12) {
+      cadastroInvalido++;
+      alert("Sua senha precisa ter no máximo 12 caracteres!");
+    } else {
+      forca++;
+    }
+
+    // Verifica se a senha possui letras maiúsculas.
+    if (senha.toLowerCase() !== senha) {
+      forca++;
+    } else {
+      cadastroInvalido++;
+      alert("Sua senha precisa Incluir letras Maiúsculas!");
+    }
+
+    // Verifica se a senha possui letras minúsculas.
+    if (senha.toUpperCase() !== senha) {
+      forca++;
+    } else {
+      cadastroInvalido++;
+      alert("Sua senha precisa Incluir letras Minúsculas!");
+    }
+
+    // Classifica a força da senha de acordo com as validações realizadas.
+    if (forca <= 1) {
+      console.log("SENHA FRACA");
+      cadastroInvalido++;
+    } else if (forca == 2) {
+      console.log("SENHA MÉDIA");
+      cadastroInvalido++;
+    } else {
+      console.log("SENHA FORTE");
+    }
+
+    // Verifica se a senha e a confirmação de senha são iguais.
+    if (senha != confirmacaoSenha) {
+      cadastroInvalido++;
+      alert("As senhas não conferem");
+    }
+
+    // Se houver alguma validação inválida, o cadastro não é realizado.
+    if (cadastroInvalido > 0) {
+      alert("Cadastro Não realizado");
+    } else {
+
+      alert("Cadastro Realizado com Sucesso");
+
+      // Envia os dados do cadastro para o backend.
+      fetch("/usuarios/cadastrar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nomeServer: nome,
+          emailServer: email,
+          senhaServer: senha,
+          cargoServer: selectCargo.value,
+          idEmpresaVincularServer: selectEmpresa.value
+        }),
+      })
+        .then(function (resposta) {
+          console.log("resposta: ", resposta);
+
+          if (resposta.ok) {
+
+            // Após o cadastro, redireciona o usuário para a tela de login.
+            setTimeout(() => {
+              window.location = "login.html";
+            }, "750");
+
+          } else {
+            console.log("Deu erro");
           }
-          //Valida se o nome possui caracteres especiais
-          for (let i = 0; i < charEspeciais.length; i++) {
-            if (nome.includes(charEspeciais[i])) {
-                cadastroInvalido++
-                alert("O nome não pode incluir caracteres Especiais")
-                break;
-            }
-          }
-
-
-    // Valida se o email termina com .com e também se tem @
-     if(email.endsWith(".com") && email.includes("@")){
-                emailValido = true
-            }else{
-                alert("email inválido!")
-                cadastroInvalido ++
-            }
-            // Validações de Força da senha
-
-            // Valida se a senha possui números
-            for (let i = 0; i < numeros.length; i++) {
-            if (senha.includes(numeros[i])) {
-                temNumeros = true;
-                break;
-            }
-          }
-            // Verifica a validação anterior
-            if (!temNumeros) {
-              cadastroInvalido ++
-            alert("Sua senha precisa Incluir números!")
-            }
-
-            // Valida se a senha tem caracteres especiais
-            for (let i = 0; i < charEspeciais.length; i++) {
-            if (senha.includes(charEspeciais[i])) {
-                temEspeciais = true
-                break;
-            }
-          }
-
-            // Verifica a validação anterior
-             if (!temEspeciais) {
-               cadastroInvalido ++
-            alert("Sua senha precisa Incluir caracteres Especiais!")
-        }
-        // Verifica se a senha possui entre 8 e 12 caracteres
-        if (senha.length < 8) {
-          cadastroInvalido ++
-          alert("Sua senha precisa ter no mínimo 8 caracteres!")
-        } else if(senha.length > 12){
-          cadastroInvalido ++
-          alert("Sua senha precisa ter no máximo 12 caracteres!")
-        }else{
-          forca++
-        }
-
-        // Verifica se a senha possui letras minúsculas e maiúsculas
-        if (senha.toLowerCase() !== senha) {
-            forca++
-        } else {
-          cadastroInvalido ++ 
-          alert("Sua senha precisa Incluir letras Maiúsculas!")
-        }
-        if (senha.toUpperCase() !== senha) {
-            forca++
-        } else {
-          cadastroInvalido ++
-            alert("Sua senha precisa Incluir letras Minúsculas!")
-        }
-
-        // Verifica a força da senha
-        if (forca <= 1) {
-            console.log("SENHA FRACA")
-            cadastroInvalido ++
-        } else if (forca == 2) {
-            console.log("SENHA MÉDIA")
-            cadastroInvalido ++
-        } else {
-            console.log("SENHA FORTE")
-        }
-
-        if(senha != confirmacaoSenha){
-          cadastroInvalido ++
-          alert("As senhas não conferem")
-        }
-
-        if(cadastroInvalido > 0){
-          alert("Cadastro Não realizado")
-        }else{
-            alert("Cadastro Realizado com Sucesso")
-            fetch("/usuarios/cadastrar", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                // crie um atributo que recebe o valor recuperado aqui
-                // Agora vá para o arquivo routes/usuario.js
-                nomeServer: nome,
-                emailServer: email,
-                senhaServer: senha,
-                cargoServer: "Produtor",
-                idEmpresaVincularServer: 1
-              }),
-            })
-              .then(function (resposta) {
-                console.log("resposta: ", resposta);
-        
-                if (resposta.ok) {
-                  
-        
-        
-                  setTimeout(() => {
-                    window.location = "login.html";
-                  }, "750");
-        
-                } else {
-                  console.log("Deu erro")
-                }
-              })
-              .catch(function (resposta) {
-                console.log(`#ERRO: ${resposta}`);
-              });
-        
-        }
-
+        })
+        .catch(function (resposta) {
+          console.log(`#ERRO: ${resposta}`);
+        });
+    }
   }
 
-  
 
-  // Listando empresas cadastradas 
-  // function listar() {
-  //   fetch("/empresas/listar", {
-  //     method: "GET",
-  //   })
-  //     .then(function (resposta) {
-  //       resposta.json().then((empresas) => {
-  //         empresas.forEach((empresa) => {
-  //           listaEmpresasCadastradas.push(empresa);
+  // Busca as empresas cadastradas no backend e preenche
+  // o campo de seleção de empresa da tela de cadastro. 
+  function listar() {
 
-  //           console.log("listaEmpresasCadastradas")
-  //           console.log(listaEmpresasCadastradas[0].codigo_ativacao)
-  //         });
-  //       });
-  //     })
-  //     .catch(function (resposta) {
-  //       console.log(`#ERRO: ${resposta}`);
-  //     });
-  // }
+    fetch("/empresas/listar", {
+      method: "GET",
+    })
+      .then(function (resposta) {
+        resposta.json().then((empresas) => {
 
+          empresas.forEach((empresa) => {
+            listaEmpresasCadastradas.push(empresa);
+          });
+
+          // Adiciona as empresas encontradas ao campo de seleção.
+          for (let i = 0; i < listaEmpresasCadastradas.length; i++) {
+            selectEmpresa.innerHTML += `
+              <option value="${listaEmpresasCadastradas[i].idEmpresa}">
+                ${listaEmpresasCadastradas[i].nome}
+              </option>
+            `;
+          }
+        });
+      })
+      .catch(function (resposta) {
+        console.log(`#ERRO: ${resposta}`);
+      });
+  }
 
 </script>

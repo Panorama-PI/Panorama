@@ -1,0 +1,379 @@
+
+body {
+background-color: var(--cor-fundo-escuro);
+}
+
+.dash {
+box-sizing: border-box;
+width: auto;
+min-height: 100vh;
+}
+
+/* Ícones (imagens) */
+.dash img {
+width: 1.4rem;
+height: 1.4rem;
+flex-shrink: 0;
+object-fit: contain;
+}
+
+/* Cabeçalho da página */
+.page-head {
+padding: 1rem;
+}
+
+.page-head h2 {
+color: white;
+font-size: 45px;
+}
+
+.page-head p {
+color: var(--cor-cinza-claro);
+max-width: 60%;
+}
+
+/* Duas colunas: formulário e lista */
+.notes-layout {
+display: flex;
+flex-direction: row;
+gap: 1.8rem;
+padding: 0 1rem;
+}
+
+.note-panel {
+box-sizing: border-box;
+min-width: 0;
+padding: 1.5rem;
+min-height: 40rem;
+}
+
+.note-panel:first-child {
+flex: 1 1 0;
+}
+
+.note-panel:last-child {
+flex: 1.25 1 0;
+}
+
+.panel-title {
+display: flex;
+align-items: center;
+gap: 0.75rem;
+color: white;
+margin: 0 0 1.5rem;
+font-size: 35px;
+}
+
+/* Formulário */
+.note-form {
+display: flex;
+flex-direction: column;
+}
+
+.note-form label {
+color: #F4F4F5;
+font-size: 15px;
+margin-bottom: 0.4rem;
+}
+
+.note-form input,
+.note-form textarea,
+.search-field {
+box-sizing: border-box;
+width: 100%;
+background-color: var(--cor-fundo-side);
+border: 1px solid var(--cor-borda-card);
+border-radius: 12px;
+padding: 0.8rem 1rem;
+color: white;
+font-family: inherit;
+font-size: 15px;
+transition: border-color 0.2s ease;
+}
+
+.note-form input {
+margin-bottom: 1.2rem;
+}
+
+.note-form textarea {
+resize: vertical;
+min-height: 10rem;
+margin-bottom: 1.5rem;
+}
+
+.note-form input::placeholder,
+.note-form textarea::placeholder,
+.search-field input::placeholder {
+color: var(--cor-cinza-claro);
+}
+
+.note-form input:focus,
+.note-form textarea:focus,
+.search-field:focus-within {
+outline: none;
+border-color: #FF383C;
+}
+
+.btn-salvar {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 0.5rem;
+align-self: flex-end;
+min-width: 9rem;
+background-color: #FF383C;
+color: #FFFFFF;
+border: 1px solid #FF383C;
+border-radius: 20px;
+padding: 0.8rem 1.5rem;
+font-family: inherit;
+font-size: 15px;
+cursor: pointer;
+transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-salvar:hover {
+background-color: #f81e21;
+border-color: #850204;
+}
+
+/* Busca e filtro */
+.note-search {
+display: flex;
+align-items: center;
+gap: 0.75rem;
+margin-bottom: 1.25rem;
+}
+
+.search-field {
+display: flex;
+align-items: center;
+gap: 0.6rem;
+padding: 0.6rem 1rem;
+color: var(--cor-cinza-claro);
+}
+
+.search-field input {
+flex: 1;
+min-width: 0;
+background: transparent;
+border: none;
+outline: none;
+color: white;
+font-family: inherit;
+font-size: 15px;
+}
+
+/* Botões de ícone (filtrar, editar, excluir) */
+.btn-icon {
+display: flex;
+align-items: center;
+justify-content: center;
+width: 2.4rem;
+height: 2.4rem;
+background-color: var(--cor-fundo-side);
+border: 1px solid var(--cor-borda-card);
+border-radius: 10px;
+color: var(--cor-cinza-claro);
+cursor: pointer;
+transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-icon img {
+width: 1.1rem;
+height: 1.1rem;
+}
+
+.btn-icon:hover {
+color: white;
+border-color: var(--cor-cinza-claro);
+background-color: #222222;
+}
+
+.btn-excluir:hover {
+color: var(--cor-coral-kpi);
+border-color: var(--cor-coral-kpi);
+}
+
+.btn-icon:focus-visible,
+.btn-salvar:focus-visible {
+outline: 2px solid #FFFFFF;
+outline-offset: 2px;
+}
+
+/* Lista de anotações */
+.note-list {
+list-style: none;
+margin: 0;
+padding: 0;
+display: flex;
+flex-direction: column;
+gap: 1rem;
+}
+
+.note-item {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+gap: 1rem;
+padding: 1.2rem 1.4rem;
+background-color: var(--cor-fundo-side);
+}
+
+.note-body h4 {
+color: white;
+margin: 0 0 0.5rem;
+}
+
+.note-body p {
+color: #D4D4D8;
+font-size: 14px;
+line-height: 1.5;
+margin: 0 0 0.9rem;
+}
+
+.note-body time {
+display: flex;
+align-items: center;
+gap: 0.5rem;
+color: var(--cor-cinza-claro);
+font-size: 13px;
+}
+
+.note-body time img {
+width: 1rem;
+height: 1rem;
+}
+
+.note-actions {
+display: flex;
+gap: 0.5rem;
+}
+
+/* Faixa de projetos */
+.projects-bar {
+    padding: 0 1rem 1.5rem;
+}
+
+.projects-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.9rem;
+}
+
+.projects-head h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: white;
+    margin: 0;
+    font-size: 22px;
+}
+
+.btn-novo-projeto,
+.btn-cancelar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: transparent;
+    color: #FFFFFF;
+    border: 1px solid #FF383C;
+    border-radius: 20px;
+    padding: 0.6rem 1.2rem;
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-novo-projeto:hover,
+.btn-cancelar:hover {
+    background-color: rgba(255, 56, 60, 0.15);
+}
+
+.project-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0.4rem;
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+}
+
+.project-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    white-space: nowrap;
+    background-color: var(--cor-fundo-side);
+    color: var(--cor-cinza-claro);
+    border: 1px solid var(--cor-borda-card);
+    border-radius: 12px;
+    padding: 0.7rem 1.1rem;
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.project-chip:hover {
+    color: white;
+    border-color: var(--cor-cinza-claro);
+}
+
+.project-chip.active {
+    color: white;
+    border-color: #FF383C;
+}
+
+.project-chip.active .fa-folder {
+    color: #FF383C;
+}
+
+.project-count {
+    background-color: #222222;
+    border-radius: 10px;
+    padding: 0.1rem 0.5rem;
+    font-size: 12px;
+}
+
+.project-chip:focus-visible,
+.btn-novo-projeto:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: 2px;
+}
+
+/* Título do painel da lista com o projeto ativo */
+.projeto-ativo {
+    color: #FF383C;
+}
+
+.project-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+/* Modal de novo projeto */
+.dialog-projeto {
+    width: min(26rem, 90vw);
+    padding: 1.5rem;
+    color: white;
+    border: 1px solid var(--cor-borda-card);
+    background-color: var(--cor-fundo-escuro);
+}
+
+.dialog-projeto::backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.dialog-projeto h3 {
+    margin: 0 0 1.2rem;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}

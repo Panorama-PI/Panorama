@@ -74,7 +74,7 @@ img {
 .header {
   display: flex;
   flex-direction: column;
-  background-image: url('./img/fundo-panorama.jpg');
+  background-image: url('../assets/imgs/fundo-panorama.jpg');
   background-size: cover;
   padding-bottom: 15%;
 }
@@ -100,10 +100,10 @@ img {
   border-radius: 0 0 40px 0px;
 }
 
-.logo {
-  font-family: 'Fraunces', serif;
-  font-size: 25px;
-  color: #fff9f2;
+.logo{
+
+  width: 8vw;
+
 }
 
 .links-navegacao {
@@ -235,11 +235,11 @@ li {
 }
 
 .icone-cartao-papel {
-  background-image: url('./img/paginas.webp');
+  background-image: url('../assets/imgs/paginas.webp');
 }
 
 .icone-cartao-pessoa {
-  background-image: url('./img/cameraMan.png');
+  background-image: url('../assets/imgs/cameraMan.png');
 }
 
 .texto-cartao {
