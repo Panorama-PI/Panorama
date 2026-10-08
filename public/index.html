@@ -1,25 +1,37 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panorama — Dados que decidem qual história contar</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/estilo.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panorama — Dados que decidem qual história contar</title>
+
+    <link rel="stylesheet" href="./css/estilo.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
+
+    <!-- Cabeçalho com a navegação e apresentação inicial do projeto. -->
     <header class="header" id="topo">
+
         <div class="sobreposicao-header"></div>
 
+        <!-- Menu de navegação da página. -->
         <nav class="navegacao">
+
             <div class="logo">
                 <img src="./assets/imgs/logoPanorama.png" alt="">
             </div>
 
             <ul class="links-navegacao">
-                <li><a href="#topo">Início</a></li>
+                <li><a href="./dashboard/dashboard-produtor/dashboard.html">Dashboard</a></li>
                 <li><a href="#problema">Problema</a></li>
                 <li><a href="#solucao">Solução</a></li>
                 <li><a href="#quem-somos">Quem Somos</a></li>
@@ -29,143 +41,268 @@
                 <a href="./login.html" class="botao login">Login</a>
                 <a href="./cadastro.html" class="botao cadastro">Cadastro</a>
             </div>
+
         </nav>
 
+        <!-- Apresentação inicial do Panorama. -->
         <div class="conteudo">
+
             <h1 class="titulo">Panorama</h1>
-            <p class="slogan">A oportunidade não está escondida.
-            <br>Só nunca foi procurada.</p>
+
+            <p class="slogan">
+                A oportunidade não está escondida.
+                <br>
+                Só nunca foi procurada.
+            </p>
+
             <a href="#problema" class="botao saibaMais">Saiba mais</a>
+
         </div>
+
     </header>
 
     <main>
+
+        <!-- Apresenta o problema que motivou o desenvolvimento do projeto. -->
         <div class="problema" id="problema">
+
             <h2 class="titulo-problema">Problema</h2>
 
             <div class="linha-problema">
-                <div class="cartao">
-                <span class="icone-cartao icone-cartao-papel" ></span>
-                <p class="texto-cartao">Ele sabe escrever, mas não sabe se vale a pena escrever aquela história.</p>
-            </div>
 
-            <p class="texto-problema">
+                <div class="cartao">
+                    <span class="icone-cartao icone-cartao-papel"></span>
+
+                    <p class="texto-cartao">
+                        Ele sabe escrever, mas não sabe se vale a pena escrever aquela história.
+                    </p>
+                </div>
+
+                <p class="texto-problema">
                     O catálogo da Netflix guarda milhares de informações — gênero, país, diretor, elenco,
                     data de lançamento — mas ninguém usa esses dados pra decidir nada. Eles existem só
                     como registro, e por isso, decisões importantes acabam sendo tomadas no achismo.
-            </p>
-                <div class="cartao">
-                <span class="icone-cartao icone-cartao-pessoa" ></span>
-                <p class="texto-cartao">Ele precisa decidir em qual filme investir.</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="solucao" >
-            <div class="cabecalho-solucao">
-                <h2 class="titulo-solucao" id="solucao">Solução</h2>
-                <p class="texto-solucao" >
-                O objetivo deste projeto é analisar e enriquecer uma base de dados de filmes para compreender quais
-                características das produções estão relacionadas à aceitação do público e ao seu desempenho financeiro.
-                Para isso, serão analisadas e relacionadas informações como gênero, orçamento, receita, avaliação, país,
-                idioma e características presentes nas sinopses, buscando identificar padrões e relações entre esses
-                dados que não são evidentes quando observados individualmente.
                 </p>
+
+                <div class="cartao">
+                    <span class="icone-cartao icone-cartao-pessoa"></span>
+
+                    <p class="texto-cartao">
+                        Ele precisa decidir em qual filme investir.
+                    </p>
                 </div>
-                
-                <div class="paineis-solucao">
-                
+
+            </div>
+
+        </div>
+
+        <!-- Apresenta a solução proposta pelo projeto. -->
+        <div class="solucao">
+
+            <div class="cabecalho-solucao">
+
+                <h2 class="titulo-solucao" id="solucao">
+                    Solução
+                </h2>
+
+                <p class="texto-solucao">
+                    O objetivo deste projeto é analisar e enriquecer uma base de dados de filmes para compreender quais
+                    características das produções estão relacionadas à aceitação do público e ao seu desempenho
+                    financeiro.
+                    Para isso, serão analisadas e relacionadas informações como gênero, orçamento, receita, avaliação,
+                    país,
+                    idioma e características presentes nas sinopses, buscando identificar padrões e relações entre esses
+                    dados que não são evidentes quando observados individualmente.
+                </p>
+
+            </div>
+
+            <!-- Apresenta as duas principais perspectivas de uso do projeto. -->
+            <div class="paineis-solucao">
+
                 <div class="painel-solucao">
-                    <span class="persona-painel">PARA QUEM ESCREVE</span>
-                    <img src="./assets/imgs/dash2.png" alt="Prévia do dashboard voltado a quem escreve" class="imagem-dashboard">
-                    </div>
-                    
-                    <div class="painel-solucao">
-                    <span class="persona-painel">PARA QUEM INVESTE</span>
-                    <img src="./assets/imgs/dash1.png" alt="Prévia do dashboard voltado a quem investe" class="imagem-dashboard">
-                    </div>
-                
+
+                    <span class="persona-painel">
+                        PARA QUEM ESCREVE
+                    </span>
+
+                    <img src="./assets/imgs/dash2.png" alt="Prévia do dashboard voltado a quem escreve"
+                        class="imagem-dashboard">
+
                 </div>
+
+                <div class="painel-solucao">
+
+                    <span class="persona-painel">
+                        PARA QUEM INVESTE
+                    </span>
+
+                    <img src="./assets/imgs/dash1.png" alt="Prévia do dashboard voltado a quem investe"
+                        class="imagem-dashboard">
+
+                </div>
+
+            </div>
+
         </div>
 
-
+        <!-- Apresenta os integrantes responsáveis pelo projeto. -->
         <div class="quem-somos">
-        <h2 class="titulo-quem-somos"  id="quem-somos">Quem somos</h2>
 
-        <div class="grade-integrantes">
-            <div class="linha-integrantes">
+            <h2 class="titulo-quem-somos" id="quem-somos">
+                Quem somos
+            </h2>
 
-            <div class="integrante">
-                <div class="foto-integrante">
-                    <img src="./assets/imgs/larissa.jpg">
+            <div class="grade-integrantes">
+
+                <div class="linha-integrantes">
+
+                    <div class="integrante">
+
+                        <div class="foto-integrante">
+                            <img src="./assets/imgs/larissa.jpg">
+                        </div>
+
+                        <p class="nome-integrante">
+                            Larissa Cardozo
+                        </p>
+
+                        <a href="https://github.com/Larissa-Cardozo" class="github-integrante">
+
+                            <img class="git" src="./assets/imgs/gitC.webp">
+
+                        </a>
+
+                    </div>
+
+                    <div class="integrante">
+
+                        <div class="foto-integrante">
+                            <img src="./assets/imgs/nathan.jpg">
+                        </div>
+
+                        <p class="nome-integrante">
+                            Nathan Fioravantti
+                        </p>
+
+                        <a 
+                            href="https://github.com/Nathan-Martins3010" 
+                            class="github-integrante">
+
+                            <img 
+                                class="git" 
+                                src="./assets/imgs/gitC.webp">
+
+                        </a>
+
+                    </div>
+
+                    <div class="integrante">
+
+                        <div class="foto-integrante">
+                            <img src="./assets/imgs/gio.jpg">
+                        </div>
+
+                        <p class="nome-integrante">
+                            Giovanna Flores
+                        </p>
+
+                        <a 
+                            href="https://github.com/giovannaflores37" 
+                            class="github-integrante">
+
+                            <img 
+                                class="git" 
+                                src="./assets/imgs/gitC.webp">
+
+                        </a>
+
+                    </div>
+
                 </div>
-                <p class="nome-integrante">Larissa Cardozo</p>
-                <a href="https://github.com/Larissa-Cardozo" class="github-integrante">
-                    <img class="git" src="./assets/imgs/gitC.webp">    
-                </a>
-            </div>
 
-            <div class="integrante">
-                <div class="foto-integrante">
-                    <img src="./assets/imgs/nathan.jpg">
-                </div>
-                <p class="nome-integrante">Nathan Fioravantti</p>
-                <a href="https://github.com/Nathan-Martins3010" class="github-integrante">
-                    <img class="git" src="./assets/imgs/gitC.webp">    
-                </a>
-            </div>
+                <div class="linha-integrantes linha-integrantes-deslocada">
 
-            <div class="integrante">
-                <div class="foto-integrante">
-                    <img src="./assets/imgs/gio.jpg">
+                    <div class="integrante">
+
+                        <div class="foto-integrante">
+                            <img src="./assets/imgs/gabril.jpg">
+                        </div>
+
+                        <p class="nome-integrante">
+                            Gabriel Fernandes
+                        </p>
+                        <a 
+                            href="https://github.com/GabrieldmeloSptech" 
+                            class="github-integrante">
+
+                            <img 
+                                class="git" 
+                                src="./assets/imgs/gitC.webp">
+
+                        </a>
+
+                    </div>
+
+                    <div class="integrante">
+
+                        <div class="foto-integrante">
+                            <img src="./assets/imgs/matheus.jpg">
+                        </div>
+
+                        <p class="nome-integrante">
+                            Matheus dos Santos
+                        </p>
+                        <a 
+                            href="https://github.com/Madosan-Dev" 
+                            class="github-integrante">
+                            <img 
+                                class="git" 
+                                src="./assets/imgs/gitC.webp">
+
+                        </a>
+
+                    </div>
+
+                    <div class="integrante">
+
+                        <div class="foto-integrante">
+                            <img src="./assets/imgs/david.jpg">
+                        </div>
+
+                        <p class="nome-integrante">
+                            David Cavalcante
+                        </p>
+
+                        <a 
+                            href="https://github.com/davidCavalcantee" 
+                            class="github-integrante">
+
+                            <img 
+                                class="git" 
+                                src="./assets/imgs/gitC.webp">
+
+                        </a>
+
+                    </div>
+
                 </div>
-                <p class="nome-integrante">Giovanna Flores</p>
-                <a href="https://github.com/giovannaflores37" class="github-integrante">
-                    <img class="git" src="./assets/imgs/gitC.webp">    
-                </a>
+
             </div>
 
         </div>
 
-        <div class="linha-integrantes linha-integrantes-deslocada">
-
-            <div class="integrante">
-                <div class="foto-integrante">
-                    <img src="./assets/imgs/gabril.jpg">
-                </div>
-                <p class="nome-integrante">Gabriel Fernandes</p>
-                <a href="https://github.com/GabrieldmeloSptech" class="github-integrante">
-                    <img class="git" src="./assets/imgs/gitC.webp">    
-                </a>
-            </div>
-
-            <div class="integrante">
-                <div class="foto-integrante">
-                    <img src="./assets/imgs/matheus.jpg">
-                </div>
-                <p class="nome-integrante">Matheus dos Santos</p>
-                <a href="https://github.com/Madosan-Dev" class="github-integrante">
-                    <img class="git" src="./assets/imgs/gitC.webp">    
-                </a>
-            </div>
-
-            <div class="integrante">
-                <div class="foto-integrante">
-                    <img src="./assets/imgs/david.jpg">
-                </div>
-                <p class="nome-integrante">David Cavalcante</p>
-                <a href="https://github.com/davidCavalcantee" class="github-integrante">
-                    <img class="git" src="./assets/imgs/gitC.webp">    
-                </a>
-            </div>
-
-        </div>
-        </div>
-        </div>
     </main>
 
+    <!-- Rodapé com a identificação do projeto. -->
     <footer class="rodape">
-    <p> 2026 Panorama — dados que ajudam o cinema a decidir melhor.</p>
+
+        <p> 
+            2026 Panorama — dados que ajudam o cinema a decidir melhor.
+        </p>
+
     </footer>
+    
 </body>
+
 </html>
