@@ -20,7 +20,7 @@ body {
   padding: 0;
   display: flex;
   flex-direction: row;
-  background-color: var(--cor-fundo);
+  background-color: var(--cor-fundo--card);
 }
 
 .aside-left a {
@@ -266,9 +266,30 @@ body {
     height: fit-content;
 
 }
-.table-pesquisa td, tr{
-    padding: 2rem;
+.table-pesquisa table {
+    border-collapse: separate;
+    border-spacing: 0 1rem;
+    width: 100%;
 }
+
+.table-pesquisa td {
+    padding: 1.5rem 2rem;
+    border-top: 2px solid #FF383C;
+    border-bottom: 2px solid #FF383C;
+}
+
+/* Borda esquerda do card */
+.table-pesquisa td:first-child {
+    border-left: 2px solid #FF383C;
+    border-radius: 12px 0 0 12px;
+}
+
+/* Borda direita do card */
+.table-pesquisa td:last-child {
+    border-right: 2px solid #FF383C;
+    border-radius: 0 12px 12px 0;
+}
+
 
 
 
