@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <link rel="shortcut icon" href="../assets/icon/favicon2.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panorama | Anotações</title>
+
+
+    <link rel="stylesheet" href="../css/anotacoes.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+
+    <script src="../js/sessao.js"></script>
+    <script src="./../js/alerta.js"></script>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <!-- scripts do Chart.js - 2022-1 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!--FONT AWESOME-->
+    <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
+</head>
+
+<!-- <body onload=" atualizarFeed()"> -->
+
+<body>
+
+    <aside class="aside-left">
+        <div class="usuario-side">
+            <img src="../assets/imgs/matheus.jpg" alt="Foto do usuário">
+
+            <h2 id="a_usuario">Usuário</h2>
+            <h3 id="b_produtor">Produtor</h3>
+            <h4 id="c_email">email@gmail.com</h4>
+        </div>
+        <div class="btns-side">
+            <a href="#"><img src="../assets/icon/chart-icon.png" alt="">Dashboard</a>
+            <a href="#"><img src="../assets/icon/settings-icon.png" alt="">Configurações</a>
+            <a href="#" class="active"><img src="../assets/icon/observacoes-icon.png" alt="">Anotações</a>
+            <a href="#"><img src="../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
+        </div>
+        <div class="btns-side">
+            <a href="#"><img src="../assets/icon/sair-icon.png" alt="">Sair</a>
+        </div>
+    </aside>
+
+    <main class="dash">
+
+        <section class="page-head">
+            <h2>Minhas Anotações</h2>
+            <p>Aqui você pode salvar e consultar suas anotações. Use o espaço para registrar ideias, insights,
+                observações e tudo o que for relevante para seus projetos.</p>
+        </section>
+
+        <section class="projects-bar">
+            <div class="projects-head">
+                <h3><i class="fa-solid fa-folder-open"></i> Meus projetos</h3>
+                <button type="button" class="btn-novo-projeto"
+                    onclick="document.getElementById('dialog-projeto').showModal()">
+                    <i class="fa-solid fa-plus"></i> Novo projeto
+                </button>
+            </div>
+
+            <ul class="project-list" id="lista-projetos"></ul>
+        </section>
+
+        <section class="notes-layout">
+
+            <div class="card note-panel">
+                <h3 class="panel-title" id="titulo-form">
+                    <img src="../assets/imgs/escrever.png" alt="">
+                    Nova anotação
+                </h3>
+
+                <form class="note-form" id="form-anotacao">
+                    <input type="hidden" id="nota_id" name="id">
+
+                    <label for="nota_projeto">Projeto</label>
+                    <select id="selectProjeto"></select>
+
+                    <label for="nota_titulo">Título</label>
+                    <input type="text" id="nota_titulo" name="titulo" placeholder="Ex.: Ideia de novo projeto" required>
+
+                    <label for="nota_texto">Anotação</label>
+                    <textarea id="nota_texto" name="anotacao" rows="8" placeholder="Escreva aqui sua anotação..."
+                        required></textarea>
+
+                    <button type="submit" class="btn-salvar">
+                        <img src="../assets/imgs/save.png" alt="">
+                        Salvar
+                    </button>
+                </form>
+            </div>
+
+            <div class="card note-panel">
+                <h3 class="panel-title">
+                    <img src="../assets/imgs/anotacao.png" alt="">
+                    Anotações de <span class="projeto-ativo" id="nome-projeto-ativo">Filme sci-fi</span>
+                </h3>
+
+                <div class="note-search">
+                    <label class="search-field" for="busca_nota">
+                        <img src="../assets/icon/pesquisa-icon.png" alt="">
+                        <input type="search" id="busca_nota" placeholder="Buscar anotações...">
+                    </label>
+                </div>
+
+                <ul class="note-list">
+                    <li class="card note-item" data-nota-id="1">
+                        <div class="note-body">
+                            <h4>Possíveis temas para o próximo projeto</h4>
+                            <p>Filme de ficção científica com foco em distopia. Verificar tendências de mercado e
+                                orçamento médio de produções semelhantes.</p>
+                            <time datetime="2026-05-12T14:04">
+                                <img src="../assets/icon/calendario-icon.png" alt="">
+                                12/05/2026 - 14:04
+                            </time>
+                        </div>
+                        <div class="note-actions">
+                            <button type="button" class="btn-icon" aria-label="Editar anotação">
+                                <img src="../assets/icon/editar-icon.png" alt="">
+                            </button>
+                            <button type="button" class="btn-icon btn-excluir" aria-label="Excluir anotação">
+                                <img src="../assets/icon/excluir-icon.png" alt="">
+                            </button>
+                        </div>
+                    </li>
+
+                    <li class="card note-item" data-nota-id="2">
+                        <div class="note-body">
+                            <h4>Atores recorrentes em filmes lucrativos</h4>
+                            <p>Comparar a lista de atores com mais aparições com o gênero mais lucrativo e conferir se
+                                o padrão se repete por país.</p>
+                            <time datetime="2026-05-14T09:30">
+                                <img src="../assets/icon/calendario-icon.png" alt="">
+                                14/05/2026 - 09:30
+                            </time>
+                        </div>
+                        <div class="note-actions">
+                            <button type="button" class="btn-icon" aria-label="Editar anotação">
+                                <img src="../assets/icon/editar-icon.png" alt="">
+                            </button>
+                            <button type="button" class="btn-icon btn-excluir" aria-label="Excluir anotação">
+                                <img src="../assets/icon/excluir-icon.png" alt="">
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Modal: novo projeto -->
+    <dialog id="dialog-projeto" class="card dialog-projeto">
+        <form method="dialog" class="note-form" id="form-projeto">
+            <h3>Novo projeto</h3>
+            <label for="projeto_nome">Nome do projeto</label>
+            <input type="text" id="projeto_nome" name="nome" maxlength="150"
+                placeholder="Ex.: Filme de ficção científica" required>
+            <div class="dialog-actions">
+                <button type="submit" value="cancel" formnovalidate class="btn-cancelar">Cancelar</button>
+                <button type="submit" class="btn-salvar" onclick="adicionarProjeto()">Criar</button>
+            </div>
+        </form>
+    </dialog>
+
+</body>
+
+</html>
+
+<script>
+    b_usuario.innerHTML = sessionStorage.NOME_USUARIO;
+
+    function selectProjetos(projetos) {
+        var select = document.getElementById("selectProjeto");
+        select.innerHTML = `<option value="">Selecione um projeto</option>`;
+
+       for (var i = 0; i < projetos.length; i++){
+            var projeto = projetos[i];
+
+            select.innerHTML += `<option value="${projeto.id}">
+                                    ${projeto.nome} - ${projeto.tipo}
+                                </option>`;
+        }
+    }
+
+    // Busca todos os projetos do banco pela rota e repassa para as funções
+    function obterProjetos() {
+        fetch("/projeto/listarTodos", { cache: 'no-store' })
+            .then(function(resposta) {
+                if (resposta.ok) {
+                    resposta.json().then(function(projetos) {
+                        console.log(`Dados recebidos: ${JSON.stringify(projetos)}`);
+                        selectProjetos(projetos);
+                    });
+                } else {
+                    console.error('Nenhum dado encontrado ou erro na API');
+                }
+            })
+            .catch(function(erro) {
+                console.error(`Erro na obtenção dos projetos: ${erro.message}`);
+            });
+    }
+
+    function adicionarProjeto() {
+        fetch("/projeto/adicionar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                idUsuario: sessionStorage.ID_USUARIO
+            })
+        })
+        .then(function(resposta) {
+            if (resposta.ok) {
+                obterProjetos();
+                alert("Projeto criado!");
+            } else {
+                console.error("Erro ao criar projeto");
+            }
+        })
+        .catch(function(erro) {
+            console.error(`Erro criar projeto: ${erro.message}`);
+        });
+    }
+
+</script>
