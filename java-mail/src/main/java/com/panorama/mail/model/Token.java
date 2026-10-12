@@ -4,8 +4,10 @@ import java.time.LocalDateTime;
 
 public class Token {
 
-    public String token;
-    public LocalDateTime expiration;
+    private String token;
+    private LocalDateTime expiration;
+
+    public Token(String token) {}
 
     public Token(String token, LocalDateTime expiration) {
         this.token = token;
@@ -16,15 +18,8 @@ public class Token {
         return token;
     }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
-
     public LocalDateTime getExpiration() {
         return expiration;
     }
 
-    public void setExpiration(LocalDateTime expiration) {
-        this.expiration = expiration;
-    }
 }

@@ -1,10 +1,7 @@
 package com.panorama.mail.service;
 
 import com.panorama.mail.config.EmailConfig;
-import com.panorama.mail.model.EmailMessage;
-import com.panorama.mail.model.Empresa;
-import com.panorama.mail.model.Token;
-import com.panorama.mail.model.Usuario;
+import com.panorama.mail.model.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
@@ -18,7 +15,7 @@ public class EmailService {
         this.config = config;
     }
 
-    public void enviarEmail(EmailMessage emailMessage, Usuario usuario, Empresa empresa, Token token) throws MessagingException {
+    public void enviarEmail(EmailMessage emailMessage, PendenciaEmailEnvio pendenciaEmailEnvio) throws MessagingException {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -32,10 +29,15 @@ public class EmailService {
             }
         });
 
+        Usuario usuario = pendenciaEmailEnvio.getUsuario();
+        Empresa empresa = pendenciaEmailEnvio.getEmpresa();
+        Token token = pendenciaEmailEnvio.getToken();
+
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(config.getUsername()));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailMessage.getTo()));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(usuario.getEmail()));
         message.setSubject(emailMessage.getSubject());
+
 
         String htmlContent = "<div style=\"background-color: #0b0b0b; padding: 30px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e0e0e0;\">" +
                 "<table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"background-color: #141414; border: 1px solid #222222; border-radius: 8px; overflow: hidden;\">" +
