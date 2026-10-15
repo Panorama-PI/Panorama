@@ -3,7 +3,6 @@ CREATE DATABASE IF NOT EXISTS filmes_db
   COLLATE utf8mb4_unicode_ci;
 USE filmes_db;
 
-
 CREATE TABLE empresa (
     id INT PRIMARY KEY AUTO_INCREMENT,
     telefone CHAR(11),
@@ -83,9 +82,20 @@ WHERE data_lancamento_real > CURDATE() and id >=1;
 */
 CREATE TABLE projeto (
 	id INT PRIMARY KEY AUTO_INCREMENT,
-	nome VARCHAR(50) NOT NULL,
-	usuario_id INT NOT NULL,
-	CONSTRAINT fk_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+	nome VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE publicacao(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    projeto_id INT,
+    usuario_id INT,
+    titulo VARCHAR(50),
+    descricao TEXT NOT NULL,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_publicacao_projeto FOREIGN KEY (projeto_id) REFERENCES projeto(id),
+    CONSTRAINT fk_publicacao_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 CREATE TABLE observacao (
     id INT PRIMARY KEY AUTO_INCREMENT,
