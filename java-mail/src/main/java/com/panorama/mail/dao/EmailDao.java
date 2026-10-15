@@ -19,7 +19,7 @@ public class EmailDao {
                 SELECT 
                     e.nome AS empresa_nome,
                     u.nome AS usuario_nome,
-                    u.email AS usuario_email,
+                    t.email_destinatario AS usuario_email,
                     t.codigo AS codigo_token,
                     t.status_enviado AS status_enviado,
                     t.expiracao AS expiracao

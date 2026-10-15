@@ -18,7 +18,7 @@ function verificarTokenExiste(token){
     return database.executar(sql);
 }
 
-function salvarToken(token,idEmpresa){
+function salvarToken(token,idEmpresa,email){
     console.log(
             "ACESSEI O TOKEN MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n" +
             " \t\t >> verifique suas credenciais de acesso ao banco\n" +
@@ -30,18 +30,56 @@ function salvarToken(token,idEmpresa){
     let sql = `
         INSERT INTO 
             token 
-            (codigo, status_enviado, expiracao, id_empresa) 
+            (codigo, status_enviado, expiracao, email_destinatario, id_empresa) 
         VALUES 
-            ('${token}', 0, NOW() + INTERVAL 15 MINUTE, ${idEmpresa}); 
+            ('${token}', 0, NOW() + INTERVAL 15 MINUTE,${email}, ${idEmpresa}); 
+    `
+
+    return database.executar(sql)
+}
+
+function autenticar(token){
+    console.log(
+                "ACESSEI O TOKEN MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n" +
+                " \t\t >> verifique suas credenciais de acesso ao banco\n" +
+                " \t\t >> e se o servidor de seu BD está rodando corretamente. \n\n" +
+                " function salvarToken(): ", 
+                token
+    );
+
+    let sql = `
+            SELECT 
+                codigo,
+                id_empresa
+            FROM
+                token
+            WHERE
+                codigo = '${token}' AND expiracao > NOW();
+    `
+
+    return database.executar(sql)
+}
+
+function deletarToken(token){
+    console.log(
+        "ACESSEI O TOKEN MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n" +
+        " \t\t >> verifique suas credenciais de acesso ao banco\n" +
+        " \t\t >> e se o servidor de seu BD está rodando corretamente. \n\n" +
+        " function deletarToken(): ", 
+        token
+    );
+
+    let sql = `
+        DELETE FROM token WHERE codigo = '${token}';
     `
 
     return database.executar(sql)
 }
 
 
-
-
 module.exports = {
     verificarTokenExiste,
-    salvarToken
+    salvarToken,
+    autenticar,
+    deletarToken
 }

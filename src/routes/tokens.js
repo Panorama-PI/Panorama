@@ -12,4 +12,12 @@ router.post("/", function(req,res){
     tokenController.salvarToken(req,res);
 })
 
+router.get("/", function(req,res){
+    tokenController.autenticar(req,res);
+})
+
+router.delete("/:token", function(req,res){
+    tokenController.deletarToken(req,res);
+})
+
 module.exports = router;

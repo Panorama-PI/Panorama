@@ -1,4 +1,4 @@
-async function gerarToken(idEmpresa) {
+async function gerarToken(idEmpresa,email) {
     let tamanho = 6;
     let caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
     let token = "";
@@ -22,7 +22,7 @@ async function gerarToken(idEmpresa) {
         console.log(`SUCESSO: Token único gerado [${token}]. Salvando...`);
         
 
-        await salvarToken(token, idEmpresa); 
+        await salvarToken(token, idEmpresa, email); 
         
         return token;
     }
@@ -46,7 +46,7 @@ function verificarTokenExiste(token){
         });
 }
 
-function salvarToken(token,idEmpresa){
+function salvarToken(token,idEmpresa,email){
 
     fetch(`/tokens/`, {
         method: "POST",
@@ -54,7 +54,8 @@ function salvarToken(token,idEmpresa){
           "Content-Type": "application/json",
         },body: JSON.stringify({
             token: token,
-            idEmpresa: idEmpresa
+            idEmpresa: idEmpresa,
+            email: email
         })
       }).then(function (resposta) {
           console.log("resposta: ", resposta);
