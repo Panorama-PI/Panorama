@@ -42,7 +42,7 @@
             <a href="./dashboard-geral.html" ><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
             <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
             <a href="#"><img src="../../assets/icon/settings-icon.png" alt="">Configurações</a>
-            <a href="../anotacoes.html" class="active"><img src="../../assets/icon/observacoes-icon.png" alt="">Anotações</a>
+            <a href="../anotacoes.html" class="ativo"><img src="../../assets/icon/observacoes-icon.png" alt="">Anotações</a>
             <a href="./pesquisa.html"><img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
         </div>
         <div class="btns-side">
@@ -132,7 +132,7 @@
                 placeholder="Ex.: Filme de ficção científica" required>
             <div class="dialog-actions">
                 <button type="button" class="btn-cancelar"
-                    onclick="document.getElementById('dialog-projeto').close()">Cancelar</button>
+                    onclick="document.getElementById('modal-projeto').close()">Cancelar</button>
                 <button type="submit" class="btn-salvar">Criar</button>
             </div>
         </form>
@@ -143,15 +143,40 @@
 </html>
 
 <script>
+ // if (!sessionStorage.ID_USUARIO) {
+ //   sessionStorage.ID_USUARIO = 1;
+ //   sessionStorage.NOME_USUARIO = "l";
+ // }
+
     a_usuario.innerHTML = sessionStorage.NOME_USUARIO;
 
     // guarda o estado atual da página para eu consultar mais fácil depois
-    // projetoSelecionado = id do projeto escolhido na faixa (null = "Todas")
+    // projetoSelecionado = id do projeto escolhido na faixa (null = tds)
     let dashboardAtual = {
         projetos: [],
         anotacoes: [],
         projetoSelecionado: null
     };
+
+    // evita que texto digitado pelo usuário quebre 
+    function escapar(texto) {
+        var div = document.createElement("div");
+        div.textContent = texto;
+        return div.innerHTML;
+    }
+
+    // conta quantas anotações um projeto tem p por no botao
+    function contarAnotacoes(idProjeto) {
+        var total = 0;
+
+        for (var i = 0; i < dashboardAtual.anotacoes.length; i++) {
+            if (dashboardAtual.anotacoes[i].projeto_id == idProjeto) {
+                total++;
+            }
+        }
+
+        return total;
+    }
 
     window.onload = function () {
         obterProjetos();
@@ -189,11 +214,11 @@
     // renderiza os botoes
     function exibirProjetos() {
         var container = document.getElementById("lista-projetos");
-        container.innerHTML = ""; // limpa antes de exibir
+        container.innerHTML = "";
 
         var classeTodas = "projeto-botao";
         if (dashboardAtual.projetoSelecionado === null) {
-            classeTodas += " active";
+            classeTodas += " ativo";
         }
 
         container.innerHTML += `
@@ -209,7 +234,7 @@
 
             var classe = "projeto-botao";
             if (projeto.id == dashboardAtual.projetoSelecionado) {
-                classe += " active";
+                classe += " ativo";
             }
 
             container.innerHTML += `
@@ -224,13 +249,12 @@
         }
     }
 
-    // monta o select com os projetos do usuário
     function exibirSelectProjeto() {
         var select = document.getElementById("selectProjeto");
         var valorAnterior = select.value;
 
         if (dashboardAtual.projetos.length == 0) {
-            select.innerHTML = `<option value="">Crie um projeto primeiro</option>`;
+            select.innerHTML = `<option class="select-projeto" value="">Crie um projeto primeiro</option>`;
             return;
         }
 
@@ -239,7 +263,7 @@
         for (var i = 0; i < dashboardAtual.projetos.length; i++) {
             var projeto = dashboardAtual.projetos[i];
 
-            select.innerHTML += `<option value="${projeto.id}">${escapar(projeto.nome)}</option>`;
+            select.innerHTML += `<option class="select-projeto" value="${projeto.id}">${escapar(projeto.nome)}</option>`;
         }
 
         if (dashboardAtual.projetoSelecionado !== null) {
@@ -249,7 +273,7 @@
         }
     }
 
-    // Chamada quando o usuário clica em um botao: guarda o projeto e redesenha a tela
+    // quando o usuário clica em um botao guarda o projeto e reload a tela
     function selecionarProjeto(idProjeto) {
         dashboardAtual.projetoSelecionado = idProjeto;
         atualizarTela();
@@ -280,7 +304,7 @@
                 if (resposta.ok) {
                     resposta.json().then(function (dados) {
                         input.value = "";
-                        document.getElementById("dialog-projeto").close();
+                        document.getElementById("modal-projeto").close();
                         dashboardAtual.projetoSelecionado = dados.id; // já abre o projeto novo
                         obterProjetos();                              // atualiza a lista na tela
                     });
@@ -294,9 +318,8 @@
             });
     }
 
-    // ─── ANOTAÇÕES ──────────────────────────────────────────────────────
+    // Parte de anotacoes
 
-    // Busca as anotações do usuário na rota e salva na dashboardAtual.anotacoes
     function obterAnotacoes() {
         fetch(`/anotacoes/listar/${sessionStorage.ID_USUARIO}`, { cache: 'no-store' })
             .then(function (resposta) {
@@ -315,7 +338,6 @@
             });
     }
 
-    // Devolve o nome do projeto a partir do id
     function nomeDoProjeto(idProjeto) {
         for (var i = 0; i < dashboardAtual.projetos.length; i++) {
             if (dashboardAtual.projetos[i].id == idProjeto) {
@@ -325,12 +347,12 @@
         return "";
     }
 
-    // Renderiza os cards na ul#listaAnotacoes
+    // Renderiza os cards na ul listaAnotacoes
     // Filtra pelo projeto selecionado e pelo texto da busca (título ou conteúdo)
     function exibirAnotacoes() {
         var container = document.getElementById("listaAnotacoes");
         var busca = document.getElementById("busca_nota").value.toLowerCase();
-        container.innerHTML = ""; // limpa antes de exibir
+        container.innerHTML = "";
 
         // título do painel: nome do projeto selecionado
         var nomeAtivo = "todos os projetos";
@@ -355,10 +377,10 @@
                 continue;
             }
 
-            // quando está em "Todas", mostra de qual projeto é a anotação
-            var etiqueta = "";
+            // quando está em "todas", mostra de qual projeto é a anotação
+            var tituloTodas = "";
             if (dashboardAtual.projetoSelecionado === null) {
-                etiqueta = `<span class="note-tag"><i class="fa-solid fa-folder"></i> ${escapar(nomeDoProjeto(anotacao.projeto_id))}</span>`;
+                tituloTodas = `<span class="note-tag"><i class="fa-solid fa-folder"></i> ${escapar(nomeDoProjeto(anotacao.projeto_id))}</span>`;
             }
 
             var data = new Date(anotacao.criado_em);
@@ -366,22 +388,21 @@
             container.innerHTML += `
                 <li class="card note-item" data-nota-id="${anotacao.id}">
                     <div class="note-body">
-                        ${etiqueta}
+                        <h2>${tituloTodas}</h2>
                         <h4>${escapar(anotacao.titulo)}</h4>
                         <p>${escapar(anotacao.conteudo)}</p>
                         <time datetime="${anotacao.criado_em}">
-                            <img src="../assets/icon/calendario-icon.png" alt="">
-                            ${data.toLocaleString("pt-BR")}
+                            Criada em: ${data.toLocaleString("pt-BR")}
                         </time>
                     </div>
                     <div class="note-actions">
-                        <button type="button" class="btn-icon" aria-label="Editar anotação"
+                        <button type="button" class="btn-icon btn-excluir" aria-label="Editar anotação"
                             onclick="editarAnotacao(${anotacao.id})">
-                            <img src="../assets/icon/editar-icon.png" alt="">
+                            <img src="../../assets/imgs/edit.png" alt="">
                         </button>
                         <button type="button" class="btn-icon btn-excluir" aria-label="Excluir anotação"
                             onclick="excluirAnotacao(${anotacao.id})">
-                            <img src="../assets/icon/excluir-icon.png" alt="">
+                            <img src="../../assets/imgs/lixo.png" alt="">
                         </button>
                     </div>
                 </li>
@@ -394,8 +415,8 @@
         }
     }
 
-    // Chamada quando o usuário clica em Salvar
-    // Se nota_id estiver vazio cria uma anotação nova, se estiver preenchido edita a existente
+    // 
+    // se nota_id estiver vazio cria uma anotacao nova senao edita
     function salvarAnotacao(evento) {
         evento.preventDefault();
 
@@ -404,7 +425,6 @@
         var titulo = document.getElementById("nota_titulo").value.trim();
         var conteudo = document.getElementById("nota_texto").value.trim();
 
-        // impede salvar sem projeto selecionado
         if (idProjeto == "") {
             alert("Crie ou selecione um projeto para salvar a anotação");
             return;
@@ -438,7 +458,7 @@
                 if (resposta.ok) {
                     // se já estava filtrando por um projeto, passa a mostrar o projeto onde salvou
                     if (dashboardAtual.projetoSelecionado !== null) {
-                        dashboardAtual.projetoSelecionado = Number(idProjeto);
+                        dashboardAtual.projetoSelecionado = idProjeto;
                     }
                     limparFormulario();
                     obterAnotacoes(); // atualiza a lista na tela
@@ -452,7 +472,6 @@
             });
     }
 
-    // Chamada quando o usuário clica no lápis de uma anotação: joga os dados dela no formulário
     function editarAnotacao(idNota) {
         for (var i = 0; i < dashboardAtual.anotacoes.length; i++) {
             var anotacao = dashboardAtual.anotacoes[i];
@@ -485,7 +504,6 @@
         exibirSelectProjeto(); // reaplica o projeto selecionado no select
     }
 
-    // Chamada quando o usuário clica na lixeira de uma anotação
     function excluirAnotacao(idNota) {
         if (!confirm("Deseja excluir esta anotação?")) {
             return;
