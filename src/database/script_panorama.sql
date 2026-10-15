@@ -3,6 +3,7 @@ CREATE DATABASE IF NOT EXISTS filmes_db
   COLLATE utf8mb4_unicode_ci;
 USE filmes_db;
 
+
 CREATE TABLE empresa (
     id INT PRIMARY KEY AUTO_INCREMENT,
     telefone CHAR(11),
@@ -11,8 +12,9 @@ CREATE TABLE empresa (
 
 CREATE TABLE token (
 id INT PRIMARY KEY AUTO_INCREMENT,
-numero INT NOT NULL,
-status BOOLEAN,
+codigo VARCHAR(6) NOT NULL,
+status_enviado BOOLEAN,
+expiracao DATETIME,
 id_empresa INT NOT NULL,
     CONSTRAINT fk_token_empresa FOREIGN KEY (id_empresa) REFERENCES empresa(id) 
 );
@@ -27,35 +29,44 @@ CREATE TABLE usuario (
     id_empresa INT NOT NULL,
     CONSTRAINT fk_usuario_empresa FOREIGN KEY (id_empresa) REFERENCES empresa(id)
 );
-
 CREATE TABLE filme (
-    id INT NOT NULL AUTO_INCREMENT,
-    titulo VARCHAR(255) NOT NULL,
-    score DECIMAL(4,2),
-    budget_x DECIMAL(15,2),
-    revenue DECIMAL(15,2),
-    orig_lang VARCHAR(50),
-    country VARCHAR(100),
-    overview TEXT,
-    release_date DATETIME NOT NULL,
-    status BIGINT NOT NULL,
-
-    PRIMARY KEY (id)
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255),
+    data_lancamento VARCHAR(50),
+    score INT,
+    sinopse TEXT,
+    titulo_original VARCHAR(255),
+    status_filme VARCHAR(50),
+    idioma_original VARCHAR(50),
+    orcamento DOUBLE,
+    receita DOUBLE,
+    pais VARCHAR(50)
 );
 
-CREATE TABLE genero (
-    id INT NOT NULL AUTO_INCREMENT,
-    nome VARCHAR(100),
 
-    PRIMARY KEY (id)
+CREATE TABLE filme_genero (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    filme_id INT,
+    genero VARCHAR(100),
+    FOREIGN KEY (filme_id) REFERENCES filme(id)
 );
 
-CREATE TABLE pessoa (
-    id INT NOT NULL AUTO_INCREMENT,
-    nome VARCHAR(150) NOT NULL,
-
-    PRIMARY KEY (id)
+CREATE TABLE filme_elenco (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    filme_id INT,
+    ator TEXT,
+    personagem TEXT,
+    FOREIGN KEY (filme_id) REFERENCES filme(id)
 );
+
+/* UPDATE IGNORE filme 
+SET data_lancamento_real = STR_TO_DATE(data_lancamento, '%m/%d/%y') where id >=1;
+
+UPDATE filme 
+SET data_lancamento_real = DATE_SUB(data_lancamento_real, INTERVAL 100 YEAR)
+WHERE data_lancamento_real > CURDATE() and id >=1;
+*/
+
 
 /* CREATE TABLE log_atividade (
     id INT NOT NULL AUTO_INCREMENT,
@@ -116,26 +127,3 @@ CREATE TABLE notificacao (
         FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
 
-CREATE TABLE filmes_elenco (
-    filme_id INT NOT NULL,
-    pessoa_id INT NOT NULL,
-
-    PRIMARY KEY (filme_id, pessoa_id),
-
-    CONSTRAINT fk_filmes_elenco_filme
-        FOREIGN KEY (filme_id) REFERENCES filme(id),
-    CONSTRAINT fk_filmes_elenco_pessoa
-        FOREIGN KEY (pessoa_id) REFERENCES pessoa(id)
-);
-
-CREATE TABLE filmes_generos (
-    filme_id INT NOT NULL,
-    genero_id INT NOT NULL,
-
-    PRIMARY KEY (filme_id, genero_id),
-
-    CONSTRAINT fk_filmes_generos_filme
-        FOREIGN KEY (filme_id) REFERENCES filme(id),
-    CONSTRAINT fk_filmes_generos_genero
-        FOREIGN KEY (genero_id) REFERENCES genero(id)
-);
