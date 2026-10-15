@@ -1,7 +1,7 @@
 // Define o ambiente em que a aplicação será executada.
 // O ambiente escolhido determina qual arquivo .env será utilizado.
 // var ambiente_processo = 'producao';
-var ambiente_processo = 'desenvolvimento';
+var ambiente_processo = 'producao';
 
 // Seleciona o arquivo de configurações de acordo com o ambiente.
 var caminho_env = ambiente_processo === 'producao' ? '.env' : '.env.dev';
@@ -21,7 +21,8 @@ var app = express();
 var indexRouter = require("./src/routes/index");
 var usuarioRouter = require("./src/routes/usuarios");
 var empresasRouter = require("./src/routes/empresas");
-var anotacoesRouter = require("./src/routes/anotacoes"); 
+var anotacoesRouter = require("./src/routes/anotacoes");
+var tokensRouter = require("./src/routes/tokens");
 
 // Permite que a aplicação receba dados enviados no formato JSON
 // e também dados enviados por formulários.
@@ -40,7 +41,8 @@ app.use(cors());
 app.use("/", indexRouter);
 app.use("/usuarios", usuarioRouter);
 app.use("/empresas", empresasRouter);
-app.use("/anotacoes", anotacoesRouter);  
+app.use("/anotacoes", anotacoesRouter);
+app.use("/tokens", tokensRouter);  
 
 // Inicia o servidor utilizando a porta definida nas configurações
 // do ambiente.

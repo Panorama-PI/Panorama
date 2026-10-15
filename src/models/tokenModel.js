@@ -12,7 +12,7 @@ function verificarTokenExiste(token){
     let sql = ` 
         SELECT codigo
         FROM token
-        WHERE codigo = ${token}
+        WHERE codigo = '${token}';
     `;
 
     return database.executar(sql);
@@ -32,7 +32,7 @@ function salvarToken(token,idEmpresa){
             token 
             (codigo, status_enviado, expiracao, id_empresa) 
         VALUES 
-            (${token}, 0, CURRENT_DATETIME() + INTERVAL 15 MINUTES, ${idEmpresa}); 
+            ('${token}', 0, NOW() + INTERVAL 15 MINUTE, ${idEmpresa}); 
     `
 
     return database.executar(sql)

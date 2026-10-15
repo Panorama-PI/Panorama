@@ -5,14 +5,14 @@ function verificaTokenExiste(req,res){
     let token = req.params.token;
 
     if(!token || !token.trim()){
-        res.status(400).send({
+        res.status(400).json({
             sucesso: false,
             mensagem: "O parametro 'token' é obrigatorio e não pode estar vazio"
         });
     }else{
         tokenModel.verificarTokenExiste(token)
         .then((verifica)=>{
-            if(verifica){
+            if(verifica.length == 1){
                 console.log("["+ hora.obterDataHoraFormatada() + "] ERRO 400: Token já cadastrado no banco");
 
                 res.status(409).json({
@@ -44,12 +44,12 @@ function salvarToken(req,res){
     let idEmpresa = req.body.idEmpresa;
 
     if(!token || !token.trim()){
-        res.status(400).send({
+        res.status(400).json({
             sucesso: false,
             mensagem: "O parametro 'token' é obrigatorio e não pode estar vazio"
         });
     }else if (!idEmpresa){
-        res.status(400).send({
+        res.status(400).json({
             sucesso: false,
             mensagem: "O parametro 'idEmpresa' invalido ou não informado"
         });
