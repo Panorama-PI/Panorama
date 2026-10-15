@@ -1,9 +1,7 @@
 var anotacaoModel = require("../models/anotacaoModel");
 
 function listarProjetos(req, res) {
-    var idUsuario = req.params.idUsuario;
-
-    anotacaoModel.listarProjetos(idUsuario)
+    anotacaoModel.listarProjetos()
         .then(function (resultado) {
             res.json(resultado);
         })
@@ -14,10 +12,9 @@ function listarProjetos(req, res) {
 }
 
 function criarProjeto(req, res) {
-    var idUsuario = req.body.idUsuario;
     var nome = req.body.nome;
 
-    anotacaoModel.criarProjeto(idUsuario, nome)
+    anotacaoModel.criarProjeto(nome)
         .then(function (resultado) {
             res.status(201).json({ id: resultado.insertId });
         })
@@ -48,9 +45,9 @@ function criarAnotacao(req, res) {
 
     anotacaoModel.criarAnotacao(idUsuario, idProjeto, titulo, conteudo)
         .then(function (resultado) {
-            // 0 linhas inseridas = o projeto não é desse usuário
+            // 0 linhas inseridas = o projeto não existe
             if (resultado.affectedRows == 0) {
-                res.status(403).send("Projeto não encontrado para este usuário!");
+                res.status(404).send("Projeto não encontrado!");
                 return;
             }
             res.status(201).json({ id: resultado.insertId });
@@ -70,9 +67,9 @@ function editarAnotacao(req, res) {
 
     anotacaoModel.editarAnotacao(idAnotacao, idUsuario, idProjeto, titulo, conteudo)
         .then(function (resultado) {
-            // 0 linhas alteradas = anotação ou projeto não são desse usuário
+            // 0 linhas alteradas entao anotação não eh desse usuário ou projeto não existe
             if (resultado.affectedRows == 0) {
-                res.status(404).send("Anotação não encontrada para este usuário!");
+                res.status(404).send("Anotação ou projeto não encontrado!");
                 return;
             }
             res.status(200).send("Anotação atualizada!");
