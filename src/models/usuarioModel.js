@@ -2,7 +2,7 @@ var database = require("../database/config")
 
 // Cadastra um novo usuário no banco de dados.
 // Recebe os dados do usuário e executa a instrução SQL de inserção.
-function cadastrar(nome, email, senha, cargo, fkEmpresa) {
+function cadastrar(nome, email, senha, perfil_id, id_empresa) {
     console.log(
         "ACESSEI O USUARIO MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n" + 
         " \t\t >> verifique suas credenciais de acesso ao banco\n" + 
@@ -11,13 +11,13 @@ function cadastrar(nome, email, senha, cargo, fkEmpresa) {
         nome, 
         email, 
         senha, 
-        cargo, 
-        fkEmpresa
+        perfil_id, 
+        id_empresa
     );
 
     var instrucaoSql = `
-        INSERT INTO usuario (nome, email, senha, cargo, fkEmpresa) 
-        VALUES ('${nome}', '${email}', '${senha}','${cargo}', '${fkEmpresa}');
+        INSERT INTO usuario (nome, email, senha_hash, perfil_id, id_empresa) 
+        VALUES ('${nome}', '${email}', '${senha}','${perfil_id}', '${id_empresa}');
     `;
 
     console.log("Executando a instrução SQL: \n" + instrucaoSql);
@@ -40,9 +40,9 @@ function autenticar(email, senha) {
     );
 
     var instrucaoSql = `
-        SELECT idUsuario, nome, email, fkEmpresa as empresaId 
+        SELECT id, nome, email, id_empresa as empresaId 
         FROM usuario 
-        WHERE email = '${email}' AND senha = '${senha}';
+        WHERE email = '${email}' AND senha_hash = '${senha}';
     `;
 
     console.log("Executando a instrução SQL: \n" + instrucaoSql);
@@ -53,11 +53,11 @@ function autenticar(email, senha) {
 
 // Busca os usuários vinculados a uma determinada empresa.
 // Recebe o ID da empresa e retorna os usuários associados a ela.
-function buscarUsuariosPorEmpresa(empresaId) {
+function buscarUsuariosPorEmpresa(id) {
     var instrucaoSql = `
         SELECT * 
         FROM usuario a 
-        WHERE fkEmpresa = ${empresaId}
+        WHERE id_empresa = ${id}
     `;
 
     console.log("Executando a instrução SQL: \n" + instrucaoSql);
