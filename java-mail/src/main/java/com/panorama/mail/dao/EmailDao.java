@@ -18,14 +18,12 @@ public class EmailDao {
         String sql = """
                 SELECT 
                     e.nome AS empresa_nome,
-                    u.nome AS usuario_nome,
                     t.email_destinatario AS usuario_email,
                     t.codigo AS codigo_token,
                     t.status_enviado AS status_enviado,
                     t.expiracao AS expiracao
                 FROM token t
                 INNER JOIN empresa e ON t.id_empresa = e.id
-                INNER JOIN usuario u ON e.id = u.id_empresa
                 WHERE t.status_enviado = false AND t.expiracao > CURRENT_TIMESTAMP
                 """;
 
@@ -35,7 +33,6 @@ public class EmailDao {
                     rs.getString("empresa_nome")
             );
             Usuario usuario = new Usuario(
-                    rs.getString("usuario_nome"),
                     rs.getString("usuario_email")
             );
             Token token = new Token(
