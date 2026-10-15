@@ -91,7 +91,7 @@ function salvarToken(req,res){
 }
 
 function autenticar(req,res){
-    let token = req.param.token;
+    let token = req.params.token;
 
     if(!token || !token.trim()){
         res.status(400).json({

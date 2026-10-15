@@ -79,7 +79,7 @@ function salvarToken(token,idEmpresa,email){
         });
 }
 
-function auteticar(token){
+function autenticar(token){
     fetch(`/tokens/autenticar/${token}`, {
         method: "GET",
         headers: {
