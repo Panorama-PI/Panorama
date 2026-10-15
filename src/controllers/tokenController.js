@@ -60,7 +60,7 @@ function salvarToken(req,res){
             mensagem: "O parametro 'idEmpresa' invalido ou não informado"
         });
     }else{
-        tokenModel.salvarToken(token,idEmpresa)
+        tokenModel.salvarToken(token,idEmpresa,email)
         .then((salvar)=>{
             if(salvar){
                 console.log("["+ hora.obterDataHoraFormatada() + "] SUCESSO 201: Token Salvo com sucesso!");

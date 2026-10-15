@@ -3,7 +3,7 @@ async function gerarTokenSalvar(idEmpresa,email) {
     let existe = true;
 
     while (existe) {
-        token = gerarToken();
+        token = await gerarToken();
 
         existe = await verificarTokenExiste(token); 
 
@@ -21,7 +21,7 @@ async function gerarTokenSalvar(idEmpresa,email) {
     }
 }
 
-async function gerarToken(){
+function gerarToken(){
     let tamanho = 6;
     let caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
     let token = "";
@@ -88,7 +88,7 @@ function auteticar(token){
     })
     .then(function (resposta) {
         if (resposta.ok) {
-            return resposta.json(); // Passa a Promise do JSON para o próximo .then
+            return resposta.json(); 
         } else {
             console.log("Token inválido ou expirado");
             return null;
@@ -111,7 +111,7 @@ function atualizarToken(tokenAntigo){
     let tokenNovo = gerarToken();
 
     fetch(`/tokens/`, {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },body: JSON.stringify({
