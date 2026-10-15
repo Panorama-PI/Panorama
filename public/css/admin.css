@@ -1,0 +1,569 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap');
+
+:root {
+    --cor-fundo: #0B0B0C;
+    --cor-sidebar: #161616;
+    --cor-card: #27272A;
+    --cor-borda: #3C3C41;
+    --cor-texto: #F4F4F5;
+    --cor-texto-secundario: #A1A1AA;
+    --cor-vermelho: #FF383C;
+    --cor-verde: #34C759;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Barlow", sans-serif;
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+}
+
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    width: 24rem;
+    height: 100vh;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    background-color: var(--cor-sidebar);
+    border-right: 2px solid var(--cor-borda);
+}
+
+.usuario-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-top: 1.5rem;
+}
+
+.usuario-side img {
+    width: 8rem;
+    height: 8rem;
+
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.usuario-side h2 {
+    margin: 1rem 0 0.5rem;
+
+    color: var(--cor-texto);
+    font-size: 1.6rem;
+}
+
+.usuario-side h3 {
+    margin: 0;
+
+    color: var(--cor-texto-secundario);
+    font-size: 1.2rem;
+}
+
+.usuario-side h4 {
+    margin: 0.5rem 0 0;
+
+    color: #5F5F5F;
+    font-size: 1rem;
+}
+
+
+/* MENU */
+
+.btns-side {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btns-side.menu-principal {
+    margin-top: 2rem;
+}
+
+.btns-side.menu-sair {
+    margin-top: auto;
+    margin-bottom: 1.5rem;
+}
+
+.btns-side a {
+    width: 16rem;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0.8rem 1rem;
+    margin: 0.4rem 0;
+
+    color: var(--cor-texto-secundario);
+    text-decoration: none;
+
+    border-radius: 20px;
+}
+
+.btns-side a img {
+    width: 1.5rem;
+    height: 1.5rem;
+
+    object-fit: contain;
+    margin-right: 0.6rem;
+}
+
+.btns-side a.active {
+    background-color: var(--cor-vermelho);
+    color: white;
+}
+
+
+/* =========================
+   CONTEÚDO
+========================= */
+
+.admin-content {
+    margin-left: 24rem;
+    padding: 2.5rem;
+}
+
+.admin-content h1 {
+    margin: 0;
+
+    color: var(--cor-texto);
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.admin-content > p {
+    margin: 0.4rem 0 1.5rem;
+
+    color: var(--cor-texto-secundario);
+    font-size: 1rem;
+}
+
+
+/* =========================
+   CARDS SUPERIORES
+========================= */
+
+.cards-superiores {
+    display: flex;
+    align-items: stretch;
+    gap: 1.2rem;
+}
+
+.card-codigo,
+.card-informacoes {
+    background-color: var(--cor-card);
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+    padding: 1.2rem;
+}
+
+.card-codigo {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.card-informacoes {
+    width: 60%;
+}
+
+
+/* TÍTULOS */
+
+.card-codigo h2,
+.titulo-informacoes h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    margin: 0;
+
+    color: var(--cor-texto);
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.card-codigo h2 img,
+.titulo-informacoes h2 img {
+    width: 1.3rem;
+    height: 1.3rem;
+
+    object-fit: contain;
+}
+
+
+/* =========================
+   CÓDIGO DA EMPRESA
+========================= */
+
+.codigo-empresa {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 1rem;
+    padding: 0.7rem 0.8rem;
+
+    background-color: #3C3C41;
+    border-radius: 8px;
+}
+
+.codigo-empresa img {
+    width: 1.3rem;
+    height: 1.3rem;
+
+    object-fit: contain;
+}
+
+.btn-info-codigo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.codigo-empresa p {
+    margin: 0;
+
+    color: var(--cor-texto);
+    font-size: 1.3rem;
+}
+
+/* =========================
+   MODAL CÓDIGO DA EMPRESA
+========================= */
+.modal-codigo {
+    display: none;
+    position: absolute;
+    top: 13rem;
+    right: 17rem;
+    width: 23rem;
+    background-color: #434349;
+    border-radius: 12px;
+    padding: 1rem;
+    z-index: 100;
+}
+
+.btn-info-codigo:hover + .modal-codigo {
+    display: flex;
+}
+
+.conteudo-modal {
+    width: 25rem;
+    padding: 1.2rem;
+    border-radius: 12px;
+}
+
+.titulo-modal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 1.5rem;
+}
+
+.titulo-modal h2 {
+    margin: 0;
+
+    color: var(--cor-texto);
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+
+.passo-modal {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+
+    margin-bottom: 1rem;
+}
+
+.passo-modal span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 1.8rem;
+    height: 1.8rem;
+
+    background-color: var(--cor-vermelho);
+    color: white;
+
+    border-radius: 50%;
+
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.passo-modal p {
+    margin: 0;
+
+    color: var(--cor-texto);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* BOTÃO E-MAIL */
+
+.btn-email {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    width: 100%;
+
+    margin-top: 1rem;
+    padding: 0.65rem 1rem;
+
+    background-color: var(--cor-vermelho);
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 0.9rem;
+
+    cursor: pointer;
+}
+
+.btn-email img {
+    width: 1.1rem;
+    height: 1.1rem;
+
+    object-fit: contain;
+}
+
+
+/* =========================
+   INFORMAÇÕES DA EMPRESA
+========================= */
+
+.titulo-informacoes {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.titulo-informacoes button {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    padding: 0.45rem 0.8rem;
+
+    background-color: transparent;
+    color: var(--cor-texto);
+
+    border: 1px solid var(--cor-vermelho);
+    border-radius: 8px;
+
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.titulo-informacoes button img {
+    width: 1rem;
+    height: 1rem;
+
+    object-fit: contain;
+}
+
+
+/* INFORMAÇÕES */
+
+.informacoes {
+    margin-top: 1.3rem;
+}
+
+.informacao-empresa {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 0.7rem;
+}
+
+.informacao-empresa span {
+    color: var(--cor-texto-secundario);
+    font-size: 0.9rem;
+}
+
+.informacao-empresa strong {
+    color: var(--cor-texto);
+    font-size: 0.9rem;
+    font-weight: 500;
+}   
+
+.filtros-funcionarios input {
+    flex: 1;
+
+    padding: 0.7rem 1rem;
+
+    background-color: var(--cor-card);
+    color: var(--cor-texto);
+
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.filtros-funcionarios {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+
+    margin-top: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.filtros-funcionarios select {
+    width: 10rem;
+
+    padding: 0.7rem 1rem;
+
+    background-color: var(--cor-card);
+    color: var(--cor-texto);
+
+    border: 1px solid var(--cor-borda);
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+.cabecalho-funcionarios {
+    display: flex;
+    align-items: center;
+
+    padding: 0 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+
+    color: var(--cor-texto-secundario);
+    font-size: 0.85rem;
+}
+
+.cabecalho-funcionarios span {
+    flex: 0.9;
+    text-align: center;
+}
+
+.cabecalho-funcionarios span:first-child,
+.cabecalho-funcionarios span:nth-child(2) {
+    flex: 1.3;
+}
+
+.card-funcionario {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    background-color: var(--cor-card);
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+    padding: 0.6rem 1.5rem;
+    margin-top: 0.8rem;
+}
+
+.card-funcionario h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.card-funcionario > div {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.funcionario-nome {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start !important;
+    gap: 0.7rem;
+}
+
+.funcionario-nome img {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.card-funcionario > div:first-child {
+    flex: 1.5;
+}
+
+.card-funcionario > div:nth-child(2) {
+    flex: 1.5;
+}
+
+.card-funcionario > div:last-child {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.status {
+    font-weight: 500;
+}
+
+.status.ativo {
+    color: var(--cor-verde);
+}
+
+.status.inativo {
+    color: var(--cor-vermelho);
+}
+
+.card-funcionario button {
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.btn-editar {
+    background-color: transparent;
+    color: var(--cor-texto);
+    border: 1px solid var(--cor-vermelho) !important;
+
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.btn-editar img {
+    width: 1rem;
+    height: 1rem;
+    object-fit: contain;
+}
+
+.btn-excluir {
+    background-color: var(--cor-vermelho);
+    color: white;
+}
+

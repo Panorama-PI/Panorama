@@ -40,7 +40,7 @@ var database = require("../database/config");
 // Retorna apenas os dados necessários para exibição da lista.
 function listar() {
     var instrucaoSql = `
-      SELECT idEmpresa, nome, cnpj, telefone 
+      SELECT id, nome, telefone 
       FROM empresa
     `;
 

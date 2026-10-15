@@ -21,6 +21,7 @@ var app = express();
 var indexRouter = require("./src/routes/index");
 var usuarioRouter = require("./src/routes/usuarios");
 var empresasRouter = require("./src/routes/empresas");
+var anotacoesRouter = require("./src/routes/anotacoes"); 
 
 // Permite que a aplicação receba dados enviados no formato JSON
 // e também dados enviados por formulários.
@@ -39,6 +40,7 @@ app.use(cors());
 app.use("/", indexRouter);
 app.use("/usuarios", usuarioRouter);
 app.use("/empresas", empresasRouter);
+app.use("/anotacoes", anotacoesRouter);  
 
 // Inicia o servidor utilizando a porta definida nas configurações
 // do ambiente.
