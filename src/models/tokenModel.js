@@ -39,22 +39,24 @@ function salvarToken(token,idEmpresa,email){
 }
 
 function autenticar(token){
-    console.log(
-                "ACESSEI O TOKEN MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n" +
-                " \t\t >> verifique suas credenciais de acesso ao banco\n" +
-                " \t\t >> e se o servidor de seu BD está rodando corretamente. \n\n" +
-                " function salvarToken(): ", 
-                token
-    );
-
     let sql = `
-            SELECT 
-                codigo,
-                id_empresa
-            FROM
-                token
-            WHERE
-                codigo = '${token}' AND expiracao > NOW();
+        SELECT
+            codigo,
+            id_empresa,
+            email_destinatario
+        FROM
+            token
+        WHERE
+            codigo = '${token}' AND expiracao > NOW();
+    `
+
+    return database.executar(sql)
+}
+
+// Invalida o token depois de usado.
+function invalidarToken(token){
+    let sql = `
+        UPDATE token SET expiracao = NOW() WHERE codigo = '${token}';
     `
 
     return database.executar(sql)
@@ -81,5 +83,6 @@ module.exports = {
     verificarTokenExiste,
     salvarToken,
     autenticar,
-    atualizarToken
+    atualizarToken,
+    invalidarToken
 }
