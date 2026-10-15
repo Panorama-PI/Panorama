@@ -10,7 +10,6 @@ public class EmailMessage {
         this.body = body;
     }
 
-
     public String getSubject() {
         return subject;
     }

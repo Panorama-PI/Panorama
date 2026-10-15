@@ -56,7 +56,7 @@ public class EmailService {
                 "<td style=\"padding: 40px 30px; background-color: #141414; text-align: center;\">" +
                 "<h2 style=\"color: #ffffff; font-size: 20px; margin-top: 0; margin-bottom: 10px;\">Código de Verificação</h2>" +
                 "<p style=\"color: #b3b3b3; font-size: 15px; line-height: 1.5; margin-top: 0; margin-bottom: 30px;\">" +
-                "Olá, "+ usuario.getNome() +". a empresa " + empresa.getNome() + " solicitou um código de acesso para a sua conta no <strong>Panorama</strong>. Utilize o token abaixo para prosseguir:" +
+                "Olá, a empresa " + empresa.getNome() + " solicitou um código de acesso para a sua conta no <strong>Panorama</strong>. Utilize o token abaixo para prosseguir:" +
                 "</p>" +
 
                 // <!-- CAIXA DESTAQUE DO TOKEN -->
