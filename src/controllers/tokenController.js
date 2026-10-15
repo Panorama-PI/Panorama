@@ -91,7 +91,7 @@ function salvarToken(req,res){
 }
 
 function autenticar(req,res){
-    let token = req.body.token;
+    let token = req.param.token;
 
     if(!token || !token.trim()){
         res.status(400).json({
@@ -129,30 +129,36 @@ function autenticar(req,res){
     }
 }
 
-function deletarToken(req,res){
-    let token = req.body.token;
+function atualizarToken(req,res){
+    let tokenNovo = req.body.tokenNovo;
+    let tokenAntigo = req.body.tokenAntigo;
 
-    if(!token || !token.trim()){
+    if(!tokenNovo || !tokenNovo.trim()){
+        res.status(400).json({
+            sucesso: false,
+            mensagem: "O parametro 'token' é obrigatorio e não pode estar vazio"
+        });
+    }else if(!tokenAntigo || !tokenAntigo.trim()){
         res.status(400).json({
             sucesso: false,
             mensagem: "O parametro 'token' é obrigatorio e não pode estar vazio"
         });
     }else{
-        tokenModel.deletar(token)
+        tokenModel.atualizarToken(tokenNovo,tokenAntigo)
         .then((deletar)=>{
             if(deletar){
-                console.log("["+ hora.obterDataHoraFormatada() + "] SUCESSO 200: Token deletado com sucesso!");
+                console.log("["+ hora.obterDataHoraFormatada() + "] SUCESSO 200: Token atualizado com sucesso!");
 
                 res.status(200).json({
                     sucesso: true,
-                    mensagem: "Token deletado com sucesso!"
+                    mensagem: "Token atualizado com sucesso!"
                 });
             }else{
-                console.log("["+ hora.obterDataHoraFormatada() + "] ERRO 400: Não foi possivel deletar o Token no banco");
+                console.log("["+ hora.obterDataHoraFormatada() + "] ERRO 400: Não foi possivel atualizar o Token no banco");
 
                 res.status(400).json({
                     sucesso: false,
-                    mensagem: "Não foi possivel deletar o Token no banco"
+                    mensagem: "Não foi possivel atualizar o Token no banco"
                 });
             }
         }
@@ -172,5 +178,5 @@ module.exports = {
     verificaTokenExiste,
     salvarToken,
     autenticar,
-    deletarToken
+    atualizarToken
 }

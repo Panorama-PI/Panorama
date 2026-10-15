@@ -60,7 +60,7 @@ function autenticar(token){
     return database.executar(sql)
 }
 
-function deletarToken(token){
+function atualizarToken(tokenNovo, tokenAntigo){
     console.log(
         "ACESSEI O TOKEN MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n" +
         " \t\t >> verifique suas credenciais de acesso ao banco\n" +
@@ -70,7 +70,7 @@ function deletarToken(token){
     );
 
     let sql = `
-        DELETE FROM token WHERE codigo = '${token}';
+        UPDATE FROM token SET codigo = '${tokenNovo}' WHERE codigo = '${tokenAntigo}';
     `
 
     return database.executar(sql)
@@ -81,5 +81,5 @@ module.exports = {
     verificarTokenExiste,
     salvarToken,
     autenticar,
-    deletarToken
+    atualizarToken
 }
