@@ -17,3 +17,7 @@ function verificarTokenExiste(token){
 
 
 }
+
+function salvarToken(token){
+    
+}

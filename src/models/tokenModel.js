@@ -1,0 +1,47 @@
+var database = require("../database/config");
+
+function verificarTokenExiste(token){
+    console.log(
+            "ACESSEI O TOKEN MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n" +
+            " \t\t >> verifique suas credenciais de acesso ao banco\n" +
+            " \t\t >> e se o servidor de seu BD está rodando corretamente. \n\n" +
+            " function verificarTokenExiste(): ", 
+            token
+    );
+
+    let sql = ` 
+        SELECT codigo
+        FROM token
+        WHERE codigo = ${token}
+    `;
+
+    return database.executar(sql);
+}
+
+function salvarToken(token,idEmpresa){
+    console.log(
+            "ACESSEI O TOKEN MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n" +
+            " \t\t >> verifique suas credenciais de acesso ao banco\n" +
+            " \t\t >> e se o servidor de seu BD está rodando corretamente. \n\n" +
+            " function salvarToken(): ", 
+            token
+    );
+
+    let sql = `
+        INSERT INTO 
+            token 
+            (codigo, status_enviado, expiracao, id_empresa) 
+        VALUES 
+            (${token}, 0, CURRENT_DATETIME() + INTERVAL 15 MINUTES, ${idEmpresa}); 
+    `
+
+    return database.executar(sql)
+}
+
+
+
+
+module.exports = {
+    verificarTokenExiste,
+    salvarToken
+}
