@@ -35,15 +35,12 @@
         </div>
 
         <div class="btns-side">
+            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
             <a href="./dashboard-geral.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
             <a href="./dashboard-especifica.html" class="active"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
-            <a href="#"><img src="../../assets/icon/settings-icon.png" alt="">Configurações</a>
             <a href="../anotacoes.html"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
             <a href="./pesquisa.html"><img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
-        </div>
-
-        <div class="btns-side">
-            <a href="#" onclick="limparSessao(); return false;"><img src="../../assets/icon/sair-icon.png" alt="">Sair</a>
+            <a href="#"><img src="../../assets/icon/publicacao.png" alt="">Publicações</a>
         </div>
 
     </aside>
@@ -151,10 +148,13 @@
             scales: {
                 x: {
                     grid: { color: COR_LINHA_GRID },
-                    ticks: { stepSize: 2 },
+                    ticks: { stepSize: 2,
+                        color: '#dfdfdf'
+                     },
                     title: { display: true, text: 'Em bilhões', color: '#828282', font: { size: 10 } }
                 },
-                y: { grid: { display: false } }
+                y: { grid: { display: false },
+                    ticks:{color: '#dfdfdf',} }
             }
         }
     });
@@ -199,8 +199,11 @@
                 }
             },
             scales: {
-                x: { display: false },
-                y: { grid: { display: false } }
+                x: { display: false,
+                    ticks: { color: '#dfdfdf' }
+                 },
+                y: { grid: { display: false },
+                    ticks: { color: '#dfdfdf' } }
             }
         }
     });
@@ -243,10 +246,12 @@
                     grid: { color: COR_LINHA_GRID },
                     ticks: {
                         stepSize: 1000000000,
-                        callback: (val) => val.toLocaleString('pt-BR')
+                        callback: (val) => val.toLocaleString('pt-BR'),
+                        color: '#dfdfdf'
                     }
                 },
-                x: { grid: { display: false } }
+                x: { grid: { display: false },
+                    ticks: { color: '#dfdfdf', } }
             }
         }
     });
@@ -292,10 +297,12 @@
                     grid: { color: COR_LINHA_GRID },
                     ticks: {
                         stepSize: 200,
-                        callback: (val) => val === 0 ? '0' : `${val}M`
+                        callback: (val) => val === 0 ? '0' : `${val}M`,
+                        color: '#dfdfdf'
                     }
                 },
-                x: { grid: { display: false } }
+                x: { grid: { display: false },
+                    ticks: { color: '#dfdfdf' } }
             }
         }
     });

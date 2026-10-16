@@ -34,17 +34,14 @@
         </div>
 
         <div class="btns-side">
-
+            
+            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
             <a href="./dashboard-geral.html">
                 <img src="../../assets/icon/chart-icon.png" alt="">Visão Geral
             </a>
 
             <a href="./dashboard-especifica.html" class="active">
                 <img src="../../assets/icon/chart-icon.png" alt="">Visão Específica
-            </a>
-
-            <a href="#">
-                <img src="../../assets/icon/settings-icon.png" alt="">Configurações
             </a>
 
             <a href="../anotacoes.html">
@@ -54,13 +51,7 @@
             <a href="./pesquisa.html">
                 <img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa
             </a>
-
-        </div>
-
-        <div class="btns-side">
-            <a href="#" onclick="limparSessao(); return false;">
-                <img src="../../assets/icon/sair-icon.png" alt="">Sair
-            </a>
+            <a href="#"><img src="../../assets/icon/publicacao.png" alt="">Publicações</a>
         </div>
 
     </aside>
@@ -210,11 +201,14 @@
                     min: 0,
                     max: 10,
                     grid: { color: COR_LINHA_GRID },
-                    ticks: { stepSize: 2 }
+                    ticks: { stepSize: 2,
+                          color: '#dfdfdf'
+                     }
                 },
 
                 x: {
-                    grid: { display: false }
+                    grid: { display: false },
+                    ticks: { color: '#dfdfdf' }
                 }
             }
         }
@@ -276,12 +270,14 @@
                     grid: { color: COR_LINHA_GRID },
                     ticks: {
                         stepSize: 20,
-                        callback: (value) => `${value}%`
+                        callback: (value) => `${value}%`,
+                        color: '#dfdfdf' 
                     }
                 },
 
                 y: {
-                    grid: { display: false }
+                    grid: { display: false },
+                    ticks: { color: '#dfdfdf' }
                 }
             }
         }
@@ -341,11 +337,14 @@
                 x: {
                     beginAtZero: true,
                     grid: { color: COR_LINHA_GRID },
-                    ticks: { precision: 0 }
+                    ticks: { precision: 0,
+                        color: '#dfdfdf'
+                     }
                 },
 
                 y: {
-                    grid: { display: false }
+                    grid: { display: false },
+                    ticks: { color: '#dfdfdf' }
                 }
             }
         }
