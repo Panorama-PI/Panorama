@@ -30,13 +30,17 @@
                 <legend>Dados da empresa</legend>
 
                 <div class="campo">
-                    <label for="ipt_nome_empresa">Nome da empresa</label>
+                    <label for="ipt_nome_empresa">
+                        Nome da empresa <span class="obrigatorio">*</span>
+                    </label>
                     <input type="text" id="ipt_nome_empresa" name="nome_empresa" placeholder="Nome da sua empresa"
                         autocomplete="organization" required>
                 </div>
 
                 <div class="campo">
-                    <label for="ipt_telefone">Telefone para contato</label>
+                    <label for="ipt_telefone">
+                        Telefone para contato <span class="obrigatorio">*</span>
+                    </label>
                     <input type="tel" id="ipt_telefone" name="telefone" placeholder="(11) 99999-9999" autocomplete="tel"
                         inputmode="tel" required>
                 </div>
@@ -53,13 +57,17 @@
                 </p>
 
                 <div class="campo">
-                    <label for="ipt_nome">Nome completo</label>
+                    <label for="ipt_nome">
+                        Nome completo <span class="obrigatorio">*</span>
+                    </label>
                     <input type="text" id="ipt_nome" name="nome" placeholder="Nome completo do responsável"
                         autocomplete="name" required>
                 </div>
 
                 <div class="campo">
-                    <label for="ipt_email">E-mail</label>
+                    <label for="ipt_email">
+                        E-mail <span class="obrigatorio">*</span>
+                    </label>
                     <input type="email" id="ipt_email" name="email" placeholder="voce@exemplo.com" autocomplete="email"
                         required>
                 </div>
@@ -67,14 +75,17 @@
                 <div class="campos-senha">
 
                     <div class="campo">
-                        <label for="ipt_senha">Senha</label>
+                        <label for="ipt_senha">
+                            Senha <span class="obrigatorio">*</span>
+                        </label>
+
                         <input type="password" id="ipt_senha" name="senha" placeholder="8 a 12 caracteres"
                             autocomplete="new-password" minlength="8" maxlength="12" required>
                     </div>
 
                     <div class="campo">
                         <label for="ipt_confirmacao_senha">
-                            Confirmação de senha
+                            Confirmação de senha <span class="obrigatorio">*</span>
                         </label>
                         <input type="password" id="ipt_confirmacao_senha" name="confirmacao_senha"
                             placeholder="Repita a senha" autocomplete="new-password" minlength="8" maxlength="12"

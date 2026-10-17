@@ -107,6 +107,11 @@ body {
 
 /* Campos */
 
+.obrigatorio {
+  color: #ffb4a9;
+  font-weight: 700;
+}
+
 .campo {
   display: flex;
   flex-direction: column;
@@ -257,14 +262,6 @@ body {
   cursor: pointer;
 }
 
-/* Ajustes para celular */
-
-@media (max-width: 560px) {
-  .campos-senha {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* Responsividade */
 
 @media (max-width: 560px) {
@@ -279,6 +276,10 @@ body {
   .secao {
     grid-template-columns: 1fr;
     gap: 16px;
+  }
+
+  .campos-senha {
+    grid-template-columns: 1fr;
   }
 
   .card-botao-cadastro {
