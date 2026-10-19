@@ -1,93 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Tela de Login</title>
-     <link rel="stylesheet" href="./css/login.css">
+
+    <link rel="stylesheet" href="./css/login.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
-     <div class="card">
 
-    <div class="card-titulo">
-      <h1>Login</h1>
+    <div class="card">
+
+        <div class="card-titulo">
+            <h1>Login</h1>
+        </div>
+
+        <div class="card-formulario">
+
+            <input 
+                type="email" 
+                id="ipt_email" 
+                placeholder="E-mail">
+            
+            <input 
+                type="password" 
+                id="ipt_senha" 
+                placeholder="Senha">
+
+        </div>
+
+        <div class="card-mensagem-login">
+
+            <p>
+                Ainda não tem uma conta? 
+                <a href="cadastro.html">Cadastre-se!</a>
+            </p>
+
+        </div>
+
+        <div class="card-botao-cadastro">
+
+            <button class="voltar botao">
+                <a href="./index.html">Voltar</a>
+            </button>
+
+            <button 
+                class="botao cadastrar" 
+                onclick="entrar()">
+                Entrar
+            </button>
+
+        </div>
+
     </div>
 
-    <div class="card-formulario">
-      <input type="email"  id="ipt_email" placeholder="E-mail">
-      <input type="password" id="ipt_senha" placeholder="Senha">
-    </div>
-
-    <div class="card-mensagem-login">
-      <p>Ainda não tem uma conta? <a href="cadastro.html">Cadastre-se!</a></p>
-    </div>
-
-    <div class="card-botao-cadastro">
-      <button class="voltar botao"><a href="./index.html">Voltar</a></button>
-      <button class="botao cadastrar" onclick="entrar()">Entrar</button>
-    </div>
-
-  </div>
 </body>
+
 </html>
 
 <script>
 
-
+    // Realiza a autenticação do usuário utilizando os dados informados no login.
     function entrar() {
-        
 
         let email = ipt_email.value;
         let senha = ipt_senha.value;
 
+        // Verifica se os campos obrigatórios foram preenchidos.
         if (email == "" || senha == "") {
-            alert("Preencha todos os campos")
-        }else{
 
+            alert("Preencha todos os campos");
+
+        } else {
+
+            // Envia os dados de login para o backend realizar a autenticação.
             fetch("/usuarios/autenticar", {
                 method: "POST",
+
                 headers: {
                     "Content-Type": "application/json"
                 },
+
                 body: JSON.stringify({
                     emailServer: email,
                     senhaServer: senha
                 })
+
             }).then(function (resposta) {
+
                 console.log("ESTOU NO THEN DO entrar()!")
-    
+
+                // Verifica se a autenticação foi realizada com sucesso.
                 if (resposta.ok) {
+
                     console.log(resposta);
-    
+
                     resposta.json().then(json => {
-                        alert("Login realizado com sucesso")
+
+                        alert("Login realizado com sucesso");
+
+                        // Redireciona o usuário para a página inicial após o login.
                         setTimeout(function () {
                             window.location = "/index.html";
-                        }, 750); 
-    
+                        }, 750);
+
                     });
-    
+
                 } else {
-    
+
                     console.log("Houve um erro ao tentar realizar o login!");
-    
+
+                    alert("Login Não Realizado! Credenciais não encontradas");
+
                     resposta.text().then(texto => {
                         console.error(texto);
                     });
                 }
-    
+
             }).catch(function (erro) {
+
                 console.log(erro);
-            })
+
+            });
         }
-        
-
-
-        
     }
-    
 
 </script>

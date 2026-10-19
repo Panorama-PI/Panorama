@@ -1,194 +1,299 @@
+:root {
+  --vinho: #760e00;
+  --vinho-escuro: #4a0900;
+  --vinho-claro: #8a2b2b;
+  --marinho: #06234e;
+  --marinho-hover: #0a3a7d;
+  --creme: #fffbfb;
+  --texto-claro: #f5f5f5;
+  --texto-suave: #e6c9c9;
+  --erro-fundo: #fff1f0;
+  --erro-texto: #8c1d12;
+  --link: #8fb8f5;
+  --raio: 10px;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-html, body {
-  height: 100%;
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
+
 body {
-  background: #000000;
-  background: radial-gradient(circle, rgba(0, 0, 0, 1) 0%, rgb(54, 17, 17) 50%, rgba(118, 14, 0, 1) 100%);
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: clamp(16px, 4vw, 48px);
+  font-family: "IBM Plex Serif", Georgia, serif;
+  color: var(--texto-claro);
+  background: radial-gradient(circle at center, #361111 0%, #1a0707 55%, #760e00 140%);
+  background-attachment: fixed;
 }
 
+/* ---------- Card ---------- */
 .card {
-  width: 50%;
-  height: 85%;
-  background-color: #760e00;
-  border-radius: 30px;
-  box-shadow: 0px 10px 30px rgba(0, 0, 0, 7.5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 30px 40px;
+  width: 100%;
+  max-width: 600px;
+  padding: clamp(24px, 5vw, 48px);
+  background: linear-gradient(180deg, #820f00 0%, var(--vinho) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: clamp(18px, 3vw, 28px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
 }
 
 .card-titulo {
-  width: 100%;
-  height: 20%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  font-family: "Bodoni Moda", serif;
-}
-.card-titulo h1 {
-  color: #f5f5f5;
-  font-size: 85px;
   text-align: center;
+  margin-bottom: clamp(20px, 4vw, 32px);
 }
 
+.card-titulo h1 {
+  font-family: "Bodoni Moda", serif;
+  font-weight: 700;
+  font-size: clamp(2.6rem, 9vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+
+.card-titulo p {
+  margin-top: 8px;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  color: var(--texto-suave);
+}
+
+/* ---------- Formulário ---------- */
 .card-formulario {
-  width: 100%;
-  height: 50%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 16px;
+}
+
+.campo {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 25px;
-}
-.card-formulario input {
-  width: 85%;
-  padding: 25px 28px;
-  border-radius: 8px;
-  border: 1px solid #470d0d;
-  background-color: #fffbfb;
-  color: #2c0c0c;
-  font-size: 17px;
-}
-.card-formulario input::placeholder {
-  color: #2b1616;
-  font-size: 20px;
+  gap: 6px;
+  min-width: 0;
 }
 
-.card-mensagem-login {
+.campo-total {
+  grid-column: 1 / -1;
+}
+
+.campo label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--texto-suave);
+}
+
+.campo input,
+.campo select {
   width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  text-align: center;
+  height: 52px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 1rem;
+  color: #2c0c0c;
+  background-color: var(--creme);
+  border: 1px solid transparent;
+  border-radius: var(--raio);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.card-mensagem-login p {
-  color: #e6c9c9;
-  font-size: 22px;
+.campo select {
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+.campo input::placeholder {
+  color: #7a6262;
+}
+
+.campo input:focus-visible,
+.campo select:focus-visible {
+  outline: none;
+  border-color: #fff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.28);
+}
+
+.campo .invalido {
+  border-color: #ff8a7a;
+}
+
+.dica {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+  opacity: 0.85;
+}
+
+.mostrar-senha {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+  cursor: pointer;
+  width: fit-content;
+}
+
+.mostrar-senha input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--marinho);
+  cursor: pointer;
+}
+
+/* ---------- Mensagem de erro ---------- */
+.erros {
+  grid-column: 1 / -1;
+  display: none;
+  padding: 14px 16px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--erro-texto);
+  background: var(--erro-fundo);
+  border-left: 4px solid #d93a26;
+  border-radius: var(--raio);
+}
+
+.erros.visivel {
+  display: block;
+}
+
+.erros strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.erros ul {
+  padding-left: 18px;
+}
+
+/* ---------- Mensagem de sucesso ---------- */
+.sucesso {
+  grid-column: 1 / -1;
+  display: none;
+  padding: 14px 16px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #14532d;
+  background: #f0fdf4;
+  border-left: 4px solid #22a559;
+  border-radius: var(--raio);
+}
+
+.sucesso.visivel {
+  display: block;
+}
+
+.sucesso strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* ---------- Login + botões ---------- */
+.card-mensagem-login {
+  margin-top: 24px;
+  text-align: center;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  color: var(--texto-suave);
 }
 
 .card-mensagem-login a {
-  color: #387ecec2;
-  font-size: 22px;
+  color: var(--link);
+  font-weight: 600;
   text-decoration: none;
-  font-weight: bold;
+}
+
+.card-mensagem-login a:hover {
+  text-decoration: underline;
 }
 
 .card-botao-cadastro {
-  width: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 50px; 
-  margin-top: 55px;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 24px;
 }
 
-    .botao {
-        width: 30%;
-        height: 60px;
-        background-color: #8a2b2b;
-        color: #ffffff;
-        border: none;
-        border-radius: 8px;
-        font-size: 22px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.589);
-        font-weight: bold;
-    }
+.botao {
+  flex: 1 1 140px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 54px;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  border: none;
+  border-radius: var(--raio);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s, background-color 0.2s;
+}
 
-    .cadastrar {
-    background-color: #06234e;
-    transition: 0.5s;
-    }
-    .cadastrar:hover{
-    background-color: #043072;
-        transform: translateY(-5px);
-    }
+.voltar {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: none;
+}
 
-    .card-botao-cadastro a{
-    text-decoration: none;
-    color: #f5f5f5;
-    }
-    .voltar{
-    transition: 0.5s;
-    }
-    .voltar:hover{
-    transform: translateY(-5px);
-    }
+.voltar:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
 
-@media screen and (max-width: 720px) {
+.cadastrar {
+  background-color: var(--marinho);
+}
 
-  body {
-    min-height: 100%;
-    padding: 20px;
-  }
+.cadastrar:hover {
+  background-color: var(--marinho-hover);
+  transform: translateY(-2px);
+}
 
-  .card {
-    width: 90%;
-    height: auto;
-    min-height: 100px;
-    padding: 25px 20px 30px;
-    border-radius: 20px;
-  }
+.cadastrar:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+}
 
-  .card-titulo {
-    width: 100%;
-    height: auto;
-    margin-top: 10px;
-    margin-bottom: 30px;
-  }
+.botao:focus-visible,
+.card-mensagem-login a:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
 
-  .card-titulo h1 {
-    font-size: 48px;
-    line-height: 1.1;
-  }
-
+/* ---------- Responsivo ---------- */
+@media (max-width: 560px) {
   .card-formulario {
-    width: 100%;
-    height: auto;
-    gap: 16px;
-  }
-
-  .card-formulario input {
-    width: 90%;
-    padding: 18px 18px;
-    font-size: 16px;
-  }
-
-  .card-mensagem-login {
-    width: 100%;
-    margin-top: 25px;
-  }
-
-  .card-mensagem-login p {
-    font-size: 15px;
-    line-height: 1.5;
-  }
-
-  .card-mensagem-login a {
-    font-size: 15px;
+    grid-template-columns: 1fr;
   }
 
   .card-botao-cadastro {
-    width: 100%;
-    gap: 12px;
-    margin-top: 30px;
+    flex-direction: column-reverse;
   }
 
   .botao {
-    width: 50%;
-    height: 50px;
-    font-size: 17px;
+    flex: none;
+    width: 100%;
   }
+}
 
+@media (max-height: 520px) and (orientation: landscape) {
+  body {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
 }

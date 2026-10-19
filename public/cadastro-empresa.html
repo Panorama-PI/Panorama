@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela de Cadastro da Empresa</title>
+
+    <link rel="stylesheet" href="./css/cadastro-empresa.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=IBM+Plex+Serif:wght@400;500;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <main class="card">
+
+        <header class="card-titulo">
+            <h1>Cadastrar empresa</h1>
+            <p>Cadastre sua empresa e comece a usar o Panorama.</p>
+        </header>
+
+        <form class="card-formulario" autocomplete="on">
+
+            <fieldset class="secao">
+                <legend>Dados da empresa</legend>
+
+                <div class="campo">
+                    <label for="ipt_nome_empresa">
+                        Nome da empresa <span class="obrigatorio">*</span>
+                    </label>
+                    <input type="text" id="ipt_nome_empresa" name="nome_empresa" placeholder="Nome da sua empresa"
+                        autocomplete="organization" required>
+                </div>
+
+                <div class="campo">
+                    <label for="ipt_cnpj">
+                        CNPJ <span class="obrigatorio">*</span>
+                    </label>
+                    <!-- inputmode="text" porque o novo CNPJ (desde jul/2026) pode ter letras -->
+                    <input type="text" id="ipt_cnpj" name="cnpj" placeholder="00.000.000/0000-00" maxlength="18"
+                        inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" required>
+                </div>
+
+                <div class="campo">
+                    <label for="ipt_telefone">
+                        Telefone para contato <span class="obrigatorio">*</span>
+                    </label>
+                    <input type="tel" id="ipt_telefone" name="telefone" placeholder="(11) 99999-9999" maxlength="15"
+                        autocomplete="tel" inputmode="tel" required>
+                </div>
+            </fieldset>
+
+            <fieldset class="secao">
+                <legend>Dados do administrador</legend>
+
+                <p class="aviso-administrador">
+                    <strong>Sobre o administrador:</strong>
+                    O usuário cadastrado nesta etapa ficará vinculado à empresa como
+                    administrador. Ele poderá editar as informações da empresa e dos
+                    funcionários, além de auxiliar a equipe no cadastro na plataforma.
+                </p>
+
+                <div class="campo">
+                    <label for="ipt_nome">
+                        Nome completo <span class="obrigatorio">*</span>
+                    </label>
+                    <input type="text" id="ipt_nome" name="nome" placeholder="Nome completo do responsável"
+                        autocomplete="name" required>
+                </div>
+
+                <div class="campo">
+                    <label for="ipt_email">
+                        E-mail <span class="obrigatorio">*</span>
+                    </label>
+                    <input type="email" id="ipt_email" name="email" placeholder="voce@exemplo.com" autocomplete="email"
+                        required>
+                </div>
+
+                <div class="campos-senha">
+
+                    <div class="campo">
+                        <label for="ipt_senha">
+                            Senha <span class="obrigatorio">*</span>
+                        </label>
+
+                        <input type="password" id="ipt_senha" name="senha" placeholder="8 a 12 caracteres"
+                            autocomplete="new-password" minlength="8" maxlength="12" required>
+                    </div>
+
+                    <div class="campo">
+                        <label for="ipt_confirmacao_senha">
+                            Confirmação de senha <span class="obrigatorio">*</span>
+                        </label>
+                        <input type="password" id="ipt_confirmacao_senha" name="confirmacao_senha"
+                            placeholder="Repita a senha" autocomplete="new-password" minlength="8" maxlength="12"
+                            required>
+                    </div>
+
+                </div>
+
+                <p class="dica-senha">
+                    A senha deve ter de 8 a 12 caracteres, com letras maiúsculas
+                    e minúsculas, números e um caractere especial (@ ! # $ % & * _ -).
+                </p>
+
+                <label class="mostrar-senha" for="chk_mostrar">
+                    <input type="checkbox" id="chk_mostrar">
+                    Mostrar senhas
+                </label>
+            </fieldset>
+
+            <!-- Mensagens de erro e de sucesso (as regras .erros e .sucesso vêm do cadastro.css) -->
+            <div class="erros" id="caixa_erros" role="alert" aria-live="assertive"></div>
+            <div class="sucesso" id="caixa_sucesso" role="status" aria-live="polite"></div>
+
+            <div class="card-botao-cadastro">
+                <a class="botao voltar" href="./index.html">Voltar</a>
+
+                <button type="button" class="botao cadastrar" id="btn_cadastrar">
+                    Cadastrar empresa
+                </button>
+            </div>
+
+        </form>
+
+    </main>
+
+    <script src="./js/validacoes-cadastro.js"></script>
+    <script src="./js/cadastro-empresa.js"></script>
+
+</body>
+
+</html>

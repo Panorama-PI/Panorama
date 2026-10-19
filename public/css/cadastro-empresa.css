@@ -1,0 +1,312 @@
+
+:root {
+  --vinho: #760e00;
+  --vinho-escuro: #4a0900;
+  --vinho-claro: #8a2b2b;
+  --marinho: #06234e;
+  --marinho-hover: #0a3a7d;
+  --creme: #fffbfb;
+  --texto-claro: #f5f5f5;
+  --texto-suave: #e6c9c9;
+  --raio: 10px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(16px, 4vw, 48px);
+  font-family: "IBM Plex Serif", Georgia, serif;
+  color: var(--texto-claro);
+  background: radial-gradient(
+    circle at center,
+    #361111 0%,
+    #1a0707 55%,
+    #760e00 140%
+  );
+  background-attachment: fixed;
+}
+
+/* Card principal */
+
+.card {
+  width: 100%;
+  max-width: 600px;
+  padding: clamp(24px, 5vw, 48px);
+  background: linear-gradient(
+    180deg,
+    #820f00 0%,
+    var(--vinho) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: clamp(18px, 3vw, 28px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* Título */
+
+.card-titulo {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.card-titulo h1 {
+  font-family: "Bodoni Moda", serif;
+  font-weight: 700;
+  font-size: clamp(2.3rem, 7vw, 3.8rem);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+}
+
+.card-titulo p {
+  margin-top: 8px;
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  color: var(--texto-suave);
+}
+
+/* Formulário */
+
+.card-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Seções */
+
+.secao {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  min-width: 0;
+  padding: 0;
+  border: none;
+}
+
+.secao legend {
+  width: 100%;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--texto-claro);
+}
+
+/* Campos */
+
+.obrigatorio {
+  color: #ffb4a9;
+  font-weight: 700;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.campo label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--texto-suave);
+}
+
+.campo input {
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #2c0c0c;
+  background-color: var(--creme);
+  border: 1px solid transparent;
+  border-radius: var(--raio);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campo input::placeholder {
+  color: #7a6262;
+  opacity: 1;
+}
+
+.aviso-administrador {
+  grid-column: 1 / -1;
+  padding: 12px 14px;
+  margin-top: -4px;
+  margin-bottom: 2px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--texto-suave);
+  background-color: rgba(0, 0, 0, 0.12);
+  border-left: 3px solid rgba(255, 255, 255, 0.55);
+  border-radius: 6px;
+}
+
+.aviso-administrador strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--texto-claro);
+}
+/* Indicação visual de foco */
+
+.campo input:focus-visible {
+  outline: none;
+  border-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.28);
+}
+
+/* Botões */
+
+.card-botao-cadastro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 2px;
+}
+
+.botao {
+  flex: 1 1 140px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+  padding: 10px 16px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  border-radius: var(--raio);
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.voltar {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.voltar:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cadastrar {
+  background-color: var(--marinho);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.cadastrar:hover {
+  background-color: var(--marinho-hover);
+  transform: translateY(-2px);
+}
+
+.botao:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+/* Campos de senha lado a lado */
+
+.campos-senha {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Instrução sobre a senha */
+
+.dica-senha {
+  grid-column: 1 / -1;
+  margin-top: -6px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--texto-suave);
+  opacity: 0.9;
+}
+
+/* Mostrar senhas */
+
+.mostrar-senha {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.mostrar-senha input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--marinho);
+  cursor: pointer;
+}
+
+/* Responsividade */
+
+@media (max-width: 560px) {
+  body {
+    align-items: flex-start;
+  }
+
+  .card {
+    margin: auto 0;
+  }
+
+  .secao {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .campos-senha {
+    grid-template-columns: 1fr;
+  }
+
+  .card-botao-cadastro {
+    flex-direction: column-reverse;
+  }
+
+  .botao {
+    flex: none;
+    width: 100%;
+  }
+}
+
+/* Telas baixas */
+
+@media (max-height: 520px) and (orientation: landscape) {
+  body {
+    align-items: flex-start;
+  }
+}
+
+/* Acessibilidade */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
