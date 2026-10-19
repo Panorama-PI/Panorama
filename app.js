@@ -1,10 +1,10 @@
 // Define o ambiente em que a aplicação será executada.
 // O ambiente escolhido determina qual arquivo .env será utilizado.
 // var ambiente_processo = 'producao';
-var ambiente_processo = 'producao';
+var ambiente_processo = 'desenvolvimento';
 
 // Seleciona o arquivo de configurações de acordo com o ambiente.
-var caminho_env = ambiente_processo === 'producao' ? '.env' : '.env.dev';
+var caminho_env = ambiente_processo === 'desenvolvimento' ? '.env' : '.env.dev';
 
 require("dotenv").config({ path: caminho_env });
 
