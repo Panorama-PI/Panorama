@@ -1,60 +1,71 @@
+
 var empresaModel = require("../models/empresaModel");
+var validacoes = require("../../public/js/validacoes-cadastro");
 
-// Cadastra uma nova empresa.
-// Verifica se o CNPJ já está cadastrado antes de realizar o cadastro.
-// Essa função será utilizada posteriormente.
-// function cadastrar(req, res) {
-//   var cnpj = req.body.cnpj;
-//   var razaoSocial = req.body.razaoSocial;
+async function cadastrar(req, res) {
+    console.log("[CADASTRO 1] Requisição recebida");
 
-//   empresaModel.buscarPorCnpj(cnpj).then((resultado) => {
-//     if (resultado.length > 0) {
-//       res
-//         .status(401)
-//         .json({ mensagem: `a empresa com o cnpj ${cnpj} já existe` });
-//     } else {
-//       empresaModel.cadastrar(razaoSocial, cnpj).then((resultado) => {
-//         res.status(201).json(resultado);
-//       });
-//     }
-//   });
-// }
+    var corpo = req.body || {};
 
+    var resultado = validacoes.validarCadastroEmpresa({
+        nomeEmpresa: corpo.nomeEmpresaServer,
+        cnpj: corpo.cnpjServer,
+        telefone: corpo.telefoneServer,
+        nomeAdmin: corpo.nomeAdminServer,
+        email: corpo.emailServer,
+        senha: corpo.senhaServer,
+        confirmacaoSenha: corpo.confirmacaoSenhaServer
+    });
 
-// Busca uma empresa pelo CNPJ.
-// Essa função será utilizada posteriormente.
-// function buscarPorCnpj(req, res) {
-//   var cnpj = req.query.cnpj;
+    console.log("[CADASTRO 2] Validação concluída");
 
-//   empresaModel.buscarPorCnpj(cnpj).then((resultado) => {
-//     res.status(200).json(resultado);
-//   });
-// }
+    if (resultado.erros.length > 0) {
+        return res.status(400).json({
+            mensagem: "Cadastro não realizado. Corrija os itens informados.",
+            erros: resultado.erros
+        });
+    }
 
+    try {
+        console.log("[CADASTRO 3] Chamando model");
 
-// Busca uma empresa pelo ID.
-// Essa função será utilizada posteriormente.
-// function buscarPorId(req, res) {
-//   var id = req.params.id;
+        await empresaModel.cadastrar(resultado.dados);
 
-//   empresaModel.buscarPorId(id).then((resultado) => {
-//     res.status(200).json(resultado);
-//   });
-// }
+        console.log("[CADASTRO 4] Model concluiu o cadastro");
 
+        return res.status(201).json({
+            mensagem: "Empresa e administrador cadastrados com sucesso."
+        });
+    } catch (erro) {
+        console.error("[CADASTRO ERRO]", erro);
 
-// Lista as empresas cadastradas.
-// Solicita os dados ao model e retorna o resultado em formato JSON.
-function listar(req, res) {
-  empresaModel.listar().then((resultado) => {
-    res.status(200).json(resultado);
-  });
+        if (erro.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({
+                mensagem: "Este e-mail já está cadastrado. Utilize outro e-mail."
+            });
+        }
+
+        return res.status(500).json({
+            mensagem: "Não foi possível realizar o cadastro. Tente novamente."
+        });
+    }
 }
 
+function listar(req, res) {
+    empresaModel.listar()
+        .then(function (resultado) {
+            return res.status(200).json(resultado);
+        })
+        .catch(function (erro) {
+            console.error("Erro ao listar empresas:", erro.code || "ERRO_INTERNO");
+
+            return res.status(500).json({
+                mensagem: "Não foi possível listar as empresas."
+            });
+        });
+}
 
 module.exports = {
-  // cadastrar,
-  // buscarPorCnpj,
-  // buscarPorId,
-  listar
+    cadastrar,
+    listar
 };
