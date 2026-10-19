@@ -1,5 +1,45 @@
 var database = require("../database/config");
+var bcrypt = require("bcryptjs");
 
+async function cadastrar(dados) {
+    // Gera o hash antes de abrir a transação
+    var senhaHash = await bcrypt.hash(dados.senha, 10);
+
+    return database.executarTransacao(async function ({ query }) {
+        // 1. Cadastra a empresa
+        var resultadoEmpresa = await query(
+            `INSERT INTO empresa (nome, cnpj, telefone)
+             VALUES (?, ?, ?)`,
+            [
+                dados.nomeEmpresa,
+                dados.cnpj,
+                dados.telefone
+            ]
+        );
+
+        // Recupera o ID gerado pelo MySQL
+        var idEmpresa = resultadoEmpresa.insertId;
+
+        // 2. Cadastra o administrador vinculado à empresa
+        var resultadoUsuario = await query(
+            `INSERT INTO usuario
+                (nome, email, senha_hash, perfil_id, criado_em, id_empresa)
+             VALUES (?, ?, ?, ?, NOW(), ?)`,
+            [
+                dados.nomeAdmin,
+                dados.email,
+                senhaHash,
+                3,
+                idEmpresa
+            ]
+        );
+
+        return {
+            idEmpresa: idEmpresa,
+            idAdministrador: resultadoUsuario.insertId
+        };
+    });
+}
 // Cadastra uma nova empresa.
 // Essa função será utilizada posteriormente.
 // function cadastrar(razaoSocial, cnpj) {
@@ -52,5 +92,6 @@ module.exports = {
   // cadastrar,
   // buscarPorCnpj,
   // buscarPorId,
+  cadastrar,
   listar
 };

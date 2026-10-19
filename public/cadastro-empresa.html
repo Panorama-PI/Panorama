@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
@@ -41,16 +41,17 @@
                     <label for="ipt_cnpj">
                         CNPJ <span class="obrigatorio">*</span>
                     </label>
+                    <!-- inputmode="text" porque o novo CNPJ (desde jul/2026) pode ter letras -->
                     <input type="text" id="ipt_cnpj" name="cnpj" placeholder="00.000.000/0000-00" maxlength="18"
-                        inputmode="numeric" autocomplete="off" required>
+                        inputmode="text" autocapitalize="characters" spellcheck="false" autocomplete="off" required>
                 </div>
 
                 <div class="campo">
                     <label for="ipt_telefone">
                         Telefone para contato <span class="obrigatorio">*</span>
                     </label>
-                    <input type="tel" id="ipt_telefone" name="telefone" placeholder="(11) 99999-9999" autocomplete="tel"
-                        inputmode="tel" required>
+                    <input type="tel" id="ipt_telefone" name="telefone" placeholder="(11) 99999-9999" maxlength="15"
+                        autocomplete="tel" inputmode="tel" required>
                 </div>
             </fieldset>
 
@@ -113,6 +114,10 @@
                 </label>
             </fieldset>
 
+            <!-- Mensagens de erro e de sucesso (as regras .erros e .sucesso vêm do cadastro.css) -->
+            <div class="erros" id="caixa_erros" role="alert" aria-live="assertive"></div>
+            <div class="sucesso" id="caixa_sucesso" role="status" aria-live="polite"></div>
+
             <div class="card-botao-cadastro">
                 <a class="botao voltar" href="./index.html">Voltar</a>
 
@@ -124,6 +129,9 @@
         </form>
 
     </main>
+
+    <script src="./js/validacoes-cadastro.js"></script>
+    <script src="./js/cadastro-empresa.js"></script>
 
 </body>
 

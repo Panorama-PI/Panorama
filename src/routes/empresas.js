@@ -4,6 +4,10 @@ var router = express.Router();
 
 var empresaController = require("../controllers/empresaController");
 
+router.post("/cadastrar", function (req, res) {
+    empresaController.cadastrar(req, res);
+});
+
 // Rotas de cadastro e consulta de empresas.
 // Estão mantidas comentadas porque serão utilizadas posteriormente.
 
