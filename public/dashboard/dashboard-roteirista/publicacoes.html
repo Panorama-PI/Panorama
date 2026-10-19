@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <link rel="shortcut icon" href="../assets/icon/favicon2.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panorama | Dashboards</title>
+
+    
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <!-- scripts do Chart.js - 2022-1 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!--FONT AWESOME-->
+    <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
+</head>
+
+<!-- <body onload=" atualizarFeed()"> -->
+
+<body class="body-publicacao">
+
+    <!-- SIDEBAR -->
+    <aside class="aside-left">
+        <div class="usuario-side">
+            <img src="../../assets/imgs/matheus.jpg" alt="Foto do usuário">
+
+            <h2 id="a_usuario">Usuário</h2>
+            <h3 id="b_produtor">Roteirista</h3>
+            <h4 id="c_email">email@gmail.com</h4>
+        </div>
+
+        <div class="btns-side">
+            <a href="../../index.html">
+                <img src="../../assets/icon/sair-icon.png" alt="">
+                Home
+            </a>
+
+            <a href="./dashboard-geral.html">
+                <img src="../../assets/icon/chart-icon.png" alt="">
+                Visão Geral
+            </a>
+
+            <a href="./dashboard-especifica.html">
+                <img src="../../assets/icon/chart-icon.png" alt="">
+                Visão Específica
+            </a>
+
+            <a href="./anotacoes.html">
+                <img src="../../assets/icon/observacoes-icon.png" alt="">
+                Observações
+            </a>
+
+            <a href="./pesquisa.html">
+                <img src="../../assets/icon/pesquisa-icon.png" alt="">
+                Pesquisa
+            </a>
+
+            <a href="./publicacao.html" class="active">
+                <img src="../../assets/icon/publicacao.png" alt="">
+                Publicações
+            </a>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="home-publicacao">
+
+        <header class="publicacao-header">
+            <div>
+                <h1>Publicações</h1>
+
+                <p>
+                    Compartilhe um projeto com os produtores da sua empresa.
+                </p>
+            </div>
+        </header>
+
+        <!-- NAVEGAÇÃO DA PÁGINA -->
+        <nav class="publicacao-acoes">
+        </nav>
+
+        <!-- FORMULÁRIO -->
+        <section
+            class="publicacao-form-card"
+            id="form-publicacao"
+        >
+            <div class="publicacao-form-header">
+                <h2>Nova publicação de projeto</h2>
+            </div>
+
+            <form class="publicacao-form">
+
+                <div class="publicacao-campos">
+
+                    <div class="publicacao-campo">
+                        <label for="titulo-publicacao">
+                            Título da publicação
+                        </label>
+
+                        <input
+                            type="text"
+                            id="titulo-publicacao"
+                            name="titulo"
+                            placeholder="Ex.: Entre Linhas"
+                            required
+                        >
+                    </div>
+
+                    <div class="publicacao-campo">
+                        <label for="projeto-anotacoes">
+                            Projeto de Anotações
+                        </label>
+
+                        <select
+                            id="projeto-anotacoes"
+                            name="projeto_id"
+                            required
+                        >
+                            <option value="" disabled selected>
+                                Selecionar um projeto
+                            </option>
+
+                            <!-- Preencher com projetos do banco -->
+                        </select>
+                    </div>
+
+                    <div class="publicacao-campo publicacao-campo-descricao">
+                        <label for="descricao-publicacao">
+                            Descrição
+                        </label>
+
+                        <textarea
+                            id="descricao-publicacao"
+                            name="descricao"
+                            placeholder="Digite sua aqui a descrição da publicação."
+                            required
+                        ></textarea>
+                    </div>
+
+                </div>
+
+                <div class="publicacao-form-footer">
+                    <div class="publicacao-form-acoes">
+                        <button
+                            type="reset"
+                            class="publicacao-btn-cancelar"
+                        >
+                            Limpar
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="publicacao-btn-principal"
+                        >
+                            Publicar projeto
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </section>
+
+        <!-- LISTAGEM DAS PUBLICAÇÕES -->
+        <section
+            class="publicacao-lista"
+            id="minhas-publicacoes"
+        >
+            <div class="publicacao-lista-header">
+                <div>
+                    <h2>Minhas publicações</h2>
+                </div>
+            </div>
+
+            <div class="publicacao-vazia">
+                <h3>Nenhuma publicação encontrada</h3>
+                <p>
+                    Suas publicações aparecerão aqui após serem cadastradas.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+</body>
