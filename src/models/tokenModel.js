@@ -30,7 +30,7 @@ function salvarToken(token,idEmpresa,email){
     let sql = `
         INSERT INTO 
             token 
-            (codigo, status_enviado, expiracao, email_destinatario, id_empresa) 
+            (codigo, status_enviado, expiracao, id_empresa) 
         VALUES 
             ('${token}', 0, NOW() + INTERVAL 15 MINUTE,'${email}', ${idEmpresa}); 
     `
@@ -42,8 +42,7 @@ function autenticar(token){
     let sql = `
         SELECT
             codigo,
-            id_empresa,
-            email_destinatario
+            id_empresa
         FROM
             token
         WHERE
