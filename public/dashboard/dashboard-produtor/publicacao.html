@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <link rel="shortcut icon" href="../assets/icon/favicon2.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panorama | Dashboards</title>
+
+    
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../css/publicacao.css">
+    
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <!-- scripts do Chart.js - 2022-1 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!--FONT AWESOME-->
+    <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
+</head>
+
+<!-- <body onload=" atualizarFeed()"> -->
+
+<body style="background-color: black;">
+
+        <aside class="aside-left">
+            <div class="usuario-side">
+                <img src="../../assets/imgs/matheus.jpg">
+
+                <h2 id="a_usuario">Usuário</h3>
+                <h3 id="b_produtor">Produtor</h3>
+                <h4 id="c_email">email@gmail.com</h3>
+            </div>
+
+            <div class="btns-side">
+            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
+            <a href="./dashboard-geral.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
+            <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
+            <a href="../anotacoes.html"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
+            <a href="./pesquisa.html"><img src="../../assets/icon/pesquisa-icon.png" alt="" id="limpar_pesquisa">Pesquisa</a>
+            <a href="./publicacao.html" class="active"><img src="../../assets/icon/publicacao.png" alt="">Publicações</a>
+        </div>
+
+        </aside>
+
+        <main class="publicacao">
+    <div class="cabecalho-publicacoes">
+        <h1>Publicações da empresa</h1>
+        <p>Use filtros para localizar projetos com potencial de investimento.</p>
+    </div>
+
+    <!-- Barra de Filtros -->
+    <div class="filtros-container">
+        <div class="filtro-item">
+            <label for="genero">GÊNERO</label>
+            <select id="genero">
+                <option value="">Todos</option>
+                <option value="drama">Drama</option>
+                <option value="suspense">Suspense</option>
+            </select>
+        </div>
+
+        <div class="filtro-item">
+            <label for="tema">TEMA</label>
+            <select id="tema">
+                <option value="">Todos</option>
+                <option value="relacoes">Relações familiares</option>
+                <option value="misterio">Mistério</option>
+            </select>
+        </div>
+
+        <div class="filtro-item">
+            <label for="roteirista">ROTEIRISTA</label>
+            <select id="roteirista">
+                <option value="">Todos</option>
+                <option value="ana">Ana Ribeiro</option>
+                <option value="lucas">Lucas Martins</option>
+            </select>
+        </div>
+
+        <div class="filtro-item">
+            <label for="ordenar">ORDENAR</label>
+            <select id="ordenar">
+                <option value="recentes">Recentes</option>
+            </select>
+        </div>
+
+        <button class="btn-filtrar">Aplicar filtros</button>
+    </div>
+
+    <div class="cards-publicacoes">
+  
+    </div>
+
+</main>
+  
+
+<script src="../../js/publicacao.js"></script>
+
+</body>
+
+</html>
