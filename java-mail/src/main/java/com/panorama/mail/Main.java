@@ -34,8 +34,8 @@ public class Main {
                 List<PendenciaEmailEnvio> pendentes = emailDao.verificarEmailPendente();
                 for (PendenciaEmailEnvio pendente : pendentes) {
                     EmailMessage message = new EmailMessage(
-                            "Teste de E-mail via POO",
-                            "Olá! Este e-mail foi enviado com sucesso utilizando a estrutura por pacotes."
+                            "Envio do Token da Panorama",
+                            "Olá! use o token no site para conseguir o acesso!"
                     );
                     emailService.enviarEmail(message,pendente);
                     System.out.println("E-mail enviado com sucesso!");
