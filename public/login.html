@@ -107,10 +107,20 @@
                     resposta.json().then(json => {
 
                         alert("Login realizado com sucesso");
+                        console.log(json);
+                        console.log(JSON.stringify(json));
+                        sessionStorage.EMAIL_USUARIO = json.email;
+                        sessionStorage.NOME_USUARIO = json.nome;
+                        sessionStorage.ID_USUARIO = json.id;
+                        sessionStorage.PERFIL_ID_USUARIO = json.perfil_id;
 
                         // Redireciona o usuário para a página inicial após o login.
                         setTimeout(function () {
-                            window.location = "/index.html";
+                            if(sessionStorage.PERFIL_ID_USUARIO == 1){
+                                window.location.href = "dashboard/dashboard-produtor/dashboard-especifica.html";
+                            }else if (sessionStorage.PERFIL_ID_USUARIO == 2){
+                                window.location.href = "./dashboard/dashboard-roteirista/dashboard-especifica.html";
+                            }
                         }, 750);
 
                     });

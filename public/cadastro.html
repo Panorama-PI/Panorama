@@ -169,7 +169,7 @@
 
       btn_cadastrar.disabled = true;
       btn_cadastrar.textContent = "Cadastrando...";
-
+            console.log(selectCargo.value)
       // Envia os dados do cadastro para o backend.
       fetch("/usuarios/cadastrar", {
         method: "POST",
@@ -190,11 +190,10 @@
           if (resposta.ok) {
             btn_cadastrar.textContent = "Cadastro realizado!";
             mostrarSucesso("Cadastro realizado com sucesso!");
-
             // Após o cadastro, redireciona o usuário para a tela de login.
             setTimeout(() => {
               window.location = "login.html";
-            }, 2000);
+            }, 9000);
 
           } else {
             // Mostra a mensagem que o backend enviou (token inválido, formato, etc.).
