@@ -8,10 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panorama | Dashboards</title>
 
-    
     <link rel="stylesheet" href="../../css/dashboard.css">
     <link rel="stylesheet" href="../../css/publicacao.css">
-    
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link
@@ -24,8 +22,6 @@
     <!--FONT AWESOME-->
     <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
 </head>
-
-<!-- <body onload=" atualizarFeed()"> -->
 
 <body style="background-color: black;">
 
@@ -61,8 +57,12 @@
             <label for="genero">GÊNERO</label>
             <select id="genero">
                 <option value="">Todos</option>
-                <option value="drama">Drama</option>
-                <option value="suspense">Suspense</option>
+                <option value="Ação">Ação</option>
+                <option value="Drama">Drama</option>
+                <option value="Épico / Histórico">Épico / Histórico</option>
+                <option value="Ficção Científica">Ficção Científica</option>
+                <option value="Romance">Romance</option>
+                <option value="Suspense">Suspense</option>
             </select>
         </div>
 
@@ -70,8 +70,14 @@
             <label for="tema">TEMA</label>
             <select id="tema">
                 <option value="">Todos</option>
-                <option value="relacoes">Relações familiares</option>
-                <option value="misterio">Mistério</option>
+                <option value="Encontros e Desencontros">Encontros e Desencontros</option>
+                <option value="Espionagem">Espionagem</option>
+                <option value="Inteligência Artificial">Inteligência Artificial</option>
+                <option value="Investigação Criminal">Investigação Criminal</option>
+                <option value="Luta e Herança">Luta e Herança</option>
+                <option value="Mistério">Mistério</option>
+                <option value="Relações familiares">Relações familiares</option>
+                <option value="Superação">Superação</option>
             </select>
         </div>
 
@@ -79,19 +85,28 @@
             <label for="roteirista">ROTEIRISTA</label>
             <select id="roteirista">
                 <option value="">Todos</option>
-                <option value="ana">Ana Ribeiro</option>
-                <option value="lucas">Lucas Martins</option>
+                <option value="Ana Ribeiro">Ana Ribeiro</option>
+                <option value="Beatriz Fonseca">Beatriz Fonseca</option>
+                <option value="Camila Duarte">Camila Duarte</option>
+                <option value="Gabriel Santana">Gabriel Santana</option>
+                <option value="Lucas Martins">Lucas Martins</option>
+                <option value="Mariana Lopes">Mariana Lopes</option>
+                <option value="Rodrigo Neves">Rodrigo Neves</option>
+                <option value="Tiago Albuquerque">Tiago Albuquerque</option>
             </select>
         </div>
 
         <div class="filtro-item">
             <label for="ordenar">ORDENAR</label>
             <select id="ordenar">
-                <option value="recentes">Recentes</option>
+                <option value="recentes">Mais recentes</option>
+                <option value="antigos">Mais antigas</option>
+                <option value="nome-asc">Nome (A - Z)</option>
+                <option value="nome-desc">Nome (Z - A)</option>
             </select>
         </div>
 
-        <button class="btn-filtrar">Aplicar filtros</button>
+        <button type="button" class="btn-filtrar" onclick="aplicarFiltros()">Aplicar filtros</button>
     </div>
 
     <div class="cards-publicacoes">
@@ -99,7 +114,45 @@
     </div>
 
 </main>
-  
+
+    <!-- Modal: Detalhes e Anotações da Publicação -->
+    <div id="modal-publicacao" class="modal-overlay" style="display: none;" onclick="fecharModalExterno(event)">
+        <div class="modal-conteudo modal-anotacoes-projeto" onclick="event.stopPropagation()">
+            <div class="modal-header-limpo">
+                <div>
+                    <h2 id="modal-titulo" class="modal-titulo-projeto">Título do Projeto</h2>
+                    <span class="modal-subtitulo-projeto">Publicação e Anotações</span>
+                </div>
+                <button type="button" class="btn-fechar-modal" onclick="fecharModal()" aria-label="Fechar janela">&times;</button>
+            </div>
+
+            <div class="modal-corpo-limpo">
+                <!-- Descrição da publicação -->
+                <div class="modal-bloco">
+                    <h3 class="modal-bloco-titulo">Descrição da publicação</h3>
+                    <p id="modal-descricao" class="modal-descricao-texto"></p>
+                    <p id="modal-premissa" style="display: none;"></p>
+                    <div id="modal-tags" style="display: none;"></div>
+                </div>
+
+                <!-- Anotações vinculadas ao projeto -->
+                <div class="modal-bloco">
+                    <div class="modal-bloco-topo">
+                        <h3 class="modal-bloco-titulo">Anotações vinculadas</h3>
+                        <span id="modal-total-anotacoes" class="modal-contador-anotacoes">0 anotações</span>
+                    </div>
+
+                    <div id="modal-lista-anotacoes" class="modal-lista-anotacoes">
+                        <!-- Preenchido dinamicamente com as anotações do projeto -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-rodape-limpo">
+                <button type="button" class="btn-fechar-secundario" onclick="fecharModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
 
 <script src="../../js/publicacao.js"></script>
 
