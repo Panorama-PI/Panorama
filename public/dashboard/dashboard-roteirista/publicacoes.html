@@ -1,0 +1,400 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panorama | Publicações</title>
+
+    <link rel="shortcut icon" href="../assets/icon/favicon2.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../css/publicacoes.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="body-publicacao">
+
+    <!-- SIDEBAR ORIGINAL: mantida sem alterações -->
+   <aside class="aside-left">
+        <div class="usuario-side">
+            <img src="../../assets/imgs/matheus.jpg" alt="Foto do usuário">
+
+            <h2 id="a_usuario">Usuário</h2>
+            <h3 id="b_produtor">Produtor</h3>
+            <h4 id="c_email">email@gmail.com</h4>
+        </div>
+        <div class="btns-side">
+            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
+            <a href="./dashboard-geral.html" ><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
+            <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
+            <a href="./anotacoes.html" class="ativo"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
+            <a href="./pesquisa.html"><img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
+            <a href="./publicacoes.html"><img src="../../assets/icon/publicacao.png" alt="">Publicações</a>
+        </div>
+    
+    </aside>
+
+    <main class="home-publicacao">
+
+        <header class="publicacao-header">
+            <h1>Minhas publicações</h1>
+        </header>
+
+        <section class="publicacao-lista" id="minhas-publicacoes">
+
+            <div class="publicacao-lista-topo">
+                <button type="button"
+                    class="publicacao-btn-principal"
+                    id="abrir-formulario">
+                    Nova publicação
+                </button>
+            </div>
+
+            <div class="publicacao-tabela-wrap">
+                <table class="publicacao-tabela">
+                    <thead>
+                        <tr>
+                            <th>Projeto</th>
+                            <th>Criado em</th>
+                            <th>Gênero</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="lista-publicacoes"></tbody>
+                </table>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- FORMULÁRIO DE PUBLICAÇÃO -->
+    <div class="publicacao-modal-overlay"
+        id="formulario-publicacao"
+        aria-hidden="true">
+
+        <section class="publicacao-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="titulo-formulario">
+
+            <header class="publicacao-modal-topo">
+                <div>
+                    <span class="publicacao-etiqueta">PUBLICAÇÕES</span>
+                    <h2 id="titulo-formulario">Nova publicação de projeto</h2>
+                </div>
+
+                <button type="button"
+                    class="publicacao-modal-fechar"
+                    id="fechar-formulario"
+                    aria-label="Fechar formulário">×</button>
+            </header>
+
+            <form id="form-publicacao" class="publicacao-form">
+
+                <div class="publicacao-campos">
+
+                    <div class="publicacao-campo">
+                        <label for="titulo-publicacao">Título da publicação</label>
+                        <input type="text"
+                            id="titulo-publicacao"
+                            name="titulo"
+                            placeholder="Ex.: Entre Linhas"
+                            required>
+                    </div>
+
+                    <div class="publicacao-campo">
+                        <label for="projeto-anotacoes">Projeto</label>
+                        <select id="projeto-anotacoes"
+                            name="projeto_id"
+                            required>
+                            <option value="">Selecionar um projeto</option>
+                        </select>
+                    </div>
+
+                    <div class="publicacao-campo publicacao-campo-anotacoes"
+                        id="campo-anotacoes"
+                        hidden>
+
+                        <label>Anotações relacionadas ao projeto</label>
+
+                        <div id="lista-anotacoes"
+                            class="publicacao-lista-anotacoes"></div>
+
+                        <small id="ajuda-anotacoes">
+                            Selecione as anotações que deseja anexar à publicação.
+                        </small>
+                    </div>
+
+                    <div class="publicacao-campo publicacao-campo-descricao">
+                        <label for="descricao-publicacao">Descrição</label>
+                        <textarea id="descricao-publicacao"
+                            name="descricao"
+                            placeholder="Digite aqui a descrição da publicação."
+                            required></textarea>
+                    </div>
+
+                </div>
+
+                <footer class="publicacao-modal-acoes">
+                    <button type="reset" class="publicacao-btn-secundario">
+                        Limpar
+                    </button>
+
+                    <button type="submit"
+                        class="publicacao-btn-principal"
+                        id="salvar-publicacao">
+                        Publicar projeto
+                    </button>
+                </footer>
+
+            </form>
+        </section>
+    </div>
+
+    <script>
+        // Dados temporários de demonstração.
+        const projetosMock = [
+            {
+                id: "entre-linhas",
+                nome: "Entre Linhas",
+                anotacoes: [
+                    { id: "el-1", titulo: "Premissa e conflito central" },
+                    { id: "el-2", titulo: "Construção dos personagens" },
+                    { id: "el-3", titulo: "Possíveis finais" }
+                ]
+            },
+            {
+                id: "ultima-estacao",
+                nome: "Última Estação",
+                anotacoes: [
+                    { id: "ue-1", titulo: "Ambientação da estação" },
+                    { id: "ue-2", titulo: "Arco do protagonista" }
+                ]
+            },
+            {
+                id: "mare-agosto",
+                nome: "Maré de Agosto",
+                anotacoes: [
+                    { id: "ma-1", titulo: "Ideia inicial" },
+                    { id: "ma-2", titulo: "Pesquisa de referências" }
+                ]
+            }
+        ];
+
+        let publicacoes = [
+            {
+                id: 1,
+                projetoId: "entre-linhas",
+                titulo: "Entre Linhas",
+                data: "14/10/2026",
+                genero: "Drama",
+                descricao: "Apresentação do projeto Entre Linhas.",
+                anotacaoIds: ["el-1", "el-2"]
+            },
+            {
+                id: 2,
+                projetoId: "ultima-estacao",
+                titulo: "Última Estação",
+                data: "09/10/2026",
+                genero: "Suspense",
+                descricao: "Apresentação do projeto Última Estação.",
+                anotacaoIds: ["ue-1"]
+            },
+            {
+                id: 3,
+                projetoId: "mare-agosto",
+                titulo: "Maré de Agosto",
+                data: "02/10/2026",
+                genero: "Romance",
+                descricao: "Primeira versão da apresentação de Maré de Agosto.",
+                anotacaoIds: ["ma-1"]
+            }
+        ];
+
+        const formulario = document.getElementById("formulario-publicacao");
+        const formPublicacao = document.getElementById("form-publicacao");
+        const projetoSelect = document.getElementById("projeto-anotacoes");
+        const campoAnotacoes = document.getElementById("campo-anotacoes");
+        const listaAnotacoes = document.getElementById("lista-anotacoes");
+        const tituloFormulario = document.getElementById("titulo-formulario");
+        const salvarBotao = document.getElementById("salvar-publicacao");
+
+        function preencherProjetos() {
+            projetosMock.forEach(function(projeto) {
+                const opcao = document.createElement("option");
+                opcao.value = projeto.id;
+                opcao.textContent = projeto.nome;
+                projetoSelect.appendChild(opcao);
+            });
+        }
+
+        function atualizarAnotacoes(projetoId, anotacoesSelecionadas = []) {
+            listaAnotacoes.innerHTML = "";
+
+            const projeto = projetosMock.find(function(item) {
+                return item.id === projetoId;
+            });
+
+            if (!projeto) {
+                campoAnotacoes.hidden = true;
+                return;
+            }
+
+            projeto.anotacoes.forEach(function(anotacao) {
+                const item = document.createElement("label");
+                item.className = "publicacao-anotacao-item";
+
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.name = "anotacoes_ids[]";
+                checkbox.value = anotacao.id;
+                checkbox.checked = anotacoesSelecionadas.includes(anotacao.id);
+
+                const texto = document.createElement("span");
+                texto.textContent = anotacao.titulo;
+
+                item.appendChild(checkbox);
+                item.appendChild(texto);
+                listaAnotacoes.appendChild(item);
+            });
+
+            campoAnotacoes.hidden = false;
+        }
+
+        function obterAnotacoesMarcadas() {
+            return Array.from(
+                listaAnotacoes.querySelectorAll('input[type="checkbox"]:checked')
+            ).map(function(checkbox) {
+                return checkbox.value;
+            });
+        }
+
+        function renderizarPublicacoes() {
+            const lista = document.getElementById("lista-publicacoes");
+            lista.innerHTML = "";
+
+            publicacoes.forEach(function(publicacao) {
+                const linha = document.createElement("tr");
+
+                const projeto = projetosMock.find(function(item) {
+                    return item.id === publicacao.projetoId;
+                });
+
+                const nomeProjeto = projeto
+                    ? projeto.nome
+                    : publicacao.titulo;
+
+                linha.innerHTML = `
+                    <td class="publicacao-nome-projeto">
+                        ${nomeProjeto}
+                    </td>
+
+                    <td>${publicacao.data}</td>
+
+                    <td>${publicacao.genero}</td>
+
+                    <td>
+                        <div class="publicacao-acoes-linha">
+                            <button type="button"
+                                class="publicacao-btn-tabela">
+                                Editar
+                            </button>
+
+                            <button type="button"
+                                class="publicacao-btn-tabela publicacao-btn-excluir">
+                                Excluir
+                            </button>
+                        </div>
+                    </td>
+                `;
+
+                lista.appendChild(linha);
+            });
+        }
+
+        function abrirFormulario() {
+            formPublicacao.reset();
+            atualizarAnotacoes("");
+
+            tituloFormulario.textContent = "Nova publicação de projeto";
+            salvarBotao.textContent = "Publicar projeto";
+
+            formulario.classList.add("aberto");
+            formulario.setAttribute("aria-hidden", "false");
+        }
+
+        function fecharFormulario() {
+            formulario.classList.remove("aberto");
+            formulario.setAttribute("aria-hidden", "true");
+
+            formPublicacao.reset();
+            atualizarAnotacoes("");
+        }
+
+        document.getElementById("abrir-formulario")
+            .addEventListener("click", abrirFormulario);
+
+        document.getElementById("fechar-formulario")
+            .addEventListener("click", fecharFormulario);
+
+        formulario.addEventListener("click", function(evento) {
+            if (evento.target === formulario) {
+                fecharFormulario();
+            }
+        });
+
+        document.addEventListener("keydown", function(evento) {
+            if (
+                evento.key === "Escape" &&
+                formulario.classList.contains("aberto")
+            ) {
+                fecharFormulario();
+            }
+        });
+
+        projetoSelect.addEventListener("change", function() {
+            atualizarAnotacoes(projetoSelect.value);
+        });
+
+        formPublicacao.addEventListener("reset", function() {
+            setTimeout(function() {
+                atualizarAnotacoes(projetoSelect.value);
+            }, 0);
+        });
+
+        formPublicacao.addEventListener("submit", function(evento) {
+            evento.preventDefault();
+
+            const projetoId = projetoSelect.value;
+            const projeto = projetosMock.find(function(item) {
+                return item.id === projetoId;
+            });
+
+            if (!projeto) return;
+
+            const anotacoesSelecionadas = obterAnotacoesMarcadas();
+
+            if (anotacoesSelecionadas.length === 0) {
+                window.alert(
+                    "Selecione pelo menos uma anotação para anexar à publicação."
+                );
+                return;
+            }
+
+            // A integração com o back-end será feita posteriormente.
+            fecharFormulario();
+        });
+
+        preencherProjetos();
+        renderizarPublicacoes();
+    </script>
+
+</body>
+</html>
+```
