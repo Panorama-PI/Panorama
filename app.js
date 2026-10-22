@@ -16,11 +16,14 @@ var PORTA_APP = process.env.APP_PORT;
 var HOST_APP = process.env.APP_HOST;
 
 var app = express();
-
 // Importa as rotas que serão utilizadas pela aplicação.
 var indexRouter = require("./src/routes/index");
 var usuarioRouter = require("./src/routes/usuarios");
 var empresasRouter = require("./src/routes/empresas");
+var anotacoesRouter = require("./src/routes/anotacoes");
+var tokensRouter = require("./src/routes/tokens");
+var publicacaoRRouter = require("./src/routes/publicacaoR");
+var publicacoesRouter = require("./src/routes/publicacoes");
 
 // Permite que a aplicação receba dados enviados no formato JSON
 // e também dados enviados por formulários.
@@ -39,6 +42,11 @@ app.use(cors());
 app.use("/", indexRouter);
 app.use("/usuarios", usuarioRouter);
 app.use("/empresas", empresasRouter);
+app.use("/anotacoes", anotacoesRouter);
+app.use("/tokens", tokensRouter);  
+app.use("/publicacoes", publicacaoRRouter);
+
+app.use("/publicacoes", publicacoesRouter);
 
 // Inicia o servidor utilizando a porta definida nas configurações
 // do ambiente.

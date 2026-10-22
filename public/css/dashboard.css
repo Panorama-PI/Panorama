@@ -70,6 +70,7 @@ body {
 
 .btns-side a {
   box-sizing: border-box; 
+  font-size: 23px;
   display: flex;
   align-items: center;
   color: var(--cor-cinza-claro);
@@ -320,3 +321,5 @@ body {
 #risco-genero{
   color: var(--cor-coral-kpi);
 }
+
+
