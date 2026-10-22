@@ -32,4 +32,11 @@ router.delete("/excluir", function (req, res) {
     anotacaoController.excluirAnotacao(req, res);
 });
 
+router.put("/projetos/editar", function (req, res) {
+    anotacaoController.editarProjeto(req, res);
+});
+
+router.delete("/projetos/excluir", function (req, res) {
+    anotacaoController.excluirProjeto(req, res);
+});
 module.exports = router;
