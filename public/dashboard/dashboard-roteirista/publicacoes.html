@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -8,19 +7,22 @@
 
     <title>Panorama | Publicações</title>
 
-    <link rel="shortcut icon" href="../assets/icon/favicon2.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../../assets/icon/favicon2.ico" type="image/x-icon">
     <link rel="stylesheet" href="../../css/dashboard.css">
     <link rel="stylesheet" href="../../css/publicacoes.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Proteção de página: redireciona para o login se não houver sessão -->
+    <script src="../../js/sessao.js"></script>
+    <script>validarSessao();</script>
 </head>
 
 <body class="body-publicacao">
 
-    <!-- SIDEBAR ORIGINAL: mantida sem alterações -->
-   <aside class="aside-left">
+    <aside class="aside-left">
         <div class="usuario-side">
             <img src="../../assets/imgs/matheus.jpg" alt="Foto do usuário">
 
@@ -30,13 +32,12 @@
         </div>
         <div class="btns-side">
             <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
-            <a href="./dashboard-geral.html" ><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
+            <a href="./dashboard-geral.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
             <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
-            <a href="./anotacoes.html" class="ativo"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
+            <a href="./anotacoes.html"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
             <a href="./pesquisa.html"><img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
-            <a href="./publicacoes.html"><img src="../../assets/icon/publicacao.png" alt="">Publicações</a>
+            <a href="./publicacoes.html" class="ativo"><img src="../../assets/icon/publicacao.png" alt="">Publicações</a>
         </div>
-    
     </aside>
 
     <main class="home-publicacao">
@@ -61,7 +62,7 @@
                         <tr>
                             <th>Projeto</th>
                             <th>Criado em</th>
-                            <th>Gênero</th>
+                            <th>Título</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -104,6 +105,7 @@
                         <input type="text"
                             id="titulo-publicacao"
                             name="titulo"
+                            maxlength="50"
                             placeholder="Ex.: Entre Linhas"
                             required>
                     </div>
@@ -158,168 +160,321 @@
     </div>
 
     <script>
-        // Dados temporários de demonstração.
-        const projetosMock = [
-            {
-                id: "entre-linhas",
-                nome: "Entre Linhas",
-                anotacoes: [
-                    { id: "el-1", titulo: "Premissa e conflito central" },
-                    { id: "el-2", titulo: "Construção dos personagens" },
-                    { id: "el-3", titulo: "Possíveis finais" }
-                ]
-            },
-            {
-                id: "ultima-estacao",
-                nome: "Última Estação",
-                anotacoes: [
-                    { id: "ue-1", titulo: "Ambientação da estação" },
-                    { id: "ue-2", titulo: "Arco do protagonista" }
-                ]
-            },
-            {
-                id: "mare-agosto",
-                nome: "Maré de Agosto",
-                anotacoes: [
-                    { id: "ma-1", titulo: "Ideia inicial" },
-                    { id: "ma-2", titulo: "Pesquisa de referências" }
-                ]
-            }
-        ];
+        // Estado da página (substitui os dados mock).
+        var dashboardAtual = {
+            projetos: [],
+            publicacoes: [],
+            anotacoes: [],
+            publicacaoEditando: null
+        };
 
-        let publicacoes = [
-            {
-                id: 1,
-                projetoId: "entre-linhas",
-                titulo: "Entre Linhas",
-                data: "14/10/2026",
-                genero: "Drama",
-                descricao: "Apresentação do projeto Entre Linhas.",
-                anotacaoIds: ["el-1", "el-2"]
-            },
-            {
-                id: 2,
-                projetoId: "ultima-estacao",
-                titulo: "Última Estação",
-                data: "09/10/2026",
-                genero: "Suspense",
-                descricao: "Apresentação do projeto Última Estação.",
-                anotacaoIds: ["ue-1"]
-            },
-            {
-                id: 3,
-                projetoId: "mare-agosto",
-                titulo: "Maré de Agosto",
-                data: "02/10/2026",
-                genero: "Romance",
-                descricao: "Primeira versão da apresentação de Maré de Agosto.",
-                anotacaoIds: ["ma-1"]
-            }
-        ];
+        // Evita que uma resposta antiga de anotações sobrescreva uma mais recente.
+        var requisicaoAnotacoes = 0;
 
-        const formulario = document.getElementById("formulario-publicacao");
-        const formPublicacao = document.getElementById("form-publicacao");
-        const projetoSelect = document.getElementById("projeto-anotacoes");
-        const campoAnotacoes = document.getElementById("campo-anotacoes");
-        const listaAnotacoes = document.getElementById("lista-anotacoes");
-        const tituloFormulario = document.getElementById("titulo-formulario");
-        const salvarBotao = document.getElementById("salvar-publicacao");
+        var formulario = document.getElementById("formulario-publicacao");
+        var formPublicacao = document.getElementById("form-publicacao");
+        var projetoSelect = document.getElementById("projeto-anotacoes");
+        var campoAnotacoes = document.getElementById("campo-anotacoes");
+        var listaAnotacoes = document.getElementById("lista-anotacoes");
+        var tituloFormulario = document.getElementById("titulo-formulario");
+        var salvarBotao = document.getElementById("salvar-publicacao");
 
-        function preencherProjetos() {
-            projetosMock.forEach(function(projeto) {
-                const opcao = document.createElement("option");
-                opcao.value = projeto.id;
-                opcao.textContent = projeto.nome;
-                projetoSelect.appendChild(opcao);
-            });
+
+        // Preenche os dados do usuário na barra lateral
+        function preencherUsuario() {
+            document.getElementById("a_usuario").textContent =
+                sessionStorage.NOME_USUARIO || "Usuário";
+
+            document.getElementById("c_email").textContent =
+                sessionStorage.EMAIL_USUARIO || "";
+
+            document.getElementById("b_produtor").textContent =
+                sessionStorage.PERFIL_ID_USUARIO == 1 ? "Produtor" : "Roteirista";
         }
 
-        function atualizarAnotacoes(projetoId, anotacoesSelecionadas = []) {
-            listaAnotacoes.innerHTML = "";
 
-            const projeto = projetosMock.find(function(item) {
-                return item.id === projetoId;
-            });
+        // Busca os projetos do usuário no banco
+        function obterProjetos() {
+            fetch("/publicacoes/projetos?idUsuario=" + sessionStorage.ID_USUARIO, { cache: "no-store" })
+                .then(function (resposta) {
+                    if (resposta.ok) {
+                        return resposta.json();
+                    }
 
-            if (!projeto) {
-                campoAnotacoes.hidden = true;
+                    throw new Error("Erro ao buscar projetos.");
+                })
+                .then(function (projetos) {
+                    dashboardAtual.projetos = projetos;
+                    preencherProjetos();
+                    // Re-renderiza para trocar nomes pendentes caso as publicações já tenham chegado
+                    renderizarPublicacoes();
+                })
+                .catch(function (erro) {
+                    console.error("Erro ao obter projetos: " + erro.message);
+                });
+        }
+
+
+        // Exibe os projetos no campo de seleção
+        function preencherProjetos() {
+            var valorAnterior = projetoSelect.value;
+
+            projetoSelect.innerHTML =
+                '<option value="">Selecionar um projeto</option>';
+
+            for (var i = 0; i < dashboardAtual.projetos.length; i++) {
+                var projeto = dashboardAtual.projetos[i];
+                var opcao = document.createElement("option");
+
+                opcao.value = projeto.id;
+                opcao.textContent = projeto.nome;
+
+                projetoSelect.appendChild(opcao);
+            }
+
+            if (valorAnterior != "") {
+                projetoSelect.value = valorAnterior;
+            }
+        }
+
+
+        // Busca as publicações do usuário no banco
+        function obterPublicacoes() {
+            fetch("/publicacoes?idUsuario=" + sessionStorage.ID_USUARIO, { cache: "no-store" })
+                .then(function (resposta) {
+                    if (resposta.ok) {
+                        return resposta.json();
+                    }
+
+                    throw new Error("Erro ao buscar publicações.");
+                })
+                .then(function (publicacoes) {
+                    dashboardAtual.publicacoes = publicacoes;
+                    renderizarPublicacoes();
+                })
+                .catch(function (erro) {
+                    console.error("Erro ao obter publicações: " + erro.message);
+                });
+        }
+
+
+        // Descobre o nome do projeto pelo ID
+        function nomeDoProjeto(idProjeto) {
+            for (var i = 0; i < dashboardAtual.projetos.length; i++) {
+                if (dashboardAtual.projetos[i].id == idProjeto) {
+                    return dashboardAtual.projetos[i].nome;
+                }
+            }
+
+            return "Projeto não encontrado";
+        }
+
+
+        // Exibe as publicações na tabela
+        function renderizarPublicacoes() {
+            var lista = document.getElementById("lista-publicacoes");
+
+            lista.innerHTML = "";
+
+            if (dashboardAtual.publicacoes.length == 0) {
+                var linhaVazia = document.createElement("tr");
+                var colunaVazia = document.createElement("td");
+
+                colunaVazia.colSpan = 4;
+                colunaVazia.textContent = "Nenhuma publicação encontrada.";
+
+                linhaVazia.appendChild(colunaVazia);
+                lista.appendChild(linhaVazia);
+
                 return;
             }
 
-            projeto.anotacoes.forEach(function(anotacao) {
-                const item = document.createElement("label");
-                item.className = "publicacao-anotacao-item";
+            for (var i = 0; i < dashboardAtual.publicacoes.length; i++) {
+                var publicacao = dashboardAtual.publicacoes[i];
+                var linha = document.createElement("tr");
 
-                const checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.name = "anotacoes_ids[]";
-                checkbox.value = anotacao.id;
-                checkbox.checked = anotacoesSelecionadas.includes(anotacao.id);
+                var colunaProjeto = document.createElement("td");
+                var colunaData = document.createElement("td");
+                var colunaTitulo = document.createElement("td");
+                var colunaAcoes = document.createElement("td");
 
-                const texto = document.createElement("span");
-                texto.textContent = anotacao.titulo;
+                colunaProjeto.className = "publicacao-nome-projeto";
 
-                item.appendChild(checkbox);
-                item.appendChild(texto);
-                listaAnotacoes.appendChild(item);
-            });
+                colunaProjeto.textContent =
+                    publicacao.nome_projeto || nomeDoProjeto(publicacao.projeto_id);
 
-            campoAnotacoes.hidden = false;
-        }
+                // Formata a data da publicação
+                colunaData.textContent = "";
 
-        function obterAnotacoesMarcadas() {
-            return Array.from(
-                listaAnotacoes.querySelectorAll('input[type="checkbox"]:checked')
-            ).map(function(checkbox) {
-                return checkbox.value;
-            });
-        }
+                if (publicacao.criado_em) {
+                    var data = new Date(String(publicacao.criado_em).replace(" ", "T"));
 
-        function renderizarPublicacoes() {
-            const lista = document.getElementById("lista-publicacoes");
-            lista.innerHTML = "";
+                    if (!isNaN(data.getTime())) {
+                        colunaData.textContent = data.toLocaleDateString("pt-BR");
+                    }
+                }
 
-            publicacoes.forEach(function(publicacao) {
-                const linha = document.createElement("tr");
+                colunaTitulo.textContent = publicacao.titulo || "";
 
-                const projeto = projetosMock.find(function(item) {
-                    return item.id === publicacao.projetoId;
-                });
+                // Botões de edição e exclusão
+                var divAcoes = document.createElement("div");
+                divAcoes.className = "publicacao-acoes-linha";
 
-                const nomeProjeto = projeto
-                    ? projeto.nome
-                    : publicacao.titulo;
+                var botaoEditar = document.createElement("button");
 
-                linha.innerHTML = `
-                    <td class="publicacao-nome-projeto">
-                        ${nomeProjeto}
-                    </td>
+                botaoEditar.type = "button";
+                botaoEditar.className = "publicacao-btn-tabela";
+                botaoEditar.textContent = "Editar";
 
-                    <td>${publicacao.data}</td>
+                botaoEditar.onclick = (function (id) {
+                    return function () {
+                        editarPublicacao(id);
+                    };
+                })(publicacao.id);
 
-                    <td>${publicacao.genero}</td>
+                var botaoExcluir = document.createElement("button");
 
-                    <td>
-                        <div class="publicacao-acoes-linha">
-                            <button type="button"
-                                class="publicacao-btn-tabela">
-                                Editar
-                            </button>
+                botaoExcluir.type = "button";
+                botaoExcluir.className = "publicacao-btn-tabela publicacao-btn-excluir";
+                botaoExcluir.textContent = "Excluir";
 
-                            <button type="button"
-                                class="publicacao-btn-tabela publicacao-btn-excluir">
-                                Excluir
-                            </button>
-                        </div>
-                    </td>
-                `;
+                botaoExcluir.onclick = (function (id) {
+                    return function () {
+                        excluirPublicacao(id);
+                    };
+                })(publicacao.id);
+
+                divAcoes.appendChild(botaoEditar);
+                divAcoes.appendChild(botaoExcluir);
+
+                colunaAcoes.appendChild(divAcoes);
+
+                linha.appendChild(colunaProjeto);
+                linha.appendChild(colunaData);
+                linha.appendChild(colunaTitulo);
+                linha.appendChild(colunaAcoes);
 
                 lista.appendChild(linha);
-            });
+            }
         }
 
+
+        // Busca as anotações do projeto selecionado
+        function atualizarAnotacoes(idProjeto, anotacoesSelecionadas) {
+            listaAnotacoes.innerHTML = "";
+
+            requisicaoAnotacoes++;
+            var requisicaoAtual = requisicaoAnotacoes;
+
+            if (!anotacoesSelecionadas) {
+                anotacoesSelecionadas = [];
+            }
+
+            if (idProjeto == "") {
+                campoAnotacoes.hidden = true;
+                dashboardAtual.anotacoes = [];
+
+                return Promise.resolve();
+            }
+
+            return fetch(
+                "/publicacoes/projetos/" + idProjeto + "/anotacoes",
+                { cache: "no-store" }
+            )
+                .then(function (resposta) {
+                    if (resposta.ok) {
+                        return resposta.json();
+                    }
+
+                    throw new Error("Erro ao buscar anotações.");
+                })
+                .then(function (anotacoes) {
+                    // Ignora respostas antigas (usuário trocou de projeto no meio da requisição)
+                    if (requisicaoAtual !== requisicaoAnotacoes) {
+                        return;
+                    }
+
+                    dashboardAtual.anotacoes = anotacoes;
+                    listaAnotacoes.innerHTML = "";
+
+                    if (anotacoes.length == 0) {
+                        var mensagem = document.createElement("p");
+
+                        mensagem.textContent = "Não existem anotações neste projeto.";
+
+                        listaAnotacoes.appendChild(mensagem);
+                        campoAnotacoes.hidden = false;
+
+                        return;
+                    }
+
+                    for (var i = 0; i < anotacoes.length; i++) {
+                        var anotacao = anotacoes[i];
+                        var item = document.createElement("label");
+
+                        item.className = "publicacao-anotacao-item";
+
+                        var checkbox = document.createElement("input");
+
+                        checkbox.type = "checkbox";
+                        checkbox.name = "anotacoes_ids[]";
+                        checkbox.value = anotacao.id;
+
+                        for (var j = 0; j < anotacoesSelecionadas.length; j++) {
+                            if (anotacoesSelecionadas[j] == anotacao.id) {
+                                checkbox.checked = true;
+                                break;
+                            }
+                        }
+
+                        var texto = document.createElement("span");
+
+                        texto.textContent = anotacao.titulo;
+
+                        item.appendChild(checkbox);
+                        item.appendChild(texto);
+
+                        listaAnotacoes.appendChild(item);
+                    }
+
+                    campoAnotacoes.hidden = false;
+                })
+                .catch(function (erro) {
+                    console.error("Erro ao obter anotações: " + erro.message);
+
+                    if (requisicaoAtual !== requisicaoAnotacoes) {
+                        return;
+                    }
+
+                    listaAnotacoes.innerHTML = "<p>Não foi possível carregar as anotações.</p>";
+                    campoAnotacoes.hidden = false;
+                });
+        }
+
+
+        // Obtém os IDs das anotações selecionadas
+        function obterAnotacoesMarcadas() {
+            var campos = listaAnotacoes.querySelectorAll(
+                'input[name="anotacoes_ids[]"]:checked'
+            );
+
+            var ids = [];
+
+            for (var i = 0; i < campos.length; i++) {
+                ids.push(Number(campos[i].value));
+            }
+
+            return ids;
+        }
+
+
+        // Abre o formulário para criar uma publicação
         function abrirFormulario() {
+            dashboardAtual.publicacaoEditando = null;
+
             formPublicacao.reset();
+            projetoSelect.value = "";
+
             atualizarAnotacoes("");
 
             tituloFormulario.textContent = "Nova publicação de projeto";
@@ -329,13 +484,189 @@
             formulario.setAttribute("aria-hidden", "false");
         }
 
+
+        // Fecha o formulário
         function fecharFormulario() {
             formulario.classList.remove("aberto");
             formulario.setAttribute("aria-hidden", "true");
 
             formPublicacao.reset();
+
+            dashboardAtual.publicacaoEditando = null;
+
+            projetoSelect.value = "";
             atualizarAnotacoes("");
         }
+
+
+        // Salva uma nova publicação ou as alterações de uma existente
+        function salvarPublicacao(evento) {
+            evento.preventDefault();
+
+            var idProjeto = projetoSelect.value;
+            var titulo = document.getElementById("titulo-publicacao").value.trim();
+            var descricao = document.getElementById("descricao-publicacao").value.trim();
+            var anotacoesIds = obterAnotacoesMarcadas();
+
+            if (idProjeto == "") {
+                alert("Selecione um projeto.");
+                return;
+            }
+
+            if (titulo == "" || titulo.length > 50) {
+                alert("Preencha o título com até 50 caracteres.");
+                return;
+            }
+
+            if (descricao == "") {
+                alert("Preencha a descrição da publicação.");
+                return;
+            }
+
+            if (anotacoesIds.length == 0) {
+                alert("Selecione pelo menos uma anotação para anexar à publicação.");
+                return;
+            }
+
+            var rota = "/publicacoes";
+            var metodo = "POST";
+
+            var dados = {
+                idProjeto: Number(idProjeto),
+                titulo: titulo,
+                descricao: descricao,
+                anotacoesIds: anotacoesIds
+            };
+
+            if (dashboardAtual.publicacaoEditando !== null) {
+                rota = "/publicacoes/" + dashboardAtual.publicacaoEditando;
+                metodo = "PUT";
+            } else {
+                if (!sessionStorage.ID_USUARIO) {
+                    alert("Não foi possível identificar o usuário conectado.");
+                    return;
+                }
+
+                dados.idUsuario = Number(sessionStorage.ID_USUARIO);
+            }
+
+            salvarBotao.disabled = true;
+
+            fetch(rota, {
+                method: metodo,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dados)
+            })
+                .then(function (resposta) {
+                    if (!resposta.ok) {
+                        throw new Error("Não foi possível salvar a publicação.");
+                    }
+
+                    return resposta.json();
+                })
+                .then(function (resultado) {
+                    console.log("Publicação salva:", resultado);
+
+                    fecharFormulario();
+                    obterPublicacoes();
+                })
+                .catch(function (erro) {
+                    console.error("Erro ao salvar publicação: " + erro.message);
+                    alert("Não foi possível salvar a publicação.");
+                })
+                .finally(function () {
+                    salvarBotao.disabled = false;
+                });
+        }
+
+
+        // Preenche o formulário com os dados da publicação selecionada
+        function editarPublicacao(idPublicacao) {
+            var publicacao = null;
+
+            for (var i = 0; i < dashboardAtual.publicacoes.length; i++) {
+                if (dashboardAtual.publicacoes[i].id == idPublicacao) {
+                    publicacao = dashboardAtual.publicacoes[i];
+                    break;
+                }
+            }
+
+            if (!publicacao) {
+                alert("Publicação não encontrada.");
+                return;
+            }
+
+            dashboardAtual.publicacaoEditando = publicacao.id;
+
+            formPublicacao.reset();
+            preencherProjetos();
+
+            document.getElementById("titulo-publicacao").value = publicacao.titulo;
+            document.getElementById("descricao-publicacao").value = publicacao.descricao;
+
+            projetoSelect.value = publicacao.projeto_id;
+
+            tituloFormulario.textContent = "Editar publicação";
+            salvarBotao.textContent = "Salvar alterações";
+
+            formulario.classList.add("aberto");
+            formulario.setAttribute("aria-hidden", "false");
+
+            fetch("/publicacoes/" + idPublicacao + "/anotacoes")
+                .then(function (resposta) {
+                    if (resposta.ok) {
+                        return resposta.json();
+                    }
+
+                    throw new Error("Erro ao buscar anotações da publicação.");
+                })
+                .then(function (anotacoes) {
+                    var idsSelecionados = [];
+
+                    for (var i = 0; i < anotacoes.length; i++) {
+                        idsSelecionados.push(anotacoes[i].id);
+                    }
+
+                    return atualizarAnotacoes(publicacao.projeto_id, idsSelecionados);
+                })
+                .catch(function (erro) {
+                    console.error("Erro ao editar publicação: " + erro.message);
+                    alert("Não foi possível carregar as anotações da publicação.");
+                });
+        }
+
+
+        // Exclui uma publicação
+        function excluirPublicacao(idPublicacao) {
+            if (!confirm("Deseja realmente excluir esta publicação?")) {
+                return;
+            }
+
+            fetch("/publicacoes/" + idPublicacao, {
+                method: "DELETE"
+            })
+                .then(function (resposta) {
+                    if (resposta.ok) {
+                        return resposta.json();
+                    }
+
+                    throw new Error("Erro ao excluir publicação.");
+                })
+                .then(function (resultado) {
+                    console.log("Publicação excluída:", resultado);
+
+                    obterPublicacoes();
+                })
+                .catch(function (erro) {
+                    console.error("Erro ao excluir publicação: " + erro.message);
+                    alert("Não foi possível excluir a publicação.");
+                });
+        }
+
+
+        // ----- Eventos (registrados uma única vez) -----
 
         document.getElementById("abrir-formulario")
             .addEventListener("click", abrirFormulario);
@@ -343,58 +674,47 @@
         document.getElementById("fechar-formulario")
             .addEventListener("click", fecharFormulario);
 
-        formulario.addEventListener("click", function(evento) {
+        // Fecha ao clicar fora do modal
+        formulario.addEventListener("click", function (evento) {
             if (evento.target === formulario) {
                 fecharFormulario();
             }
         });
 
-        document.addEventListener("keydown", function(evento) {
-            if (
-                evento.key === "Escape" &&
-                formulario.classList.contains("aberto")
-            ) {
+        // Fecha ao pressionar Escape
+        document.addEventListener("keydown", function (evento) {
+            if (evento.key === "Escape" && formulario.classList.contains("aberto")) {
                 fecharFormulario();
             }
         });
 
-        projetoSelect.addEventListener("change", function() {
+        // Atualiza as anotações quando o projeto mudar
+        projetoSelect.addEventListener("change", function () {
             atualizarAnotacoes(projetoSelect.value);
         });
 
-        formPublicacao.addEventListener("reset", function() {
-            setTimeout(function() {
-                atualizarAnotacoes(projetoSelect.value);
-            }, 0);
-        });
+        // Envia o formulário
+        formPublicacao.addEventListener("submit", salvarPublicacao);
 
-        formPublicacao.addEventListener("submit", function(evento) {
-            evento.preventDefault();
+        // Botão Limpar: volta para o modo "nova publicação"
+        formPublicacao.querySelector('button[type="reset"]')
+            .addEventListener("click", function () {
+                setTimeout(function () {
+                    dashboardAtual.publicacaoEditando = null;
 
-            const projetoId = projetoSelect.value;
-            const projeto = projetosMock.find(function(item) {
-                return item.id === projetoId;
+                    tituloFormulario.textContent = "Nova publicação de projeto";
+                    salvarBotao.textContent = "Publicar projeto";
+
+                    atualizarAnotacoes(projetoSelect.value);
+                }, 0);
             });
 
-            if (!projeto) return;
 
-            const anotacoesSelecionadas = obterAnotacoesMarcadas();
-
-            if (anotacoesSelecionadas.length === 0) {
-                window.alert(
-                    "Selecione pelo menos uma anotação para anexar à publicação."
-                );
-                return;
-            }
-
-            // A integração com o back-end será feita posteriormente.
-            fecharFormulario();
-        });
-
-        preencherProjetos();
-        renderizarPublicacoes();
+        // ----- Inicialização -----
+        preencherUsuario();
+        obterProjetos();
+        obterPublicacoes();
     </script>
 
 </body>
 </html>
-```
