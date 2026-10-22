@@ -130,6 +130,9 @@
             </header>
 
             <form class="anotacoes-form" id="form-projeto">
+
+                <input type="hidden" id="projeto_id" value="">
+
                 <div class="anotacoes-campo">
                     <label for="projeto_nome">Nome do projeto</label>
                     <input type="text" id="projeto_nome" name="nome" maxlength="150"
@@ -141,10 +144,11 @@
                         Cancelar
                     </button>
 
-                    <button type="submit" class="anotacoes-btn-principal">
+                    <button type="submit" class="anotacoes-btn-principal" id="salvar-projeto">
                         Criar projeto
                     </button>
                 </footer>
+
             </form>
         </section>
     </div>

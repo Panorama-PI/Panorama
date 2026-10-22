@@ -1,73 +1,61 @@
+
 document.addEventListener("DOMContentLoaded", function () {
 
-    // Modais
+    // =========================
+    // ELEMENTOS DA TELA
+    // =========================
+
     var modalProjeto = document.getElementById("modal-projeto");
     var modalAnotacao = document.getElementById("formulario-anotacao");
 
-    // Botões de projeto
+    var formProjeto = document.getElementById("form-projeto");
+    var formAnotacao = document.getElementById("form-anotacao");
+
     var btnAbrirProjeto = document.getElementById("abrir-modal-projeto");
     var btnFecharProjeto = document.getElementById("fechar-modal-projeto");
     var btnCancelarProjeto = document.getElementById("cancelar-projeto");
-    var formProjeto = document.getElementById("form-projeto");
 
-    // Botões de anotação
     var btnAbrirAnotacao = document.getElementById("abrir-formulario-anotacao");
     var btnFecharAnotacao = document.getElementById("fechar-formulario");
     var btnCancelarAnotacao = document.getElementById("cancelar-anotacao");
+    var btnNovaAnotacaoProjeto = document.getElementById("nova-anotacao-projeto");
 
-    // Abre o modal de projeto
-    btnAbrirProjeto.addEventListener("click", function () {
-        modalProjeto.classList.add("aberto");
-        modalProjeto.setAttribute("aria-hidden", "false");
-    });
+    var btnVoltarProjetos = document.getElementById("voltar-projetos");
+    var campoBusca = document.getElementById("busca_nota");
 
-    // Fecha o modal de projeto
-    function fecharModalProjeto() {
-        modalProjeto.classList.remove("aberto");
-        modalProjeto.setAttribute("aria-hidden", "true");
-        formProjeto.reset();
+    var telaProjetos = document.getElementById("tela-projetos");
+    var telaDetalhes = document.getElementById("tela-detalhes");
+
+    if (typeof preencherUsuario === "function") {
+        preencherUsuario();
     }
 
-    btnFecharProjeto.addEventListener("click", fecharModalProjeto);
-    btnCancelarProjeto.addEventListener("click", fecharModalProjeto);
+    var elementoUsuario = document.getElementById("a_usuario");
 
-    // Abre o formulário de anotação
-    btnAbrirAnotacao.addEventListener("click", function () {
-        modalAnotacao.classList.add("aberto");
-        modalAnotacao.setAttribute("aria-hidden", "false");
-    });
-
-    // Fecha o formulário de anotação
-    function fecharModalAnotacao() {
-        modalAnotacao.classList.remove("aberto");
-        modalAnotacao.setAttribute("aria-hidden", "true");
+    if (elementoUsuario) {
+        elementoUsuario.textContent = sessionStorage.NOME_USUARIO || "";
     }
 
-    btnFecharAnotacao.addEventListener("click", fecharModalAnotacao);
-    btnCancelarAnotacao.addEventListener("click", fecharModalAnotacao);
+    // =========================
+    // ESTADO DA PÁGINA
+    // =========================
 
-});
-
-preencherUsuario()
-
-    a_usuario.innerHTML = sessionStorage.NOME_USUARIO;
-
-    // guarda o estado atual da página para eu consultar mais fácil depois
-    // projetoSelecionado = id do projeto escolhido na faixa (null = tds)
-    let dashboardAtual = {
+    var dashboardAtual = {
         projetos: [],
         anotacoes: [],
         projetoSelecionado: null
     };
 
-    // evita que texto digitado pelo usuário quebre 
+    // =========================
+    // FUNÇÕES AUXILIARES
+    // =========================
+
     function escapar(texto) {
         var div = document.createElement("div");
-        div.textContent = texto;
+        div.textContent = texto == null ? "" : String(texto);
         return div.innerHTML;
     }
 
-    // conta quantas anotações um projeto tem p por no botao
     function contarAnotacoes(idProjeto) {
         var total = 0;
 
@@ -80,245 +68,664 @@ preencherUsuario()
         return total;
     }
 
-    window.onload = function () {
-        obterProjetos();
-        obterAnotacoes();
-    }
-
-    // atualiza toda funcao p nao dar problema na pagina dps
-    function atualizarTela() {
-        exibirProjetos();
-        exibirSelectProjeto();
-        exibirAnotacoes();
-    }
-
-    // parte de projetos
-
-    // Busca os projetos do usuário na rota e salva na dashboardAtual.projetos
-    function obterProjetos() {
-        fetch(`/anotacoes/projetos/listar/${sessionStorage.ID_USUARIO}`, { cache: 'no-store' })
-            .then(function (resposta) {
-                if (resposta.ok) {
-                    resposta.json().then(function (projetos) {
-                        console.log(`Dados recebidos: ${JSON.stringify(projetos)}`);
-                        dashboardAtual.projetos = projetos;
-                        atualizarTela();
-                    });
-                } else {
-                    console.error('Nenhum dado encontrado ou erro na API');
-                }
-            })
-            .catch(function (erro) {
-                console.error(`Erro na obtenção dos projetos: ${erro.message}`);
-            });
-    }
-
-    // renderiza os botoes
-    function exibirProjetos() {
-        var container = document.getElementById("lista-projetos");
-        container.innerHTML = "";
-
-        var classeTodas = "projeto-botao";
-        if (dashboardAtual.projetoSelecionado === null) {
-            classeTodas += " ativo";
-        }
-
-        container.innerHTML += `
-            <li>
-                <button type="button" class="${classeTodas}" onclick="selecionarProjeto(null)">
-                    <i class="fa-solid fa-layer-group"></i> Todas
-                </button>
-            </li>
-        `;
-
-        for (var i = 0; i < dashboardAtual.projetos.length; i++) {
-            var projeto = dashboardAtual.projetos[i];
-
-            var classe = "projeto-botao";
-            if (projeto.id == dashboardAtual.projetoSelecionado) {
-                classe += " ativo";
-            }
-
-            container.innerHTML += `
-                <li>
-                    <button type="button" class="${classe}" data-projeto-id="${projeto.id}"
-                        onclick="selecionarProjeto(${projeto.id})">
-                        <i class="fa-solid fa-folder"></i> ${escapar(projeto.nome)}
-                        <span class="projeto-count">${contarAnotacoes(projeto.id)}</span>
-                    </button>
-                </li>
-            `;
-        }
-    }
-
-    function exibirSelectProjeto() {
-        var select = document.getElementById("selectProjeto");
-        var valorAnterior = select.value;
-
-        if (dashboardAtual.projetos.length == 0) {
-            select.innerHTML = `<option class="select-projeto" value="">Crie um projeto primeiro</option>`;
-            return;
-        }
-
-        select.innerHTML = "";
-
-        for (var i = 0; i < dashboardAtual.projetos.length; i++) {
-            var projeto = dashboardAtual.projetos[i];
-
-            select.innerHTML += `<option class="select-projeto" value="${projeto.id}">${escapar(projeto.nome)}</option>`;
-        }
-
-        if (dashboardAtual.projetoSelecionado !== null) {
-            select.value = dashboardAtual.projetoSelecionado;
-        } else if (valorAnterior != "") {
-            select.value = valorAnterior;
-        }
-    }
-
-    // quando o usuário clica em um botao guarda o projeto e reload a tela
-    function selecionarProjeto(idProjeto) {
-        dashboardAtual.projetoSelecionado = idProjeto;
-        atualizarTela();
-    }
-
-    // Chamada quando o usuário envia o modal "Novo projeto"
-    function adicionarProjeto(evento) {
-        evento.preventDefault();
-
-        var input = document.getElementById("projeto_nome");
-        var nome = input.value.trim();
-
-        // impede criar projeto sem nome
-        if (nome == "") {
-            alert("Digite o nome do projeto");
-            return;
-        }
-
-        fetch("/anotacoes/projetos/criar", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                idUsuario: sessionStorage.ID_USUARIO,
-                nome: nome
-            })
-        })
-            .then(function (resposta) {
-                if (resposta.ok) {
-                    resposta.json().then(function (dados) {
-                        input.value = "";
-                        document.getElementById("modal-projeto").close();
-                        dashboardAtual.projetoSelecionado = dados.id; // já abre o projeto novo
-                        obterProjetos();                              // atualiza a lista na tela
-                    });
-                } else {
-                    console.error("Não foi possível criar o projeto");
-                    alert("Não foi possível criar o projeto");
-                }
-            })
-            .catch(function (erro) {
-                console.error(`Erro ao criar projeto: ${erro.message}`);
-            });
-    }
-
-    // Parte de anotacoes
-
-    function obterAnotacoes() {
-        fetch(`/anotacoes/listar/${sessionStorage.ID_USUARIO}`, { cache: 'no-store' })
-            .then(function (resposta) {
-                if (resposta.ok) {
-                    resposta.json().then(function (anotacoes) {
-                        console.log(`Dados recebidos: ${JSON.stringify(anotacoes)}`);
-                        dashboardAtual.anotacoes = anotacoes;
-                        atualizarTela();
-                    });
-                } else {
-                    console.error('Nenhum dado encontrado ou erro na API');
-                }
-            })
-            .catch(function (erro) {
-                console.error(`Erro na obtenção das anotações: ${erro.message}`);
-            });
-    }
-
     function nomeDoProjeto(idProjeto) {
         for (var i = 0; i < dashboardAtual.projetos.length; i++) {
             if (dashboardAtual.projetos[i].id == idProjeto) {
                 return dashboardAtual.projetos[i].nome;
             }
         }
+
         return "";
     }
 
-    // Renderiza os cards na ul listaAnotacoes
-    // Filtra pelo projeto selecionado e pelo texto da busca (título ou conteúdo)
-    function exibirAnotacoes() {
-        var container = document.getElementById("listaAnotacoes");
-        var busca = document.getElementById("busca_nota").value.toLowerCase();
+    function abrirModal(modal) {
+        if (modal) {
+            modal.classList.add("aberto");
+            modal.setAttribute("aria-hidden", "false");
+        }
+    }
+
+    function fecharModal(modal) {
+        if (modal) {
+            modal.classList.remove("aberto");
+            modal.setAttribute("aria-hidden", "true");
+        }
+    }
+
+    function abrirTelaDetalhes() {
+        if (telaProjetos) {
+            telaProjetos.hidden = true;
+        }
+
+        if (telaDetalhes) {
+            telaDetalhes.hidden = false;
+        }
+
+        atualizarTela();
+    }
+
+    function voltarParaProjetos() {
+        if (telaDetalhes) {
+            telaDetalhes.hidden = true;
+        }
+
+        if (telaProjetos) {
+            telaProjetos.hidden = false;
+        }
+
+        dashboardAtual.projetoSelecionado = null;
+        atualizarTela();
+    }
+
+    function mostrarErro(mensagem, erro) {
+        console.error(mensagem, erro || "");
+        alert(mensagem);
+    }
+
+    // =========================
+    // MODAIS
+    // =========================
+
+    if (btnAbrirProjeto) {
+        btnAbrirProjeto.addEventListener("click", function () {
+            prepararFormularioProjeto();
+            abrirModal(modalProjeto);
+        });
+    }
+
+    function prepararFormularioProjeto() {
+        if (formProjeto) {
+            formProjeto.reset();
+        }
+
+        var campoId = document.getElementById("projeto_id");
+        var tituloModal = document.getElementById("titulo-modal-projeto");
+        var botaoSalvar = document.getElementById("salvar-projeto");
+
+        if (campoId) {
+            campoId.value = "";
+        }
+
+        if (tituloModal) {
+            tituloModal.textContent = "Novo projeto";
+        }
+
+        if (botaoSalvar) {
+            botaoSalvar.textContent = "Criar projeto";
+        }
+    }
+
+    function fecharModalProjeto() {
+        fecharModal(modalProjeto);
+        prepararFormularioProjeto();
+    }
+
+    if (btnFecharProjeto) {
+        btnFecharProjeto.addEventListener("click", fecharModalProjeto);
+    }
+
+    if (btnCancelarProjeto) {
+        btnCancelarProjeto.addEventListener("click", fecharModalProjeto);
+    }
+
+    if (btnAbrirAnotacao) {
+        btnAbrirAnotacao.addEventListener("click", function () {
+            limparFormulario();
+            abrirModal(modalAnotacao);
+        });
+    }
+
+    function fecharModalAnotacao() {
+        fecharModal(modalAnotacao);
+    }
+
+    if (btnFecharAnotacao) {
+        btnFecharAnotacao.addEventListener("click", fecharModalAnotacao);
+    }
+
+    if (btnCancelarAnotacao) {
+        btnCancelarAnotacao.addEventListener("click", function () {
+            limparFormulario();
+            fecharModalAnotacao();
+        });
+    }
+
+    if (btnNovaAnotacaoProjeto) {
+        btnNovaAnotacaoProjeto.addEventListener("click", function () {
+            limparFormulario();
+
+            if (dashboardAtual.projetoSelecionado !== null) {
+                document.getElementById("selectProjeto").value =
+                    dashboardAtual.projetoSelecionado;
+            }
+
+            abrirModal(modalAnotacao);
+        });
+    }
+
+    if (btnVoltarProjetos) {
+        btnVoltarProjetos.addEventListener("click", voltarParaProjetos);
+    }
+
+    // =========================
+    // FORMULÁRIOS
+    // =========================
+
+    if (formProjeto) {
+        formProjeto.addEventListener("submit", adicionarProjeto);
+    }
+
+    if (formAnotacao) {
+        formAnotacao.addEventListener("submit", salvarAnotacao);
+    }
+
+    if (campoBusca) {
+        campoBusca.addEventListener("input", exibirAnotacoes);
+    }
+
+    // =========================
+    // ATUALIZAR A TELA
+    // =========================
+
+    function atualizarTela() {
+        exibirProjetos();
+        exibirSelectProjeto();
+        exibirAnotacoes();
+    }
+
+    // =========================
+    // CARREGAR PROJETOS
+    // =========================
+
+    function obterProjetos() {
+        var idUsuario = sessionStorage.ID_USUARIO;
+
+        if (!idUsuario) {
+            console.error("Usuário não identificado na sessão.");
+            return;
+        }
+
+        fetch("/anotacoes/projetos/listar/" + encodeURIComponent(idUsuario), {
+            cache: "no-store"
+        })
+            .then(function (resposta) {
+                if (!resposta.ok) {
+                    throw new Error("Não foi possível carregar os projetos.");
+                }
+
+                return resposta.json();
+            })
+            .then(function (projetos) {
+                dashboardAtual.projetos = projetos;
+
+                if (
+                    dashboardAtual.projetoSelecionado !== null &&
+                    !dashboardAtual.projetos.some(function (projeto) {
+                        return projeto.id == dashboardAtual.projetoSelecionado;
+                    })
+                ) {
+                    dashboardAtual.projetoSelecionado = null;
+                }
+
+                atualizarTela();
+            })
+            .catch(function (erro) {
+                mostrarErro("Erro ao carregar os projetos.", erro);
+            });
+    }
+
+    // =========================
+    // EXIBIR PROJETOS E BOTÕES
+    // =========================
+
+    function exibirProjetos() {
+        var container = document.getElementById("lista-projetos-tabela");
+
+        if (!container) {
+            console.error("Elemento lista-projetos-tabela não encontrado.");
+            return;
+        }
+
         container.innerHTML = "";
 
-        // título do painel: nome do projeto selecionado
-        var nomeAtivo = "todos os projetos";
+        if (dashboardAtual.projetos.length === 0) {
+            container.innerHTML = `
+                <tr>
+                    <td colspan="4">Nenhum projeto cadastrado.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        for (var i = 0; i < dashboardAtual.projetos.length; i++) {
+            var projeto = dashboardAtual.projetos[i];
+            var linha = document.createElement("tr");
+
+            linha.innerHTML = `
+                <td>${escapar(projeto.nome)}</td>
+                <td>—</td>
+                <td>${contarAnotacoes(projeto.id)} anotações</td>
+
+                <td>
+                    <div class="projeto-acoes">
+                        <button
+                            type="button"
+                            class="btn-abrir-projeto"
+                            data-abrir-projeto="${projeto.id}">
+                            Abrir projeto
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn-editar-projeto"
+                            data-editar-projeto="${projeto.id}">
+                            ✏️ Editar
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn-excluir-projeto"
+                            data-excluir-projeto="${projeto.id}">
+                            🗑️ Excluir
+                        </button>
+                    </div>
+                </td>
+            `;
+
+            container.appendChild(linha);
+        }
+
+        container.querySelectorAll("[data-abrir-projeto]").forEach(function (botao) {
+            botao.addEventListener("click", function () {
+                selecionarProjeto(botao.dataset.abrirProjeto);
+                abrirTelaDetalhes();
+            });
+        });
+
+        container.querySelectorAll("[data-editar-projeto]").forEach(function (botao) {
+            botao.addEventListener("click", function () {
+                editarProjeto(botao.dataset.editarProjeto);
+            });
+        });
+
+        container.querySelectorAll("[data-excluir-projeto]").forEach(function (botao) {
+            botao.addEventListener("click", function () {
+                excluirProjeto(botao.dataset.excluirProjeto);
+            });
+        });
+    }
+
+    // =========================
+    // EDITAR PROJETO
+    // =========================
+
+    function editarProjeto(idProjeto) {
+        var projetoEncontrado = null;
+
+        for (var i = 0; i < dashboardAtual.projetos.length; i++) {
+            if (dashboardAtual.projetos[i].id == idProjeto) {
+                projetoEncontrado = dashboardAtual.projetos[i];
+                break;
+            }
+        }
+
+        if (!projetoEncontrado) {
+            alert("Não foi possível encontrar esse projeto.");
+            return;
+        }
+
+        var campoId = document.getElementById("projeto_id");
+        var campoNome = document.getElementById("projeto_nome");
+        var tituloModal = document.getElementById("titulo-modal-projeto");
+        var botaoSalvar = document.getElementById("salvar-projeto");
+
+        if (!campoId || !campoNome) {
+            alert("Não foi possível encontrar os campos do formulário de projeto.");
+            return;
+        }
+
+        campoId.value = projetoEncontrado.id;
+        campoNome.value = projetoEncontrado.nome;
+
+        if (tituloModal) {
+            tituloModal.textContent = "Editar projeto";
+        }
+
+        if (botaoSalvar) {
+            botaoSalvar.textContent = "Salvar alterações";
+        }
+
+        abrirModal(modalProjeto);
+        campoNome.focus();
+    }
+
+    // =========================
+    // EXCLUIR PROJETO
+    // =========================
+
+    function excluirProjeto(idProjeto) {
+        if (contarAnotacoes(idProjeto) > 0) {
+            alert("Este projeto possui anotações. Exclua as anotações antes de excluir o projeto.");
+            return;
+        }
+
+        if (!confirm("Tem certeza de que deseja excluir este projeto?")) {
+            return;
+        }
+
+        var idUsuario = sessionStorage.ID_USUARIO;
+
+        fetch("/anotacoes/projetos/excluir", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: idProjeto,
+                idUsuario: idUsuario
+            })
+        })
+            .then(function (resposta) {
+                if (!resposta.ok) {
+                    return resposta.text().then(function (mensagem) {
+                        throw new Error(mensagem || "Não foi possível excluir o projeto.");
+                    });
+                }
+
+                return resposta.text();
+            })
+            .then(function () {
+                if (dashboardAtual.projetoSelecionado == idProjeto) {
+                    voltarParaProjetos();
+                }
+
+                return Promise.all([
+                    obterProjetos(),
+                    obterAnotacoes()
+                ]);
+            })
+            .catch(function (erro) {
+                mostrarErro("Erro ao excluir projeto.", erro);
+            });
+    }
+
+    // =========================
+    // CRIAR E EDITAR PROJETO
+    // =========================
+
+    function adicionarProjeto(evento) {
+        evento.preventDefault();
+
+        var campoId = document.getElementById("projeto_id");
+        var campoNome = document.getElementById("projeto_nome");
+
+        var idProjeto = campoId ? campoId.value : "";
+        var nome = campoNome ? campoNome.value.trim() : "";
+        var idUsuario = sessionStorage.ID_USUARIO;
+
+        if (!idUsuario) {
+            alert("Não foi possível identificar o usuário. Entre novamente.");
+            return;
+        }
+
+        if (nome === "") {
+            alert("Digite o nome do projeto.");
+            return;
+        }
+
+        var editando = idProjeto !== "";
+
+        var rota = editando
+            ? "/anotacoes/projetos/editar"
+            : "/anotacoes/projetos/criar";
+
+        var metodo = editando ? "PUT" : "POST";
+
+        fetch(rota, {
+            method: metodo,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: idProjeto,
+                idUsuario: idUsuario,
+                nome: nome
+            })
+        })
+            .then(function (resposta) {
+                if (!resposta.ok) {
+                    return resposta.text().then(function (mensagem) {
+                        throw new Error(mensagem || "Não foi possível salvar o projeto.");
+                    });
+                }
+
+                if (editando) {
+                    return {};
+                }
+
+                return resposta.json();
+            })
+            .then(function (dados) {
+                fecharModalProjeto();
+
+                if (!editando && dados.id) {
+                    dashboardAtual.projetoSelecionado = String(dados.id);
+                }
+
+                obterProjetos();
+            })
+            .catch(function (erro) {
+                mostrarErro("Erro ao salvar projeto.", erro);
+            });
+    }
+
+    // =========================
+    // CARREGAR ANOTAÇÕES
+    // =========================
+
+    function obterAnotacoes() {
+        var idUsuario = sessionStorage.ID_USUARIO;
+
+        if (!idUsuario) {
+            console.error("Usuário não identificado na sessão.");
+            return;
+        }
+
+        fetch("/anotacoes/listar/" + encodeURIComponent(idUsuario), {
+            cache: "no-store"
+        })
+            .then(function (resposta) {
+                if (!resposta.ok) {
+                    throw new Error("Não foi possível carregar as anotações.");
+                }
+
+                return resposta.json();
+            })
+            .then(function (anotacoes) {
+                dashboardAtual.anotacoes = anotacoes;
+                atualizarTela();
+            })
+            .catch(function (erro) {
+                mostrarErro("Erro ao carregar as anotações.", erro);
+            });
+    }
+
+    // =========================
+    // SELECT DE PROJETOS
+    // =========================
+
+    function exibirSelectProjeto() {
+        var select = document.getElementById("selectProjeto");
+
+        if (!select) {
+            return;
+        }
+
+        var valorAnterior = select.value;
+
+        select.innerHTML = "";
+
+        if (dashboardAtual.projetos.length === 0) {
+            select.innerHTML = `
+                <option value="">Crie um projeto primeiro</option>
+            `;
+            return;
+        }
+
+        select.innerHTML = `
+            <option value="">Selecione um projeto</option>
+        `;
+
+        for (var i = 0; i < dashboardAtual.projetos.length; i++) {
+            var projeto = dashboardAtual.projetos[i];
+            var option = document.createElement("option");
+
+            option.value = projeto.id;
+            option.textContent = projeto.nome;
+
+            select.appendChild(option);
+        }
+
+        if (dashboardAtual.projetoSelecionado !== null) {
+            select.value = dashboardAtual.projetoSelecionado;
+        } else if (valorAnterior !== "") {
+            select.value = valorAnterior;
+        }
+    }
+
+    function selecionarProjeto(idProjeto) {
+        dashboardAtual.projetoSelecionado =
+            idProjeto === null ? null : String(idProjeto);
+
+        atualizarTela();
+    }
+
+    // =========================
+    // EXIBIR ANOTAÇÕES
+    // =========================
+
+    function exibirAnotacoes() {
+        var container = document.getElementById("listaAnotacoes");
+
+        if (!container) {
+            return;
+        }
+
+        var campoBusca = document.getElementById("busca_nota");
+        var busca = campoBusca ? campoBusca.value.toLowerCase().trim() : "";
+
+        container.innerHTML = "";
+
+        var nomeAtivo = "Todos os projetos";
+
         if (dashboardAtual.projetoSelecionado !== null) {
             nomeAtivo = nomeDoProjeto(dashboardAtual.projetoSelecionado);
         }
-        document.getElementById("nome-projeto-ativo").innerHTML = escapar(nomeAtivo);
+
+        var tituloProjeto = document.getElementById("nome-projeto-ativo");
+
+        if (tituloProjeto) {
+            tituloProjeto.textContent = nomeAtivo;
+        }
 
         var exibidas = 0;
 
         for (var i = 0; i < dashboardAtual.anotacoes.length; i++) {
             var anotacao = dashboardAtual.anotacoes[i];
 
-            // filtro por projeto
-            if (dashboardAtual.projetoSelecionado !== null && anotacao.projeto_id != dashboardAtual.projetoSelecionado) {
+            if (
+                dashboardAtual.projetoSelecionado !== null &&
+                anotacao.projeto_id != dashboardAtual.projetoSelecionado
+            ) {
                 continue;
             }
 
-            // filtro pela busca
-            var texto = (anotacao.titulo + " " + anotacao.conteudo).toLowerCase();
-            if (texto.indexOf(busca) == -1) {
+            var texto = (
+                String(anotacao.titulo || "") + " " +
+                String(anotacao.conteudo || "")
+            ).toLowerCase();
+
+            if (texto.indexOf(busca) === -1) {
                 continue;
             }
 
-            // quando está em "todas", mostra de qual projeto é a anotação
             var tituloTodas = "";
+
             if (dashboardAtual.projetoSelecionado === null) {
-                tituloTodas = `<span class="note-tag"><i class="fa-solid fa-folder"></i> ${escapar(nomeDoProjeto(anotacao.projeto_id))}</span>`;
+                tituloTodas = `
+                    <span class="note-tag">
+                        <i class="fa-solid fa-folder"></i>
+                        ${escapar(nomeDoProjeto(anotacao.projeto_id))}
+                    </span>
+                `;
             }
 
             var data = new Date(anotacao.criado_em);
 
-            container.innerHTML += `
-                <li class="card note-item" data-nota-id="${anotacao.id}">
-                    <div class="note-body">
-                        <h2>${tituloTodas}</h2>
-                        <h4>${escapar(anotacao.titulo)}</h4>
-                        <p>${escapar(anotacao.conteudo)}</p>
-                        <time datetime="${anotacao.criado_em}">
-                            Criada em: ${data.toLocaleString("pt-BR")}
-                        </time>
-                    </div>
-                    <div class="note-actions">
-                        <button type="button" class="btn-icon btn-excluir" aria-label="Editar anotação"
-                            onclick="editarAnotacao(${anotacao.id})">
-                            <img src="../../assets/imgs/edit.png" alt="">
-                        </button>
-                        <button type="button" class="btn-icon btn-excluir" aria-label="Excluir anotação"
-                            onclick="excluirAnotacao(${anotacao.id})">
-                            <img src="../../assets/imgs/lixo.png" alt="">
-                        </button>
-                    </div>
-                </li>
+            var dataFormatada = isNaN(data.getTime())
+                ? ""
+                : data.toLocaleString("pt-BR");
+
+            var item = document.createElement("li");
+            item.className = "card note-item";
+            item.dataset.notaId = anotacao.id;
+
+            item.innerHTML = `
+                <div class="note-body">
+                    <h2>${tituloTodas}</h2>
+                    <h4>${escapar(anotacao.titulo)}</h4>
+                    <p>${escapar(anotacao.conteudo)}</p>
+                    <time datetime="${escapar(anotacao.criado_em)}">
+                        Criada em: ${escapar(dataFormatada)}
+                    </time>
+                </div>
+
+                <div class="note-actions">
+                    <button
+                        type="button"
+                        class="btn-icon btn-editar"
+                        aria-label="Editar anotação"
+                        data-editar-nota="${escapar(anotacao.id)}">
+                        ✏️
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-icon btn-excluir"
+                        aria-label="Excluir anotação"
+                        data-excluir-nota="${escapar(anotacao.id)}">
+                        🗑️
+                    </button>
+                </div>
             `;
+
+            container.appendChild(item);
             exibidas++;
         }
 
-        if (exibidas == 0) {
-            container.innerHTML = `<li class="note-vazio">Nenhuma anotação encontrada.</li>`;
+        if (exibidas === 0) {
+            container.innerHTML = `
+                <li class="note-vazio">Nenhuma anotação encontrada.</li>
+            `;
         }
+
+        container.querySelectorAll("[data-editar-nota]").forEach(function (botao) {
+            botao.addEventListener("click", function () {
+                editarAnotacao(botao.dataset.editarNota);
+            });
+        });
+
+        container.querySelectorAll("[data-excluir-nota]").forEach(function (botao) {
+            botao.addEventListener("click", function () {
+                excluirAnotacao(botao.dataset.excluirNota);
+            });
+        });
     }
 
-    // 
-    // se nota_id estiver vazio cria uma anotacao nova senao edita
+    // =========================
+    // CRIAR E EDITAR ANOTAÇÕES
+    // =========================
+
     function salvarAnotacao(evento) {
         evento.preventDefault();
 
@@ -326,51 +733,62 @@ preencherUsuario()
         var idProjeto = document.getElementById("selectProjeto").value;
         var titulo = document.getElementById("nota_titulo").value.trim();
         var conteudo = document.getElementById("nota_texto").value.trim();
+        var idUsuario = sessionStorage.ID_USUARIO;
 
-        if (idProjeto == "") {
-            alert("Crie ou selecione um projeto para salvar a anotação");
+        if (!idUsuario) {
+            alert("Não foi possível identificar o usuário. Entre novamente.");
             return;
         }
 
-        if (titulo == "" || conteudo == "") {
-            alert("Preencha o título e a anotação");
+        if (idProjeto === "") {
+            alert("Crie ou selecione um projeto para salvar a anotação.");
+            return;
+        }
+
+        if (titulo === "" || conteudo === "") {
+            alert("Preencha o título e o conteúdo da anotação.");
             return;
         }
 
         var rota = "/anotacoes/criar";
         var metodo = "POST";
 
-        if (idNota != "") {
+        if (idNota !== "") {
             rota = "/anotacoes/editar";
             metodo = "PUT";
         }
 
         fetch(rota, {
             method: metodo,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
                 id: idNota,
-                idUsuario: sessionStorage.ID_USUARIO,
+                idUsuario: idUsuario,
                 idProjeto: idProjeto,
                 titulo: titulo,
                 conteudo: conteudo
             })
         })
             .then(function (resposta) {
-                if (resposta.ok) {
-                    // se já estava filtrando por um projeto, passa a mostrar o projeto onde salvou
-                    if (dashboardAtual.projetoSelecionado !== null) {
-                        dashboardAtual.projetoSelecionado = idProjeto;
-                    }
-                    limparFormulario();
-                    obterAnotacoes(); // atualiza a lista na tela
-                } else {
-                    console.error("Não foi possível salvar a anotação");
-                    alert("Não foi possível salvar a anotação");
+                if (!resposta.ok) {
+                    throw new Error("Não foi possível salvar a anotação.");
                 }
+
+                return resposta.text();
+            })
+            .then(function () {
+                dashboardAtual.projetoSelecionado = String(idProjeto);
+
+                limparFormulario();
+                fecharModalAnotacao();
+                abrirTelaDetalhes();
+
+                obterAnotacoes();
             })
             .catch(function (erro) {
-                console.error(`Erro ao salvar anotação: ${erro.message}`);
+                mostrarErro("Erro ao salvar a anotação.", erro);
             });
     }
 
@@ -384,26 +802,48 @@ preencherUsuario()
                 document.getElementById("nota_titulo").value = anotacao.titulo;
                 document.getElementById("nota_texto").value = anotacao.conteudo;
 
-                document.getElementById("titulo-form").innerHTML = "Editar anotação";
-                document.getElementById("texto-botao-salvar").innerHTML = "Salvar alterações";
-                document.getElementById("btn-cancelar-edicao").style.display = "block";
+                var tituloFormulario = document.getElementById("titulo-formulario");
+                var botaoSalvar = document.getElementById("salvar-anotacao");
 
+                if (tituloFormulario) {
+                    tituloFormulario.textContent = "Editar anotação";
+                }
+
+                if (botaoSalvar) {
+                    botaoSalvar.textContent = "Salvar alterações";
+                }
+
+                abrirModal(modalAnotacao);
                 document.getElementById("nota_titulo").focus();
+
                 break;
             }
         }
     }
 
-    // Volta o formulário para o modo "Nova anotação"
     function limparFormulario() {
-        document.getElementById("form-anotacao").reset();
-        document.getElementById("nota_id").value = "";
+        if (formAnotacao) {
+            formAnotacao.reset();
+        }
 
-        document.getElementById("titulo-form").innerHTML = "Nova anotação";
-        document.getElementById("texto-botao-salvar").innerHTML = "Salvar";
-        document.getElementById("btn-cancelar-edicao").style.display = "none";
+        var campoId = document.getElementById("nota_id");
 
-        exibirSelectProjeto(); // reaplica o projeto selecionado no select
+        if (campoId) {
+            campoId.value = "";
+        }
+
+        var tituloFormulario = document.getElementById("titulo-formulario");
+        var botaoSalvar = document.getElementById("salvar-anotacao");
+
+        if (tituloFormulario) {
+            tituloFormulario.textContent = "Nova anotação";
+        }
+
+        if (botaoSalvar) {
+            botaoSalvar.textContent = "Salvar anotação";
+        }
+
+        exibirSelectProjeto();
     }
 
     function excluirAnotacao(idNota) {
@@ -411,23 +851,38 @@ preencherUsuario()
             return;
         }
 
+        var idUsuario = sessionStorage.ID_USUARIO;
+
         fetch("/anotacoes/excluir", {
             method: "DELETE",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
                 id: idNota,
-                idUsuario: sessionStorage.ID_USUARIO
+                idUsuario: idUsuario
             })
         })
             .then(function (resposta) {
-                if (resposta.ok) {
-                    limparFormulario();
-                    obterAnotacoes(); // atualiza a lista na tela
-                } else {
-                    console.error("Erro ao excluir anotação");
+                if (!resposta.ok) {
+                    throw new Error("Não foi possível excluir a anotação.");
                 }
+
+                return resposta.text();
+            })
+            .then(function () {
+                return obterAnotacoes();
             })
             .catch(function (erro) {
-                console.error(`Erro ao excluir anotação: ${erro.message}`);
+                mostrarErro("Erro ao excluir a anotação.", erro);
             });
     }
+
+    // =========================
+    // INICIALIZAÇÃO
+    // =========================
+
+    obterProjetos();
+    obterAnotacoes();
+
+});

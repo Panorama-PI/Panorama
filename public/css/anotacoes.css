@@ -1,7 +1,5 @@
-
 /* =========================================
    ANOTAÇÕES — PANORAMA
-   CSS independente do dashboard.css
    ========================================= */
 
 :root {
@@ -37,9 +35,7 @@ body.body-anotacoes {
     font-family: 'Barlow', sans-serif;
 }
 
-/* =========================================
-   SIDEBAR
-   ========================================= */
+/* Sidebar */
 
 .aside-left {
     position: fixed;
@@ -164,9 +160,7 @@ body.body-anotacoes {
     background: #F81E21;
 }
 
-/* =========================================
-   CONTEÚDO PRINCIPAL
-   ========================================= */
+/* Conteúdo principal */
 
 .home-anotacoes {
     box-sizing: border-box;
@@ -179,7 +173,6 @@ body.body-anotacoes {
     margin-left: auto;
     margin-right: auto;
 
-    /* Mantém o posicionamento que funcionou */
     position: relative;
     left: 13.05rem;
 
@@ -187,9 +180,7 @@ body.body-anotacoes {
     background: var(--cor-fundo-escuro);
 }
 
-/* =========================================
-   CABEÇALHO
-   ========================================= */
+/* Cabeçalho */
 
 .anotacoes-header {
     margin-bottom: 1.5rem;
@@ -209,9 +200,7 @@ body.body-anotacoes {
     line-height: 1.5;
 }
 
-/* =========================================
-   LISTA DE PROJETOS
-   ========================================= */
+/* Lista de projetos */
 
 .anotacoes-lista,
 .anotacoes-detalhes {
@@ -246,8 +235,6 @@ body.body-anotacoes {
     font-size: 1.6rem;
 }
 
-/* Agrupamento dos botões do cabeçalho */
-
 .anotacoes-acoes {
     display: flex;
     align-items: center;
@@ -256,9 +243,7 @@ body.body-anotacoes {
     gap: 0.75rem;
 }
 
-/* =========================================
-   TABELA
-   ========================================= */
+/* Tabela de projetos */
 
 .anotacoes-tabela-wrap {
     width: 100%;
@@ -267,6 +252,7 @@ body.body-anotacoes {
 
 .anotacoes-tabela {
     width: 100%;
+    table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0 0.5rem;
 
@@ -275,9 +261,39 @@ body.body-anotacoes {
     text-align: left;
 }
 
-.anotacoes-tabela thead th {
-    padding: 1rem 1.25rem;
+.anotacoes-tabela th,
+.anotacoes-tabela td {
+    vertical-align: middle;
+}
 
+.anotacoes-tabela th:nth-child(1),
+.anotacoes-tabela td:nth-child(1) {
+    width: 16%;
+}
+
+.anotacoes-tabela th:nth-child(2),
+.anotacoes-tabela td:nth-child(2) {
+    width: 16%;
+}
+
+.anotacoes-tabela th:nth-child(3),
+.anotacoes-tabela td:nth-child(3) {
+    width: 18%;
+}
+
+.anotacoes-tabela th:nth-child(4),
+.anotacoes-tabela td:nth-child(4) {
+    width: 50%;
+}
+
+.anotacoes-tabela thead th,
+.anotacoes-tabela tbody td {
+    padding: 1rem;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.anotacoes-tabela thead th {
     border-top: 1px solid var(--cor-borda-card);
     border-bottom: 1px solid var(--cor-borda-card);
 
@@ -299,17 +315,15 @@ body.body-anotacoes {
 }
 
 .anotacoes-tabela tbody td {
-    padding: 1rem 1.25rem;
-
     border-top: 1px solid var(--cor-borda-card);
     border-bottom: 1px solid var(--cor-borda-card);
-
     background: var(--cor-fundo-side);
 }
 
 .anotacoes-tabela tbody td:first-child {
     border-left: 1px solid var(--cor-borda-card);
     border-radius: 10px 0 0 10px;
+    text-align: left;
 }
 
 .anotacoes-tabela tbody td:last-child {
@@ -317,9 +331,14 @@ body.body-anotacoes {
     border-radius: 0 10px 10px 0;
 }
 
-/* =========================================
-   BOTÕES — ESTILO PRINCIPAL E SECUNDÁRIO
-   ========================================= */
+/* Mensagem quando não existem projetos */
+
+.anotacoes-tabela tbody td[colspan] {
+    width: 100%;
+    text-align: left;
+}
+
+/* Botões */
 
 .anotacoes-btn-principal,
 .anotacoes-btn-secundario,
@@ -345,8 +364,6 @@ body.body-anotacoes {
         color 0.2s ease;
 }
 
-/* Botão principal: Nova anotação */
-
 .anotacoes-btn-principal {
     border-color: var(--cor-vermelho);
     color: #FFFFFF;
@@ -357,8 +374,6 @@ body.body-anotacoes {
     border-color: #E52E33;
     background: #E52E33;
 }
-
-/* Botão secundário: Criar projeto */
 
 .anotacoes-btn-criar-projeto {
     gap: 0.5rem;
@@ -393,8 +408,6 @@ body.body-anotacoes {
     object-fit: contain;
 }
 
-/* Outros botões secundários */
-
 .anotacoes-btn-secundario {
     margin-top: 1rem;
     color: var(--cor-texto);
@@ -405,9 +418,7 @@ body.body-anotacoes {
     background: #333337;
 }
 
-/* =========================================
-   DETALHES DAS ANOTAÇÕES
-   ========================================= */
+/* Detalhes das anotações */
 
 .anotacoes-detalhes-topo {
     display: flex;
@@ -434,9 +445,7 @@ body.body-anotacoes {
     font: inherit;
 }
 
-/* =========================================
-   MODAL DE ANOTAÇÃO
-   ========================================= */
+/* Modais */
 
 .anotacoes-modal-overlay {
     position: fixed;
@@ -555,16 +564,7 @@ body.body-anotacoes {
     gap: 0.75rem;
 }
 
-/* Esconde elementos com o atributo hidden */
-
-[hidden] {
-    display: none !important;
-}
-
-
-/* =========================================
-   MODAL DE CRIAR PROJETO
-   ========================================= */
+/* Modal de projeto */
 
 #modal-projeto .anotacoes-modal {
     width: min(100%, 500px);
@@ -582,9 +582,214 @@ body.body-anotacoes {
     margin-top: 0.5rem;
 }
 
-/* =========================================
-   RESPONSIVIDADE
-   ========================================= */
+/* Botões dos formulários */
+
+#formulario-anotacao .anotacoes-modal-acoes,
+#modal-projeto .anotacoes-modal-acoes {
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+#formulario-anotacao .anotacoes-modal-acoes button,
+#modal-projeto .anotacoes-modal-acoes button {
+    width: auto;
+    min-width: 130px;
+    min-height: 3rem;
+    margin: 0;
+    padding: 0.75rem 1.2rem;
+}
+
+/* Ações dos projetos */
+
+.projeto-acoes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.projeto-acoes button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 2.2rem;
+    padding: 0.55rem 0.8rem;
+
+    border: 1px solid var(--cor-borda-card);
+    border-radius: 7px;
+
+    color: var(--cor-texto);
+    background: var(--cor-fundo-card);
+
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.projeto-acoes .btn-abrir-projeto {
+    border-color: var(--cor-vermelho);
+    background: var(--cor-vermelho);
+}
+
+.projeto-acoes .btn-abrir-projeto:hover {
+    border-color: #E52E33;
+    background: #E52E33;
+}
+
+.projeto-acoes .btn-editar-projeto:hover {
+    border-color: #777780;
+    background: #353539;
+}
+
+.projeto-acoes .btn-excluir-projeto {
+    border-color: #713438;
+    color: #FF777A;
+    background: #302022;
+}
+
+.projeto-acoes .btn-excluir-projeto:hover {
+    border-color: var(--cor-vermelho);
+    background: #492326;
+}
+
+/* Cards das anotações */
+
+.note-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+
+    width: 100%;
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.note-list > li {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+
+    min-width: 0;
+    padding: 1.5rem;
+
+    border: 1px solid var(--cor-borda-card);
+    border-radius: 12px;
+
+    background: var(--cor-fundo-side);
+
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.note-list > li:hover {
+    border-color: #55555C;
+    background: #1B1B1D;
+}
+
+.note-list > li strong,
+.note-list > li h3 {
+    margin: 0;
+
+    color: var(--cor-texto);
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.4;
+
+    overflow-wrap: anywhere;
+}
+
+.note-list > li p {
+    margin: 0;
+
+    color: #D4D4D8;
+    font-size: 0.95rem;
+    line-height: 1.7;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.note-list > li small,
+.note-list > li .data-anotacao {
+    color: var(--cor-cinza-claro);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.note-list > li .anotacao-acoes,
+.note-list > li .acoes-anotacao {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+
+    margin-top: auto;
+    padding-top: 0.5rem;
+}
+
+.note-list > li button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+
+    min-height: 2.3rem;
+    padding: 0.55rem 0.8rem;
+
+    border: 1px solid var(--cor-borda-card);
+    border-radius: 7px;
+
+    color: var(--cor-texto);
+    background: var(--cor-fundo-card);
+
+    font-family: inherit;
+    font-size: 0.85rem;
+
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.note-list > li button:hover {
+    border-color: #777780;
+    background: #353539;
+}
+
+.note-list > li button:last-child {
+    border-color: #713438;
+    color: #FF777A;
+    background: #302022;
+}
+
+.note-list > li button:last-child:hover {
+    border-color: var(--cor-vermelho);
+    background: #492326;
+}
+
+/* Mensagem quando não existem anotações */
+
+.note-list > li:only-child {
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
+/* Responsividade */
 
 @media (max-width: 1200px) {
     .home-anotacoes {
@@ -628,7 +833,11 @@ body.body-anotacoes {
     }
 
     .anotacoes-tabela {
-        min-width: 650px;
+        min-width: 800px;
+    }
+
+    .note-list {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -676,4 +885,51 @@ body.body-anotacoes {
     .anotacoes-modal-acoes button {
         width: 100%;
     }
+
+    #formulario-anotacao .anotacoes-modal-acoes,
+    #modal-projeto .anotacoes-modal-acoes {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    #formulario-anotacao .anotacoes-modal-acoes button,
+    #modal-projeto .anotacoes-modal-acoes button {
+        width: 100%;
+    }
+
+    .projeto-acoes {
+        gap: 0.4rem;
+    }
+
+    .projeto-acoes button {
+        padding: 0.5rem 0.65rem;
+        font-size: 0.8rem;
+    }
+
+    .note-list > li {
+        padding: 1rem;
+    }
+
+    .note-list > li .anotacao-acoes,
+    .note-list > li .acoes-anotacao {
+        flex-wrap: wrap;
+    }
+}
+
+[hidden] {
+    display: none !important;
+}
+
+/* Faz a mensagem de projetos ocupar toda a tabela */
+.anotacoes-tabela tbody tr:has(td[colspan]) {
+    width: 100%;
+}
+
+.anotacoes-tabela tbody tr:has(td[colspan]) td {
+    width: 100%;
+    text-align: left;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--cor-borda-card);
+    border-radius: 10px;
+    background: var(--cor-fundo-side);
 }
