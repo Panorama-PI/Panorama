@@ -23,6 +23,7 @@ var usuarioRouter = require("./src/routes/usuarios");
 var empresasRouter = require("./src/routes/empresas");
 var anotacoesRouter = require("./src/routes/anotacoes");
 var tokensRouter = require("./src/routes/tokens");
+var publicacoesRouter = require("./src/routes/publicacoes");
 
 // Permite que a aplicação receba dados enviados no formato JSON
 // e também dados enviados por formulários.
@@ -43,6 +44,7 @@ app.use("/usuarios", usuarioRouter);
 app.use("/empresas", empresasRouter);
 app.use("/anotacoes", anotacoesRouter);
 app.use("/tokens", tokensRouter);  
+app.use("/publicacoes", publicacoesRouter);
 
 // Inicia o servidor utilizando a porta definida nas configurações
 // do ambiente.
