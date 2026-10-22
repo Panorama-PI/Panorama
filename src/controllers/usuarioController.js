@@ -34,14 +34,7 @@ function cadastrar(req, res) {
                 }
 
                 var id_empresa = resultadoToken[0].id_empresa;
-                var emailConvite = resultadoToken[0].email_destinatario;
-
-                // O token só vale para o e-mail que recebeu o convite.
-                if (!emailConvite || emailConvite.trim().toLowerCase() !== email.trim().toLowerCase()) {
-                    return res.status(403).send("Este token foi enviado para outro e-mail!");
-                }
-
-                // Cadastra o usuário vinculado à empresa do token.
+                                // Cadastra o usuário vinculado à empresa do token.
                 return usuarioModel.cadastrar(nome, email, senha, perfil_id, id_empresa)
                     .then(function (resultado) {
                         // Invalida o token para ele não ser usado de novo.
@@ -101,6 +94,7 @@ function autenticar(req, res) {
                                         id: resultadoAutenticar[0].id,
                                         email: resultadoAutenticar[0].email,
                                         nome: resultadoAutenticar[0].nome,
+                                        perfil_id: resultadoAutenticar[0].perfil_id
                                     });
                                 } else {
                                     res.status(204).json({ usuarios: [] });

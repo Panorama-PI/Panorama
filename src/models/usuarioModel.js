@@ -22,7 +22,7 @@ async function cadastrar(nome, email, senha, perfil_id, id_empresa) {
 
 async function autenticar(email, senha) {
     var instrucaoSql = `
-        SELECT id, nome, email, id_empresa AS empresaId, senha_hash
+        SELECT id, nome, email, id_empresa AS empresaId, senha_hash, perfil_id
         FROM usuario
         WHERE email = ?
     `;

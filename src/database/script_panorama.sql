@@ -5,7 +5,7 @@ USE filmes_db;
 CREATE TABLE empresa (
     id INT PRIMARY KEY AUTO_INCREMENT,
     telefone CHAR(11),
-    cnpj VARCHAR(15) NOT NULL,
+    cnpj VARCHAR(15) NOT NULL UNIQUE,
     nome VARCHAR(120) NOT NULL
 );
 
@@ -21,7 +21,7 @@ id_empresa INT NOT NULL,
 CREATE TABLE usuario (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(120) NOT NULL,
-    email VARCHAR(150) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
     senha_hash VARCHAR(255) NOT NULL,
     perfil_id INT NOT NULL,
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -108,7 +108,13 @@ CREATE TABLE observacao (
     CONSTRAINT fk_observacoes_projeto
         FOREIGN KEY (projeto_id) REFERENCES projeto(id)
 );
-
+CREATE TABLE publicacao_observacao(
+ id INT PRIMARY KEY AUTO_INCREMENT,
+ id_publicacao INT,
+ id_observacao INT,
+ CONSTRAINT fk_publicacao_obs FOREIGN KEY (id_publicacao) REFERENCES publicacao(id),
+ CONSTRAINT fk_obs_publicacao FOREIGN KEY (id_observacao) REFERENCES observacao(id)
+);
 CREATE TABLE relatorio (
     id INT NOT NULL AUTO_INCREMENT,
     usuario_id INT NOT NULL,
@@ -122,7 +128,7 @@ CREATE TABLE relatorio (
     CONSTRAINT fk_relatorios_usuario
         FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
-
+/*
 CREATE TABLE notificacao (
     id INT NOT NULL AUTO_INCREMENT,
     usuario_id INT NOT NULL,
@@ -134,4 +140,4 @@ CREATE TABLE notificacao (
     CONSTRAINT fk_notificacoes_usuario
         FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 );
-
+*/
