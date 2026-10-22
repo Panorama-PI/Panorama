@@ -94,7 +94,8 @@ function autenticar(req, res) {
                                         id: resultadoAutenticar[0].id,
                                         email: resultadoAutenticar[0].email,
                                         nome: resultadoAutenticar[0].nome,
-                                        perfil_id: resultadoAutenticar[0].perfil_id
+                                        perfil_id: resultadoAutenticar[0].perfil_id,
+                                        empresaId: resultadoAutenticar[0].empresaId
                                     });
                                 } else {
                                     res.status(204).json({ usuarios: [] });
