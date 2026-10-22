@@ -11,7 +11,7 @@
 
     <link rel="stylesheet" href="../../css/anotacoes.css">
     <link rel="stylesheet" href="../../css/dashboard.css">
-    <script src="../js/sessao.js"></script>
+    <script src="../../js/sessao.js"></script>
     <script src="./../js/alerta.js"></script>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -39,7 +39,7 @@
             <h4 id="c_email">email@gmail.com</h4>
         </div>
         <div class="btns-side">
-            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
+            <a onclick="sair()"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
             <a href="./dashboard-geral.html" ><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
             <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
             <a href="./anotacoes.html" class="ativo"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
@@ -524,5 +524,10 @@
             .catch(function (erro) {
                 console.error(`Erro ao excluir anotação: ${erro.message}`);
             });
+    }
+
+     function sair(){
+        sessionStorage.clear(); 
+        window.location.href = "../../index.html";
     }
 </script>

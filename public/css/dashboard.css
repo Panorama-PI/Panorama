@@ -195,7 +195,7 @@ body {
   height: 0.3rem; 
   margin-bottom: 3rem; 
 }
-#pesquisa-bar{
+#pesquisa_bar{
   width: 40rem;
   height: 0.1rem;
   color: white;
@@ -204,7 +204,7 @@ body {
   width: 4.5rem;
   height: 0.1rem;
 }
-#pesquisa-bar p{
+#pesquisa_bar p{
   color:white;
 }
 #filtro-bar p{

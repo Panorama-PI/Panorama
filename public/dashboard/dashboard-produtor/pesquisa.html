@@ -161,24 +161,89 @@
 </html>
 
 <script>
-    preencherUsuario()
+   
+    preencherUsuario();
+
     var tabela = document.getElementById("tabela_filmes");
     var titulo = document.getElementById("titulo");
-    tabela.style.display = "";
-    
-    let proximaAtualizacao;
-    
-    function buscar(){
+    var pesquisa = document.getElementById("pesquisa-bar");
+    var corpoTabela = document.querySelector("#tabela_filmes tbody");
 
-        tabela.style.display = "";
+    tabela.style.display = "";
+
+    function buscar() {
+
+        var filmePesquisado = pesquisa-bar.value.trim();
+
+        if (nomeFilme == "") {
+            alert("Digite o nome de um filme");
+            return;
+        }
+
         titulo.style.display = "none";
-        
-    }
-    function limpar_pesquisa(){
+        corpoTabela.innerHTML = "";
+
+      fetch("/filmes/pesquisar", {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    filmeServer: filmePesquisado
+                })
+
+            }).then(function (resposta) {
+
+                console.log("ESTOU NO THEN DO entrar()!")
+
+                // Verifica se a autenticação foi realizada com sucesso.
+                if (resposta.ok) {
+
+                    resposta.json().then(function (filmes) {
+
+                        console.log(`Dados recebidos: ${JSON.stringify(filmes)}`);
+
+                        if (filmes.length == 0) {
+                            corpoTabela.innerHTML = `
+                                <tr>
+                                    <td colspan="5">Nenhum filme encontrado</td>
+                                </tr>
+                            `;
+                            return;
+                        }
+
+                        for (var i = 0; i < filmes.length; i++) {
+
+                            corpoTabela.innerHTML += `
+                                <tr>
+                                    <td>${filmes[i].titulo}</td>
+                                    <td>${filmes[i].atorPrincipal}</td>
+                                    <td>${filmes[i].genero}</td>
+                                    <td>${filmes[i].pais}</td>
+                                    <td>${filmes[i].lucro}</td>
+                                </tr>
+                            `;
+                        }
+                    });
+                } else {
+                    console.error('Nenhum dado encontrado ou erro na API');
+                }
+            })
+            .catch(function (erro) {
+                console.error('Erro ao pesquisar filmes:', erro);
+            });
+        }
+
+    function limpar_pesquisa() {
+        pesquisa.value = "";
         titulo.style.display = "";
-        tabela.style.display = "";
-        
+        corpoTabela.innerHTML = "";
     }
-    
-   
 </script>
+
+
+
+   
+
