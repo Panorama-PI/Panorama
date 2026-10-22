@@ -409,12 +409,29 @@
     cursor: pointer;
 }
 
-.publicacao-anotacao-item input {
-    width: 1rem;
-    height: 1rem;
-    margin: 0;
-    accent-color: #FF383C;
+/* Seletor mais específico para anular o ".publicacao-campo input"
+   (width 100%, min-height, padding, border, background) nos checkboxes */
+.publicacao-campo .publicacao-anotacao-item input[type="checkbox"] {
+    appearance: auto;
+    -webkit-appearance: checkbox;
+    box-sizing: border-box;
     flex-shrink: 0;
+    width: 1.1rem;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    accent-color: #FF383C;
+    cursor: pointer;
+}
+
+/* Checkbox "Selecionar todas" */
+.publicacao-anotacao-todas {
+    font-weight: 700;
+    background: #27272A;
 }
 
 .publicacao-campo-anotacoes small {
@@ -429,6 +446,7 @@
     gap: 0.5rem;
     margin-top: 0.8rem;
 }
+
 
 /* =========================================
    RESPONSIVIDADE
