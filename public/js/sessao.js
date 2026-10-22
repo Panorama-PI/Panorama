@@ -14,12 +14,19 @@
 //    }
 // }
 
+function validarSessao() {
+    const id = sessionStorage.ID_USUARIO;
+
+    if (id == undefined || id == null) {
+        window.location.replace("/login.html"); // ajuste o caminho
+    }
+}
 
 // Encerra a sessão do usuário, limpa os dados armazenados
 // e redireciona para a tela de login.
 function limparSessao() {
     sessionStorage.clear();
-    window.location = "../login.html";
+    window.location = "../../index.html";
 }
 
 

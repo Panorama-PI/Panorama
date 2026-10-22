@@ -80,7 +80,7 @@ async function cadastrar(dados) {
 // Retorna apenas os dados necessários para exibição da lista.
 function listar() {
     var instrucaoSql = `
-      SELECT id, nome, telefone 
+      SELECT id, nome, telefone,cnpj
       FROM empresa
     `;
 
