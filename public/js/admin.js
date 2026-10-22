@@ -77,4 +77,49 @@ for (let i = 0; i < usuarios.length; i++) {
         </div>
     `;
     listaFuncionarios.appendChild(card);
+
+  function buscarEmpresas() { 
+    fetch("/empresas/listar") 
+        .then(res => res.json()) 
+        .then(dados => { 
+            const containerInfos = document.querySelector(".informacoes"); 
+            
+            if (!containerInfos) {
+                console.error("Elemento .informacoes não foi encontrado no HTML.");
+                return;
+            }
+
+            containerInfos.innerHTML = ""; 
+
+            for (let i = 0; i < dados.length; i++) { 
+                let registro = dados[1]; 
+                let telefone = registro.telefone; 
+                let nome = registro.nome; 
+                let cnpj = registro.cnpj; 
+                let email = registro.email; 
+
+                containerInfos.innerHTML = ` 
+                    <div class="informacao-empresa"> 
+                        <span>Nome da Empresa</span> 
+                        <strong>${nome}</strong> 
+                    </div> 
+                    <div class="informacao-empresa"> 
+                        <span>CNPJ</span> 
+                        <strong>${cnpj}</strong> 
+                    </div> 
+                    <div class="informacao-empresa"> 
+                        <span>E-mail de contato</span> 
+                        <strong>${email}</strong> 
+                    </div> 
+                    <div class="informacao-empresa"> 
+                        <span>Telefone</span> 
+                        <strong>${telefone}</strong> 
+                    </div>
+                `; 
+            }
+        }) 
+        .catch(err => console.error("Erro ao buscar dados das empresas desgraçado:", err)); 
 }
+
+}
+    
