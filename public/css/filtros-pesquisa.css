@@ -65,3 +65,187 @@
     cursor: pointer;
     color: white;
 }
+
+/* ========================================
+   PESQUISA DE FILMES
+   Padrão visual dos cards da administração
+======================================== */
+
+/* Título centralizado */
+.home-pesquisa .filter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.home-pesquisa .filter h2 {
+    margin: 0;
+    color: #F4F4F5;
+    font-family: "Barlow", sans-serif;
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Barra de pesquisa e botões */
+.home-pesquisa .pesquisa-cards {
+    display: flex;
+    align-items: stretch;
+    gap: 1rem;
+    width: 100%;
+    margin: 1.5rem 0;
+}
+
+.home-pesquisa .pesquisa-card {
+    box-sizing: border-box;
+    min-height: 3.5rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid #3C3C41;
+    border-radius: 8px;
+    font-family: "Barlow", sans-serif;
+    font-size: 1rem;
+}
+
+/* Campo de pesquisa */
+.home-pesquisa #pesquisa-bar,
+.home-pesquisa #pesquisa_bar {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    padding-left: 3rem;
+    color: #F4F4F5;
+    background-color: #27272A;
+    background-image: url("../assets/icon/pesquisa-icon.png");
+    background-repeat: no-repeat;
+    background-position: 1rem center;
+    background-size: 1.25rem;
+    outline: none;
+}
+
+.home-pesquisa #pesquisa-bar:focus,
+.home-pesquisa #pesquisa_bar:focus {
+    border-color: #FF383C;
+}
+
+.home-pesquisa #pesquisa-bar::placeholder,
+.home-pesquisa #pesquisa_bar::placeholder {
+    color: #A1A1AA;
+}
+
+/* Botão de filtros */
+.home-pesquisa #filtro-bar {
+    width: auto;
+    height: auto;
+    margin: 0;
+    color: #F4F4F5;
+    background-color: #27272A;
+    cursor: pointer;
+}
+
+/* Botão de buscar */
+.home-pesquisa #buscar-bar {
+    width: auto;
+    height: auto;
+    min-width: 6rem;
+    margin: 0;
+    color: #FFFFFF;
+    background-color: #FF383C;
+    cursor: pointer;
+}
+
+.home-pesquisa #filtro-bar:hover {
+    border-color: #FF383C;
+}
+
+.home-pesquisa #buscar-bar:hover {
+    background-color: #e52d31;
+}
+
+/* Área dos resultados */
+.home-pesquisa .table-pesquisa {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 1rem 0;
+    color: #F4F4F5;
+}
+
+/* Título dos resultados */
+.home-pesquisa #titulo {
+    margin: 0 0 1.5rem;
+    color: #F4F4F5;
+    font-family: "Barlow", sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Tabela responsiva */
+.home-pesquisa .tabela {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.home-pesquisa .table-pesquisa table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+}
+
+/* Cabeçalho da tabela */
+.home-pesquisa .table-pesquisa th {
+    padding: 0.8rem 1rem;
+    color: #A1A1AA;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+    border: none;
+}
+
+/* Cada linha passa a ter aparência de card */
+.home-pesquisa .table-pesquisa tbody td {
+    padding: 1rem;
+    color: #F4F4F5;
+    background-color: #27272A;
+    border-top: 1px solid #3C3C41;
+    border-bottom: 1px solid #3C3C41;
+    white-space: normal;
+}
+
+/* Cantos esquerdos */
+.home-pesquisa .table-pesquisa tbody td:first-child {
+    border-left: 1px solid #3C3C41;
+    border-radius: 12px 0 0 12px;
+}
+
+/* Cantos direitos */
+.home-pesquisa .table-pesquisa tbody td:last-child {
+    border-right: 1px solid #3C3C41;
+    border-radius: 0 12px 12px 0;
+}
+
+/* Adaptação para telas menores */
+@media (max-width: 900px) {
+    .home-pesquisa {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    .home-pesquisa .pesquisa-cards {
+        flex-wrap: wrap;
+    }
+
+    .home-pesquisa #pesquisa-bar,
+    .home-pesquisa #pesquisa_bar {
+        flex-basis: 100%;
+    }
+
+    .home-pesquisa .table-pesquisa {
+        padding: 1rem 0;
+    }
+}

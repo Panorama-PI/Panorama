@@ -55,7 +55,12 @@
             </section>
 
             <section class="pesquisa-cards">
-                <input id="pesquisa-bar" class="card pesquisa-card" placeholder="🔍"></input>
+              <input
+    id="pesquisa_bar"
+    class="card pesquisa-card"
+    type="text"
+    placeholder="Digite o nome do filme"
+>
                 <button type="button" id="filtro-bar" class="card pesquisa-card"
                     onclick="abrirFiltros()">
                     Filtros Avançados
@@ -245,90 +250,3 @@
     <script src="../../js/dashboard.js"></script>
 <script src="../../js/filtros-pesquisa.js"></script>
 
-<!-- <script>
-   
-    preencherUsuario();
-
-    var tabela = document.getElementById("tabela_filmes");
-    var titulo = document.getElementById("titulo");
-    var pesquisa = document.getElementById("pesquisa-bar");
-    var corpoTabela = document.querySelector("#tabela_filmes tbody");
-
-    tabela.style.display = "";
-
-    function buscar() {
-
-        var filmePesquisado = pesquisa-bar.value.trim();
-
-        if (nomeFilme == "") {
-            alert("Digite o nome de um filme");
-            return;
-        }
-
-        titulo.style.display = "none";
-        corpoTabela.innerHTML = "";
-
-      fetch("/filmes/pesquisar", {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    filmeServer: filmePesquisado
-                })
-
-            }).then(function (resposta) {
-
-                console.log("ESTOU NO THEN DO entrar()!")
-
-                // Verifica se a autenticação foi realizada com sucesso.
-                if (resposta.ok) {
-
-                    resposta.json().then(function (filmes) {
-
-                        console.log(`Dados recebidos: ${JSON.stringify(filmes)}`);
-
-                        if (filmes.length == 0) {
-                            corpoTabela.innerHTML = `
-                                <tr>
-                                    <td colspan="5">Nenhum filme encontrado</td>
-                                </tr>
-                            `;
-                            return;
-                        }
-
-                        for (var i = 0; i < filmes.length; i++) {
-
-                            corpoTabela.innerHTML += `
-                                <tr>
-                                    <td>${filmes[i].titulo}</td>
-                                    <td>${filmes[i].atorPrincipal}</td>
-                                    <td>${filmes[i].genero}</td>
-                                    <td>${filmes[i].pais}</td>
-                                    <td>${filmes[i].lucro}</td>
-                                </tr>
-                            `;
-                        }
-                    });
-                } else {
-                    console.error('Nenhum dado encontrado ou erro na API');
-                }
-            })
-            .catch(function (erro) {
-                console.error('Erro ao pesquisar filmes:', erro);
-            });
-        }
-
-    function limpar_pesquisa() {
-        pesquisa.value = "";
-        titulo.style.display = "";
-        corpoTabela.innerHTML = "";
-    }
-</script>
-
-
-
-   
- -->
