@@ -35,21 +35,27 @@ function pesquisar(req, res) {
 
     filmesModel.pesquisar(filtros)
         .then(function (resultado) {
-            var filmes = [];
+            
+var filmes = [];
 
-            for (var i = 0; i < resultado.length; i++) {
-                filmes.push({
-                    id: resultado[i].id,
-                    titulo: resultado[i].titulo,
-                    atorPrincipal: resultado[i].atorPrincipal,
-                    genero: resultado[i].genero,
-                    pais: resultado[i].pais,
-                    lucro: resultado[i].lucro,
-                    avaliacao: resultado[i].avaliacao
-                });
-            }
+for (var i = 0; i < resultado.length; i++) {
+    filmes.push({
+        id: resultado[i].id,
+        titulo: resultado[i].titulo,
+        atorPrincipal: resultado[i].atorPrincipal,
+        genero: resultado[i].genero,
+        pais: resultado[i].pais,
+        lucro: resultado[i].lucro,
+        avaliacao: resultado[i].avaliacao
+    });
+}
 
-            res.json(filmes);
+console.log("Filmes enviados para o navegador:", filmes);
+
+res.json(filmes);
+
+
+            
         })
         .catch(function (erro) {
             console.log("Erro ao pesquisar filmes:", erro);

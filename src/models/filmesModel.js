@@ -6,14 +6,22 @@ function pesquisar(filtros) {
         SELECT
             f.id,
             f.nome AS titulo,
-            MIN(fe.ator) AS atorPrincipal,
-            MIN(fg.genero) AS genero,
-            f.pais AS pais,
+            f.pais,
             f.score AS avaliacao,
-            (f.receita - f.orcamento) AS lucro
+            (f.receita - f.orcamento) AS lucro,
+            (
+        SELECT fg.genero
+        FROM filme_genero fg
+         WHERE fg.filme_id = f.id
+        LIMIT 1
+        ) AS genero,
+            (
+      SELECT fe.ator
+      FROM filme_elenco fe
+      WHERE fe.filme_id = f.id
+      LIMIT 1
+      ) AS atorPrincipal
         FROM filme f
-        LEFT JOIN filme_elenco fe ON fe.filme_id = f.id
-        LEFT JOIN filme_genero fg ON fg.filme_id = f.id
         WHERE f.nome LIKE ?
     `;
 
@@ -23,9 +31,9 @@ function pesquisar(filtros) {
         instrucaoSql += `
             AND EXISTS (
                 SELECT 1
-                FROM filme_genero fg2
-                WHERE fg2.filme_id = f.id
-                AND fg2.genero = ?
+                FROM filme_genero fg
+                WHERE fg.filme_id = f.id
+                AND fg.genero = ?
             )
         `;
 
@@ -37,7 +45,12 @@ function pesquisar(filtros) {
         parametros.push(filtros.pais);
     }
 
-    if (filtros.tipoVisao == "produtor" && filtros.operadorLucro && filtros.valorLucro !== "") {
+    if (
+        filtros.tipoVisao == "produtor" &&
+        filtros.operadorLucro &&
+        filtros.valorLucro !== "" &&
+        filtros.valorLucro !== undefined
+    ) {
         if (filtros.operadorLucro == "maior") {
             instrucaoSql += " AND (f.receita - f.orcamento) >= ?";
             parametros.push(Number(filtros.valorLucro));
@@ -47,7 +60,12 @@ function pesquisar(filtros) {
         }
     }
 
-    if (filtros.tipoVisao == "roteirista" && filtros.operadorAvaliacao && filtros.valorAvaliacao !== "") {
+    if (
+        filtros.tipoVisao == "roteirista" &&
+        filtros.operadorAvaliacao &&
+        filtros.valorAvaliacao !== "" &&
+        filtros.valorAvaliacao !== undefined
+    ) {
         if (filtros.operadorAvaliacao == "maior") {
             instrucaoSql += " AND f.score >= ?";
             parametros.push(Number(filtros.valorAvaliacao));
@@ -57,11 +75,7 @@ function pesquisar(filtros) {
         }
     }
 
-    instrucaoSql += `
-        GROUP BY
-            f.id, f.nome, f.pais, f.score, f.receita, f.orcamento
-        ORDER BY f.nome
-    `;
+    instrucaoSql += " ORDER BY f.nome";
 
     return database.executar(instrucaoSql, parametros);
 }
@@ -69,4 +83,3 @@ function pesquisar(filtros) {
 module.exports = {
     pesquisar
 };
-

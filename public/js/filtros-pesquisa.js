@@ -43,20 +43,36 @@ function abrirFiltros() {
 
 function fecharFiltros() {
     document.getElementById("painel-filtros").style.display = "none";
+
+    preencherCriterios({
+        genero: "",
+        pais: "",
+        operadorLucro: "",
+        valorLucro: "",
+        operadorAvaliacao: "",
+        valorAvaliacao: ""
+    });
+
+    filtroEmEdicao = null;
 }
+
 
 function obterCriterios() {
     return {
         tipoVisao: tipoVisao,
         filme: campoPesquisa.value.trim(),
+
         genero: document.getElementById("filtro-genero").value,
         pais: document.getElementById("filtro-pais").value.trim(),
+
         operadorLucro: document.getElementById("filtro-operador-lucro").value,
         valorLucro: document.getElementById("filtro-valor-lucro").value,
+
         operadorAvaliacao: document.getElementById("filtro-operador-avaliacao").value,
         valorAvaliacao: document.getElementById("filtro-valor-avaliacao").value
     };
 }
+
 
 function preencherCriterios(criterios) {
     campoPesquisa.value = criterios.filme || "";
@@ -79,6 +95,20 @@ function preencherCriterios(criterios) {
     document.getElementById("filtro-valor-avaliacao").value =
         criterios.valorAvaliacao || "";
 }
+
+
+function formatarLucro(lucro) {
+    if (lucro == null || isNaN(lucro)) {
+        return "N/A";
+    }
+
+    var milhoes = Number(lucro) / 1000000;
+
+    milhoes = Math.round(milhoes * 10) / 10;
+
+    return milhoes + "M";
+}
+
 
 function buscar() {
     var criterios = obterCriterios();
@@ -122,22 +152,22 @@ function buscar() {
         }
 
         for (var i = 0; i < filmes.length; i++) {
-            var valorFinal = tipoVisao == "produtor"
-                ? (filmes[i].lucro == null ? "N/A" :
-                    Number(filmes[i].lucro).toLocaleString("pt-BR"))
-                : (filmes[i].avaliacao == null ? "N/A" :
-                    filmes[i].avaliacao);
+    var valorFinal = tipoVisao == "produtor"
+        ? (filmes[i].lucro == null ? "N/A" :
+            (Math.round((Number(filmes[i].lucro) / 1000000) * 10) / 10) + "M")
+        : (filmes[i].avaliacao == null ? "N/A" :
+            filmes[i].avaliacao);
 
-            corpoTabela.innerHTML += `
-                <tr>
-                    <td>${filmes[i].titulo || ""}</td>
-                    <td>${filmes[i].atorPrincipal || "N/A"}</td>
-                    <td>${filmes[i].genero || "N/A"}</td>
-                    <td>${filmes[i].pais || "N/A"}</td>
-                    <td>${valorFinal}</td>
-                </tr>
-            `;
-        }
+    corpoTabela.innerHTML += `
+        <tr>
+            <td>${filmes[i].titulo || ""}</td>
+            <td>${filmes[i].atorPrincipal || "N/A"}</td>
+            <td>${filmes[i].genero || "N/A"}</td>
+            <td>${filmes[i].pais || "N/A"}</td>
+            <td>${valorFinal}</td>
+        </tr>
+    `;
+}
     })
     .catch(function (erro) {
         console.log(erro);
