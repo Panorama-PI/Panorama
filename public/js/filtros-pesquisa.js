@@ -27,7 +27,9 @@ document.getElementById("filtro-avaliacao-container").style.display =
     tipoVisao == "roteirista" ? "block" : "none";
 
 if (tipoVisao == "roteirista") {
-    tituloTabela.innerHTML = "PESQUISA DE FILMES";
+    tituloTabela.innerHTML = "TOP 10 FILMES MAIS BEM AVALIADOS";
+} else {
+    tituloTabela.innerHTML = "TOP 10 FILMES COM MAIORES LUCROS";
 }
 
 var cabecalhos = document.querySelectorAll("#tabela_filmes thead th");
@@ -108,6 +110,79 @@ function formatarLucro(lucro) {
 
     return milhoes + "M";
 }
+
+
+function carregarTop10() {
+    tituloTabela.style.display = "";
+    corpoTabela.innerHTML = `
+        <tr>
+            <td colspan="5">Carregando filmes...</td>
+        </tr>
+    `;
+
+    fetch("/filmes/top10", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            tipoVisao: tipoVisao
+        })
+    })
+    .then(function (resposta) {
+        if (!resposta.ok) {
+            throw new Error("Não foi possível carregar o ranking.");
+        }
+
+        return resposta.json();
+    })
+    .then(function (filmes) {
+        corpoTabela.innerHTML = "";
+
+        if (filmes.length == 0) {
+            corpoTabela.innerHTML = `
+                <tr>
+                    <td colspan="5">Nenhum filme encontrado.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        for (var i = 0; i < filmes.length; i++) {
+            var valorFinal;
+
+            if (tipoVisao == "produtor") {
+                valorFinal = filmes[i].lucro == null
+                    ? "N/A"
+                    : formatarLucro(filmes[i].lucro);
+            } else {
+                valorFinal = filmes[i].avaliacao == null
+                    ? "N/A"
+                    : filmes[i].avaliacao;
+            }
+
+            corpoTabela.innerHTML += `
+                <tr>
+                    <td>${filmes[i].titulo || ""}</td>
+                    <td>${filmes[i].atorPrincipal || "N/A"}</td>
+                    <td>${filmes[i].genero || "N/A"}</td>
+                    <td>${filmes[i].pais || "N/A"}</td>
+                    <td>${valorFinal}</td>
+                </tr>
+            `;
+        }
+    })
+    .catch(function (erro) {
+        console.log(erro);
+
+        corpoTabela.innerHTML = `
+            <tr>
+                <td colspan="5">Erro ao carregar os filmes.</td>
+            </tr>
+        `;
+    });
+}
+
 
 
 function buscar() {
@@ -341,7 +416,9 @@ function excluirFiltro(idFiltro) {
 
 function limpar_pesquisa() {
     campoPesquisa.value = "";
+
     preencherCriterios({
+        filme: "",
         genero: "",
         pais: "",
         operadorLucro: "",
@@ -350,6 +427,6 @@ function limpar_pesquisa() {
         valorAvaliacao: ""
     });
 
-    corpoTabela.innerHTML = "";
-    tituloTabela.style.display = "";
+    carregarTop10();
 }
+carregarTop10();
