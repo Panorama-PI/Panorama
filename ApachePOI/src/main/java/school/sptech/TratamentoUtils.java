@@ -13,7 +13,7 @@ public class TratamentoUtils {
     public static String repararEncoding(String texto) {
         if (texto == null || texto.isEmpty()) return texto;
 
-        boolean candidatoAMojibake = false;
+        boolean Mojibake = false;
 
         
         for (int i = 0; i < texto.length(); i++) {
@@ -36,12 +36,12 @@ public class TratamentoUtils {
 
             
             if (c >= 0x0080) {
-                candidatoAMojibake = true;
+                Mojibake = true;
             }
         }
 
         
-        if (!candidatoAMojibake) {
+        if (!Mojibake) {
             return texto;
         }
 

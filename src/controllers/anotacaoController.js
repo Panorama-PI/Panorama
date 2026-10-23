@@ -1,7 +1,9 @@
 var anotacaoModel = require("../models/anotacaoModel");
 
 function listarProjetos(req, res) {
-    anotacaoModel.listarProjetos()
+    var idUsuario = req.params.idUsuario;
+
+    anotacaoModel.listarProjetos(idUsuario)
         .then(function (resultado) {
             res.json(resultado);
         })
@@ -12,9 +14,10 @@ function listarProjetos(req, res) {
 }
 
 function criarProjeto(req, res) {
+    var idUsuario = req.body.idUsuario;
     var nome = req.body.nome;
 
-    anotacaoModel.criarProjeto(nome)
+    anotacaoModel.criarProjeto(idUsuario, nome)
         .then(function (resultado) {
             res.status(201).json({ id: resultado.insertId });
         })
@@ -45,7 +48,7 @@ function criarAnotacao(req, res) {
 
     anotacaoModel.criarAnotacao(idUsuario, idProjeto, titulo, conteudo)
         .then(function (resultado) {
-            // 0 linhas inseridas = o projeto não existe
+            // Nenhuma linha inserida: projeto inexistente ou não pertence ao usuário
             if (resultado.affectedRows == 0) {
                 res.status(404).send("Projeto não encontrado!");
                 return;
@@ -97,6 +100,46 @@ function excluirAnotacao(req, res) {
             res.status(500).json(erro);
         });
 }
+function editarProjeto(req, res) {
+    var idProjeto = req.body.id;
+    var idUsuario = req.body.idUsuario;
+    var nome = req.body.nome;
+
+    anotacaoModel.editarProjeto(idProjeto, idUsuario, nome)
+        .then(function (resultado) {
+            if (resultado.affectedRows === 0) {
+                res.status(404).send("Projeto não encontrado para este usuário!");
+                return;
+            }
+
+            res.status(200).send("Projeto atualizado!");
+        })
+        .catch(function (erro) {
+            console.log(erro);
+            res.status(500).json(erro);
+        });
+}
+
+function excluirProjeto(req, res) {
+    var idProjeto = req.body.id;
+    var idUsuario = req.body.idUsuario;
+
+    anotacaoModel.excluirProjeto(idProjeto, idUsuario)
+        .then(function (resultado) {
+            if (resultado.affectedRows === 0) {
+                res.status(409).send(
+                    "Não foi possível excluir. O projeto pode não existir, não pertencer a você ou possuir anotações."
+                );
+                return;
+            }
+
+            res.status(200).send("Projeto excluído!");
+        })
+        .catch(function (erro) {
+            console.log(erro);
+            res.status(500).json(erro);
+        });
+}
 
 module.exports = {
     listarProjetos,
@@ -104,5 +147,7 @@ module.exports = {
     listarAnotacoes,
     criarAnotacao,
     editarAnotacao,
-    excluirAnotacao
+    excluirAnotacao,
+    editarProjeto,
+    excluirProjeto
 };

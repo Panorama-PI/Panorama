@@ -8,10 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panorama | Anotações</title>
 
-
     <link rel="stylesheet" href="../../css/anotacoes.css">
-    <link rel="stylesheet" href="../../css/dashboard.css">
-    <script src="../../js/sessao.js"></script>
+    <script src="../../js/anotacoes.js"></script>
+    <script src="../js/sessao.js"></script>
     <script src="./../js/alerta.js"></script>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -19,16 +18,9 @@
         href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
         rel="stylesheet">
 
-    <!-- scripts do Chart.js - 2022-1 -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!--FONT AWESOME-->
-    <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
 </head>
 
-<!-- <body onload=" atualizarFeed()"> -->
-
-<body>
+<body class="body-anotacoes">
 
     <aside class="aside-left">
         <div class="usuario-side">
@@ -39,495 +31,178 @@
             <h4 id="c_email">email@gmail.com</h4>
         </div>
         <div class="btns-side">
-            <a onclick="sair()"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
-            <a href="./dashboard-geral.html" ><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
-            <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
-            <a href="./anotacoes.html" class="ativo"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
+            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
+            <a href="./dashboard-geral.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
+            <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão
+                Específica</a>
+            <a href="./anotacoes.html" class="ativo"><img src="../../assets/icon/observacoes-icon.png"
+                    alt="">Observações</a>
             <a href="./pesquisa.html"><img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
             <a href="./publicacoes.html"><img src="../../assets/icon/publicacao.png" alt="">Publicações</a>
         </div>
-    
+
     </aside>
 
-    <main class="dash">
+    <main class="home-anotacoes">
 
-        <section class="page-head">
-            <h2>Minhas Anotações</h2>
-            <p>Aqui você pode salvar e consultar suas anotações. Use o espaço para registrar ideias, insights,
-                observações e tudo o que for relevante para seus projetos.</p>
+        <header class="anotacoes-header">
+            <h1>Minhas anotações</h1>
+            <p>
+                Organize suas ideias em projetos e desenvolva
+                suas histórias em um só lugar.
+            </p>
+        </header>
+
+        <section class="anotacoes-lista" id="tela-projetos">
+
+            <div class="anotacoes-lista-topo">
+                <h2>Meus projetos</h2>
+
+                <div class="anotacoes-acoes">
+                    <button type="button" class="anotacoes-btn-secundario" id="abrir-modal-projeto">
+                        <img src="../../assets/icon/pasta-icon.png" alt="" class="icone-pasta">
+                        Criar projeto
+                    </button>
+
+                    <button type="button" class="anotacoes-btn-principal" id="abrir-formulario-anotacao">
+                        + Nova anotação
+                    </button>
+                </div>
+            </div>
+
+            <div class="anotacoes-tabela-wrap">
+                <table class="anotacoes-tabela">
+                    <thead>
+                        <tr>
+                            <th>Projeto</th>
+                            <th>Criado em</th>
+                            <th>Anotações</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="lista-projetos-tabela">
+                        <!-- Preenchido pelo JavaScript -->
+                    </tbody>
+                </table>
+            </div>
         </section>
 
-        <section class="projetos-bar">
-            <div class="projetos-head">
-                <h3><i class="fa-solid fa-folder-open"></i> Meus projetos</h3>
-                <button type="button" class="btn-novo-projeto"
-                    onclick="document.getElementById('modal-projeto').showModal()">
-                    <i class="fa-solid fa-plus"></i> Novo projeto
+        <section class="anotacoes-detalhes" id="tela-detalhes" hidden>
+
+            <div class="anotacoes-detalhes-topo">
+                <button type="button" class="anotacoes-btn-secundario" id="voltar-projetos">
+                    ← Voltar aos projetos
+                </button>
+
+                <h2 id="nome-projeto-ativo">
+                    Nome do projeto
+                </h2>
+
+                <button type="button" class="anotacoes-btn-principal" id="nova-anotacao-projeto">
+                    + Nova anotação
                 </button>
             </div>
 
-            <ul class="projeto-list" id="lista-projetos"></ul>
+            <div class="anotacoes-busca">
+                <input type="search" id="busca_nota" placeholder="Buscar anotações...">
+            </div>
+
+            <ul class="note-list" id="listaAnotacoes"></ul>
+
         </section>
 
-        <section class="notes-layout">
+    </main>
+    <!-- Modal para criar projeto -->
+    <div class="anotacoes-modal-overlay" id="modal-projeto" aria-hidden="true">
+        <section class="anotacoes-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-projeto">
 
-            <div class="card note-panel">
-                <h3 class="panel-title">
-                    <img src="../../assets/imgs/escrever.png" alt="">
-                    <span id="titulo-form">Nova anotação</span>
-                </h3>
+            <header class="anotacoes-modal-topo">
+                <div>
+                    <span class="anotacoes-etiqueta">MEUS PROJETOS</span>
+                    <h2 id="titulo-modal-projeto">Criar projeto</h2>
+                </div>
 
-                <form class="note-form" id="form-anotacao" onsubmit="salvarAnotacao(event)">
-                    <input type="hidden" id="nota_id" name="id">
+                <button type="button" class="anotacoes-modal-fechar" id="fechar-modal-projeto"
+                    aria-label="Fechar modal">
+                    ×
+                </button>
+            </header>
 
+            <form class="anotacoes-form" id="form-projeto">
+
+                <input type="hidden" id="projeto_id" value="">
+
+                <div class="anotacoes-campo">
+                    <label for="projeto_nome">Nome do projeto</label>
+                    <input type="text" id="projeto_nome" name="nome" maxlength="150"
+                        placeholder="Ex.: Meu roteiro de suspense" required>
+                </div>
+
+                <footer class="anotacoes-modal-acoes">
+                    <button type="button" class="anotacoes-btn-secundario" id="cancelar-projeto">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" class="anotacoes-btn-principal" id="salvar-projeto">
+                        Criar projeto
+                    </button>
+                </footer>
+
+            </form>
+        </section>
+    </div>
+
+    <div class="anotacoes-modal-overlay" id="formulario-anotacao" aria-hidden="true">
+
+        <section class="anotacoes-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-formulario">
+
+            <header class="anotacoes-modal-topo">
+                <div>
+                    <span class="anotacoes-etiqueta">MEUS PROJETOS</span>
+                    <h2 id="titulo-formulario">Nova anotação</h2>
+                </div>
+
+                <button type="button" class="anotacoes-modal-fechar" id="fechar-formulario"
+                    aria-label="Fechar formulário">
+                    ×
+                </button>
+            </header>
+
+            <form class="anotacoes-form" id="form-anotacao">
+
+                <input type="hidden" id="nota_id" name="id">
+
+                <div class="anotacoes-campo">
                     <label for="selectProjeto">Projeto</label>
-                    <select id="selectProjeto" name="projeto_id" required></select>
+                    <select id="selectProjeto" name="projeto_id" required>
+                    </select>
+                </div>
 
+                <div class="anotacoes-campo">
                     <label for="nota_titulo">Título</label>
                     <input type="text" id="nota_titulo" name="titulo" maxlength="150"
                         placeholder="Ex.: Ideia de novo projeto" required>
+                </div>
 
+                <div class="anotacoes-campo">
                     <label for="nota_texto">Anotação</label>
                     <textarea id="nota_texto" name="anotacao" rows="8" placeholder="Escreva aqui sua anotação..."
                         required></textarea>
-
-                    <button type="button" class="btn-cancelar" id="btn-cancelar-edicao" onclick="limparFormulario()"
-                        style="display: none; align-self: flex-end; margin-bottom: 0.75rem;">
-                        Cancelar edição
-                    </button>
-
-                    <button type="submit" class="btn-salvar">
-                        <span id="texto-botao-salvar">Salvar</span>
-                    </button>
-                </form>
-            </div>
-
-            <div class="card note-panel">
-                <h3 class="panel-title">
-                    <img src="../../assets/imgs/anotacao.png" alt="">
-                    Anotações de <span class="projeto-ativo" id="nome-projeto-ativo">todos os projetos</span>
-                </h3>
-
-                <div class="note-search">
-                    <label class="search-field" for="busca_nota">
-                        <img src="../../assets/icon/pesquisa-icon.png" alt="">
-                        <input type="search" id="busca_nota" placeholder="Buscar anotações..."
-                            oninput="exibirAnotacoes()">
-                    </label>
                 </div>
 
-                <ul class="note-list" id="listaAnotacoes"></ul>
-            </div>
+                <footer class="anotacoes-modal-acoes">
+                    <button type="button" class="anotacoes-btn-secundario" id="cancelar-anotacao">
+                        Cancelar
+                    </button>
 
+                    <button type="submit" class="anotacoes-btn-principal" id="salvar-anotacao">
+                        Salvar anotação
+                    </button>
+                </footer>
+
+            </form>
         </section>
-    </main>
-
-    <!-- Modal: novo projeto -->
-    <dialog id="modal-projeto" class="card modal-projeto">
-        <form class="note-form" id="form-projeto" onsubmit="adicionarProjeto(event)">
-            <h3>Novo projeto</h3>
-            <label for="projeto_nome">Nome do projeto</label>
-            <input type="text" id="projeto_nome" name="nome" maxlength="50"
-                placeholder="Ex.: Filme de ficção científica" required>
-            <div class="dialog-actions">
-                <button type="button" class="btn-cancelar"
-                    onclick="document.getElementById('modal-projeto').close()">Cancelar</button>
-                <button type="submit" class="btn-salvar">Criar</button>
-            </div>
-        </form>
-    </dialog>
-
-</body>
+    </div>
 
 </html>
-
-<script>
-    preencherUsuario()
-
-    a_usuario.innerHTML = sessionStorage.NOME_USUARIO;
-
-    // guarda o estado atual da página para eu consultar mais fácil depois
-    // projetoSelecionado = id do projeto escolhido na faixa (null = tds)
-    let dashboardAtual = {
-        projetos: [],
-        anotacoes: [],
-        projetoSelecionado: null
-    };
-
-    // evita que texto digitado pelo usuário quebre 
-    function escapar(texto) {
-        var div = document.createElement("div");
-        div.textContent = texto;
-        return div.innerHTML;
-    }
-
-    // conta quantas anotações um projeto tem p por no botao
-    function contarAnotacoes(idProjeto) {
-        var total = 0;
-
-        for (var i = 0; i < dashboardAtual.anotacoes.length; i++) {
-            if (dashboardAtual.anotacoes[i].projeto_id == idProjeto) {
-                total++;
-            }
-        }
-
-        return total;
-    }
-
-    window.onload = function () {
-        obterProjetos();
-        obterAnotacoes();
-    }
-
-    // atualiza toda funcao p nao dar problema na pagina dps
-    function atualizarTela() {
-        exibirProjetos();
-        exibirSelectProjeto();
-        exibirAnotacoes();
-    }
-
-    // parte de projetos
-
-    // Busca os projetos do usuário na rota e salva na dashboardAtual.projetos
-    function obterProjetos() {
-        fetch(`/anotacoes/projetos/listar/${sessionStorage.ID_USUARIO}`, { cache: 'no-store' })
-            .then(function (resposta) {
-                if (resposta.ok) {
-                    resposta.json().then(function (projetos) {
-                        console.log(`Dados recebidos: ${JSON.stringify(projetos)}`);
-                        dashboardAtual.projetos = projetos;
-                        atualizarTela();
-                    });
-                } else {
-                    console.error('Nenhum dado encontrado ou erro na API');
-                }
-            })
-            .catch(function (erro) {
-                console.error(`Erro na obtenção dos projetos: ${erro.message}`);
-            });
-    }
-
-    // renderiza os botoes
-    function exibirProjetos() {
-        var container = document.getElementById("lista-projetos");
-        container.innerHTML = "";
-
-        var classeTodas = "projeto-botao";
-        if (dashboardAtual.projetoSelecionado === null) {
-            classeTodas += " ativo";
-        }
-
-        container.innerHTML += `
-            <li>
-                <button type="button" class="${classeTodas}" onclick="selecionarProjeto(null)">
-                    <i class="fa-solid fa-layer-group"></i> Todas
-                </button>
-            </li>
-        `;
-
-        for (var i = 0; i < dashboardAtual.projetos.length; i++) {
-            var projeto = dashboardAtual.projetos[i];
-
-            var classe = "projeto-botao";
-            if (projeto.id == dashboardAtual.projetoSelecionado) {
-                classe += " ativo";
-            }
-
-            container.innerHTML += `
-                <li>
-                    <button type="button" class="${classe}" data-projeto-id="${projeto.id}"
-                        onclick="selecionarProjeto(${projeto.id})">
-                        <i class="fa-solid fa-folder"></i> ${escapar(projeto.nome)}
-                        <span class="projeto-count">${contarAnotacoes(projeto.id)}</span>
-                    </button>
-                </li>
-            `;
-        }
-    }
-
-    function exibirSelectProjeto() {
-        var select = document.getElementById("selectProjeto");
-        var valorAnterior = select.value;
-
-        if (dashboardAtual.projetos.length == 0) {
-            select.innerHTML = `<option class="select-projeto" value="">Crie um projeto primeiro</option>`;
-            return;
-        }
-
-        select.innerHTML = "";
-
-        for (var i = 0; i < dashboardAtual.projetos.length; i++) {
-            var projeto = dashboardAtual.projetos[i];
-
-            select.innerHTML += `<option class="select-projeto" value="${projeto.id}">${escapar(projeto.nome)}</option>`;
-        }
-
-        if (dashboardAtual.projetoSelecionado !== null) {
-            select.value = dashboardAtual.projetoSelecionado;
-        } else if (valorAnterior != "") {
-            select.value = valorAnterior;
-        }
-    }
-
-    // quando o usuário clica em um botao guarda o projeto e reload a tela
-    function selecionarProjeto(idProjeto) {
-        dashboardAtual.projetoSelecionado = idProjeto;
-        atualizarTela();
-    }
-
-    // Chamada quando o usuário envia o modal "Novo projeto"
-    function adicionarProjeto(evento) {
-        evento.preventDefault();
-
-        var input = document.getElementById("projeto_nome");
-        var nome = input.value.trim();
-
-        // impede criar projeto sem nome
-        if (nome == "") {
-            alert("Digite o nome do projeto");
-            return;
-        }
-
-        fetch("/anotacoes/projetos/criar", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                idUsuario: sessionStorage.ID_USUARIO,
-                nome: nome
-            })
-        })
-            .then(function (resposta) {
-                if (resposta.ok) {
-                    resposta.json().then(function (dados) {
-                        input.value = "";
-                        document.getElementById("modal-projeto").close();
-                        dashboardAtual.projetoSelecionado = dados.id; // já abre o projeto novo
-                        obterProjetos();                              // atualiza a lista na tela
-                    });
-                } else {
-                    console.error("Não foi possível criar o projeto");
-                    alert("Não foi possível criar o projeto");
-                }
-            })
-            .catch(function (erro) {
-                console.error(`Erro ao criar projeto: ${erro.message}`);
-            });
-    }
-
-    // Parte de anotacoes
-
-    function obterAnotacoes() {
-        fetch(`/anotacoes/listar/${sessionStorage.ID_USUARIO}`, { cache: 'no-store' })
-            .then(function (resposta) {
-                if (resposta.ok) {
-                    resposta.json().then(function (anotacoes) {
-                        console.log(`Dados recebidos: ${JSON.stringify(anotacoes)}`);
-                        dashboardAtual.anotacoes = anotacoes;
-                        atualizarTela();
-                    });
-                } else {
-                    console.error('Nenhum dado encontrado ou erro na API');
-                }
-            })
-            .catch(function (erro) {
-                console.error(`Erro na obtenção das anotações: ${erro.message}`);
-            });
-    }
-
-    function nomeDoProjeto(idProjeto) {
-        for (var i = 0; i < dashboardAtual.projetos.length; i++) {
-            if (dashboardAtual.projetos[i].id == idProjeto) {
-                return dashboardAtual.projetos[i].nome;
-            }
-        }
-        return "";
-    }
-
-    // Renderiza os cards na ul listaAnotacoes
-    // Filtra pelo projeto selecionado e pelo texto da busca (título ou conteúdo)
-    function exibirAnotacoes() {
-        var container = document.getElementById("listaAnotacoes");
-        var busca = document.getElementById("busca_nota").value.toLowerCase();
-        container.innerHTML = "";
-
-        // título do painel: nome do projeto selecionado
-        var nomeAtivo = "todos os projetos";
-        if (dashboardAtual.projetoSelecionado !== null) {
-            nomeAtivo = nomeDoProjeto(dashboardAtual.projetoSelecionado);
-        }
-        document.getElementById("nome-projeto-ativo").innerHTML = escapar(nomeAtivo);
-
-        var exibidas = 0;
-
-        for (var i = 0; i < dashboardAtual.anotacoes.length; i++) {
-            var anotacao = dashboardAtual.anotacoes[i];
-
-            // filtro por projeto
-            if (dashboardAtual.projetoSelecionado !== null && anotacao.projeto_id != dashboardAtual.projetoSelecionado) {
-                continue;
-            }
-
-            // filtro pela busca
-            var texto = (anotacao.titulo + " " + anotacao.conteudo).toLowerCase();
-            if (texto.indexOf(busca) == -1) {
-                continue;
-            }
-
-            // quando está em "todas", mostra de qual projeto é a anotação
-            var tituloTodas = "";
-            if (dashboardAtual.projetoSelecionado === null) {
-                tituloTodas = `<span class="note-tag"><i class="fa-solid fa-folder"></i> ${escapar(nomeDoProjeto(anotacao.projeto_id))}</span>`;
-            }
-
-            var data = new Date(anotacao.criado_em);
-
-            container.innerHTML += `
-                <li class="card note-item" data-nota-id="${anotacao.id}">
-                    <div class="note-body">
-                        <h2>${tituloTodas}</h2>
-                        <h4>${escapar(anotacao.titulo)}</h4>
-                        <p>${escapar(anotacao.conteudo)}</p>
-                        <time datetime="${anotacao.criado_em}">
-                            Criada em: ${data.toLocaleString("pt-BR")}
-                        </time>
-                    </div>
-                    <div class="note-actions">
-                        <button type="button" class="btn-icon btn-excluir" aria-label="Editar anotação"
-                            onclick="editarAnotacao(${anotacao.id})">
-                            <img src="../../assets/imgs/edit.png" alt="">
-                        </button>
-                        <button type="button" class="btn-icon btn-excluir" aria-label="Excluir anotação"
-                            onclick="excluirAnotacao(${anotacao.id})">
-                            <img src="../../assets/imgs/lixo.png" alt="">
-                        </button>
-                    </div>
-                </li>
-            `;
-            exibidas++;
-        }
-
-        if (exibidas == 0) {
-            container.innerHTML = `<li class="note-vazio">Nenhuma anotação encontrada.</li>`;
-        }
-    }
-
-    // 
-    // se nota_id estiver vazio cria uma anotacao nova senao edita
-    function salvarAnotacao(evento) {
-        evento.preventDefault();
-
-        var idNota = document.getElementById("nota_id").value;
-        var idProjeto = document.getElementById("selectProjeto").value;
-        var titulo = document.getElementById("nota_titulo").value.trim();
-        var conteudo = document.getElementById("nota_texto").value.trim();
-
-        if (idProjeto == "") {
-            alert("Crie ou selecione um projeto para salvar a anotação");
-            return;
-        }
-
-        if (titulo == "" || conteudo == "") {
-            alert("Preencha o título e a anotação");
-            return;
-        }
-
-        var rota = "/anotacoes/criar";
-        var metodo = "POST";
-
-        if (idNota != "") {
-            rota = "/anotacoes/editar";
-            metodo = "PUT";
-        }
-
-        fetch(rota, {
-            method: metodo,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                id: idNota,
-                idUsuario: sessionStorage.ID_USUARIO,
-                idProjeto: idProjeto,
-                titulo: titulo,
-                conteudo: conteudo
-            })
-        })
-            .then(function (resposta) {
-                if (resposta.ok) {
-                    // se já estava filtrando por um projeto, passa a mostrar o projeto onde salvou
-                    if (dashboardAtual.projetoSelecionado !== null) {
-                        dashboardAtual.projetoSelecionado = idProjeto;
-                    }
-                    limparFormulario();
-                    obterAnotacoes(); // atualiza a lista na tela
-                } else {
-                    console.error("Não foi possível salvar a anotação");
-                    alert("Não foi possível salvar a anotação");
-                }
-            })
-            .catch(function (erro) {
-                console.error(`Erro ao salvar anotação: ${erro.message}`);
-            });
-    }
-
-    function editarAnotacao(idNota) {
-        for (var i = 0; i < dashboardAtual.anotacoes.length; i++) {
-            var anotacao = dashboardAtual.anotacoes[i];
-
-            if (anotacao.id == idNota) {
-                document.getElementById("nota_id").value = anotacao.id;
-                document.getElementById("selectProjeto").value = anotacao.projeto_id;
-                document.getElementById("nota_titulo").value = anotacao.titulo;
-                document.getElementById("nota_texto").value = anotacao.conteudo;
-
-                document.getElementById("titulo-form").innerHTML = "Editar anotação";
-                document.getElementById("texto-botao-salvar").innerHTML = "Salvar alterações";
-                document.getElementById("btn-cancelar-edicao").style.display = "block";
-
-                document.getElementById("nota_titulo").focus();
-                break;
-            }
-        }
-    }
-
-    // Volta o formulário para o modo "Nova anotação"
-    function limparFormulario() {
-        document.getElementById("form-anotacao").reset();
-        document.getElementById("nota_id").value = "";
-
-        document.getElementById("titulo-form").innerHTML = "Nova anotação";
-        document.getElementById("texto-botao-salvar").innerHTML = "Salvar";
-        document.getElementById("btn-cancelar-edicao").style.display = "none";
-
-        exibirSelectProjeto(); // reaplica o projeto selecionado no select
-    }
-
-    function excluirAnotacao(idNota) {
-        if (!confirm("Deseja excluir esta anotação?")) {
-            return;
-        }
-
-        fetch("/anotacoes/excluir", {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                id: idNota,
-                idUsuario: sessionStorage.ID_USUARIO
-            })
-        })
-            .then(function (resposta) {
-                if (resposta.ok) {
-                    limparFormulario();
-                    obterAnotacoes(); // atualiza a lista na tela
-                } else {
-                    console.error("Erro ao excluir anotação");
-                }
-            })
-            .catch(function (erro) {
-                console.error(`Erro ao excluir anotação: ${erro.message}`);
-            });
-    }
-
-     function sair(){
-        sessionStorage.clear(); 
-        window.location.href = "../../index.html";
-    }
-</script>
