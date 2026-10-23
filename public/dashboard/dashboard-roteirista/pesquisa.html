@@ -10,6 +10,7 @@
 
     
     <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../css/filtros-pesquisa.css">
     
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -55,14 +56,75 @@
 
             <section class="pesquisa-cards">
                 <input id="pesquisa_bar" class="card pesquisa-card" placeholder="🔍"></input>
-                <div id="filtro-bar"  class="card pesquisa-card">
-                    <p>Filtros Avançados</p>
-                </div>
+                <button type="button" id="filtro-bar" class="card pesquisa-card"
+                onclick="abrirFiltros()">
+                Filtros Avançados
+                </button>
 
                 <button id="buscar-bar" class=" card pesquisa-card" onclick="buscar()">
                     Buscar
                 </button>
             </section>
+
+            
+<section id="painel-filtros" class="painel-filtros" style="display: none;">
+    <h3>Filtros avançados</h3>
+
+    <label for="filtro-genero">Gênero</label>
+    <select id="filtro-genero">
+        <option value="">Todos os gêneros</option>
+        <option value="Ação">Ação</option>
+        <option value="Aventura">Aventura</option>
+        <option value="Animação">Animação</option>
+        <option value="Comédia">Comédia</option>
+        <option value="Crime">Crime</option>
+        <option value="Drama">Drama</option>
+        <option value="Fantasia">Fantasia</option>
+        <option value="Ficção científica">Ficção científica</option>
+        <option value="Romance">Romance</option>
+        <option value="Suspense">Suspense</option>
+        <option value="Terror">Terror</option>
+    </select>
+
+    <label for="filtro-pais">País</label>
+    <input id="filtro-pais" type="text" placeholder="Ex.: United States">
+
+    <div id="filtro-lucro-container">
+        <label for="filtro-operador-lucro">Lucro</label>
+        <select id="filtro-operador-lucro">
+            <option value="">Não filtrar por lucro</option>
+            <option value="maior">Maior ou igual a</option>
+            <option value="menor">Menor ou igual a</option>
+        </select>
+        <input id="filtro-valor-lucro" type="number" min="0"
+            placeholder="Valor em unidades monetárias">
+    </div>
+
+    <div id="filtro-avaliacao-container">
+        <label for="filtro-operador-avaliacao">Avaliação</label>
+        <select id="filtro-operador-avaliacao">
+            <option value="">Não filtrar por avaliação</option>
+            <option value="maior">Maior ou igual a</option>
+            <option value="menor">Menor ou igual a</option>
+        </select>
+        <input id="filtro-valor-avaliacao" type="number"
+            placeholder="Valor de score">
+    </div>
+
+    <label for="filtro-titulo">Nome para salvar o filtro</label>
+    <input id="filtro-titulo" type="text" placeholder="Ex.: Filmes de ação">
+
+    <div class="acoes-filtros">
+        <button type="button" onclick="aplicarFiltros()">Aplicar filtros</button>
+        <button type="button" onclick="salvarFiltro()">Salvar filtro</button>
+        <button type="button" onclick="listarFiltros()">Meus filtros salvos</button>
+        <button type="button" onclick="fecharFiltros()">Fechar</button>
+    </div>
+
+    <div id="lista-filtros-salvos"></div>
+</section>
+
+
              <section id="tabela_filmes" class="table-pesquisa">
                 <h1 id="titulo">TOP 10 FILMES MAIS LUCRATIVOS</h1>
                <div class = "tabela">
@@ -160,8 +222,11 @@
 
 </html>
 
+<script src="../../js/dashboard.js"></script>
+<script src="../../js/filtros-pesquisa.js"></script>
 
-<script>
+
+<!-- <script>
     preencherUsuario();
 
     // Variáveis da página
@@ -316,4 +381,4 @@
             </tr>
         `;
     }
-</script>
+</script> -->

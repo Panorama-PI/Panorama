@@ -24,6 +24,7 @@ var anotacoesRouter = require("./src/routes/anotacoes");
 var tokensRouter = require("./src/routes/tokens");
 var filmesRouter = require("./src/routes/filmes");
 var publicacaoRRouter = require("./src/routes/publicacaoR");
+var relatoriosRouter = require("./src/routes/relatorios");
 // Permite que a aplicação receba dados enviados no formato JSON
 // e também dados enviados por formulários.
 app.use(express.json());
@@ -45,6 +46,7 @@ app.use("/anotacoes", anotacoesRouter);
 app.use("/tokens", tokensRouter);  
 app.use("/filmes", filmesRouter);  
 app.use("/publicacoes", publicacaoRRouter);
+app.use("/relatorios", relatoriosRouter);
 
 // Inicia o servidor utilizando a porta definida nas configurações
 // do ambiente.

@@ -10,6 +10,7 @@
 
     
     <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../css/filtros-pesquisa.css">
     
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -55,9 +56,10 @@
 
             <section class="pesquisa-cards">
                 <input id="pesquisa-bar" class="card pesquisa-card" placeholder="🔍"></input>
-                <div id="filtro-bar"  class="card pesquisa-card">
-                    <p>Filtros Avançados</p>
-                </div>
+                <button type="button" id="filtro-bar" class="card pesquisa-card"
+                    onclick="abrirFiltros()">
+                    Filtros Avançados
+                </button>
 
                 <button id="buscar-bar" class=" card pesquisa-card" onclick="buscar()">
                     Buscar
@@ -160,7 +162,10 @@
 
 </html>
 
-<script>
+    <script src="../../js/dashboard.js"></script>
+<script src="../../js/filtros-pesquisa.js"></script>
+
+<!-- <script>
    
     preencherUsuario();
 
@@ -246,4 +251,4 @@
 
 
    
-
+ -->

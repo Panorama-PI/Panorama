@@ -1,43 +1,60 @@
 
 var filmesModel = require("../models/filmesModel");
-var tokenModel = require("../models/tokenModel");
 
 function pesquisar(req, res) {
-    var filme = req.body.filmeServer;
+    var filtros = {
+        filme: req.body.filmeServer || "",
+        tipoVisao: req.body.tipoVisao,
+        genero: req.body.genero || "",
+        pais: req.body.pais || "",
+        operadorLucro: req.body.operadorLucro || "",
+        valorLucro: req.body.valorLucro,
+        operadorAvaliacao: req.body.operadorAvaliacao || "",
+        valorAvaliacao: req.body.valorAvaliacao
+    };
 
-    if (filme == undefined || filme.trim() == "") {
-        return res.status(400).send("Informe o nome do filme!");
+    if (
+        filtros.valorLucro !== "" &&
+        filtros.valorLucro !== undefined &&
+        !Number.isFinite(Number(filtros.valorLucro))
+    ) {
+        return res.status(400).json({
+            mensagem: "Informe um valor de lucro válido."
+        });
     }
 
-    filmesModel.pesquisar(filme)
-        .then(function (resultadoPesquisar) {
+    if (
+        filtros.valorAvaliacao !== "" &&
+        filtros.valorAvaliacao !== undefined &&
+        !Number.isFinite(Number(filtros.valorAvaliacao))
+    ) {
+        return res.status(400).json({
+            mensagem: "Informe uma avaliação válida."
+        });
+    }
 
-            console.log("Quantidade de filmes:", resultadoPesquisar.length);
-            console.log("Filmes encontrados:", resultadoPesquisar);
-
-            if (resultadoPesquisar.length == 0) {
-                return res.json([]);
-            }
-
+    filmesModel.pesquisar(filtros)
+        .then(function (resultado) {
             var filmes = [];
 
-            for (var i = 0; i < resultadoPesquisar.length; i++) {
+            for (var i = 0; i < resultado.length; i++) {
                 filmes.push({
-                    titulo: resultadoPesquisar[i].titulo,
-                    atorPrincipal: resultadoPesquisar[i].atorPrincipal,
-                    genero: resultadoPesquisar[i].genero,
-                    pais: resultadoPesquisar[i].pais,
-                    lucro: resultadoPesquisar[i].lucro
+                    id: resultado[i].id,
+                    titulo: resultado[i].titulo,
+                    atorPrincipal: resultado[i].atorPrincipal,
+                    genero: resultado[i].genero,
+                    pais: resultado[i].pais,
+                    lucro: resultado[i].lucro,
+                    avaliacao: resultado[i].avaliacao
                 });
             }
 
-            return res.json(filmes);
+            res.json(filmes);
         })
         .catch(function (erro) {
             console.log("Erro ao pesquisar filmes:", erro);
-            console.log("Erro SQL:", erro.sqlMessage);
 
-            return res.status(500).json({
+            res.status(500).json({
                 mensagem: "Erro ao pesquisar filmes."
             });
         });

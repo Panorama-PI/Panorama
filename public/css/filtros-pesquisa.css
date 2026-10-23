@@ -1,0 +1,67 @@
+
+.painel-filtros {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #27272A;
+    border: 1px solid #3C3C41;
+    border-radius: 8px;
+    color: white;
+}
+
+.painel-filtros h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.painel-filtros label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 6px;
+}
+
+.painel-filtros input,
+.painel-filtros select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    color: white;
+    background-color: #18181B;
+    border: 1px solid #3C3C41;
+    border-radius: 5px;
+}
+
+.acoes-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.acoes-filtros button,
+#lista-filtros-salvos button {
+    padding: 9px 12px;
+    color: white;
+    background-color: #E50914;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#lista-filtros-salvos {
+    margin-top: 18px;
+}
+
+.filtro-salvo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid #3C3C41;
+}
+
+#filtro-bar {
+    cursor: pointer;
+    color: white;
+}
