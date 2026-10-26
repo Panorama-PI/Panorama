@@ -22,9 +22,9 @@ var usuarioRouter = require("./src/routes/usuarios");
 var empresasRouter = require("./src/routes/empresas");
 var anotacoesRouter = require("./src/routes/anotacoes");
 var tokensRouter = require("./src/routes/tokens");
+var filmesRouter = require("./src/routes/filmes");
 var publicacaoRRouter = require("./src/routes/publicacaoR");
-var publicacoesRouter = require("./src/routes/publicacoes");
-
+var relatoriosRouter = require("./src/routes/relatorios");
 // Permite que a aplicação receba dados enviados no formato JSON
 // e também dados enviados por formulários.
 app.use(express.json());
@@ -44,9 +44,9 @@ app.use("/usuarios", usuarioRouter);
 app.use("/empresas", empresasRouter);
 app.use("/anotacoes", anotacoesRouter);
 app.use("/tokens", tokensRouter);  
+app.use("/filmes", filmesRouter);  
 app.use("/publicacoes", publicacaoRRouter);
-
-app.use("/publicacoes", publicacoesRouter);
+app.use("/relatorios", relatoriosRouter);
 
 // Inicia o servidor utilizando a porta definida nas configurações
 // do ambiente.
