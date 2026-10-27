@@ -1,4 +1,8 @@
-package school.sptech;
+package school.sptech.dao;
+
+import school.sptech.config.Conexao;
+import school.sptech.model.Filme;
+import school.sptech.model.AtorPersonagem;
 
 import java.sql.*;
 import java.util.List;
@@ -14,7 +18,7 @@ public class FilmeDAO {
         String sqlGenero = "INSERT INTO filme_genero (filme_id, genero) VALUES (?, ?)";
         String sqlElenco = "INSERT INTO filme_elenco (filme_id, ator, personagem) VALUES (?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+        try (Connection conn = Conexao.Conexao();
              PreparedStatement stmtFilme = conn.prepareStatement(sqlFilme, Statement.RETURN_GENERATED_KEYS);
              PreparedStatement stmtGenero = conn.prepareStatement(sqlGenero);
              PreparedStatement stmtElenco = conn.prepareStatement(sqlElenco)) {

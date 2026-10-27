@@ -4,6 +4,9 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import school.sptech.dao.FilmeDAO;
+import school.sptech.model.Filme;
+import school.sptech.util.LeitorExcel;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,7 +24,7 @@ public class Main {
             Sheet sheet = workbook.getSheetAt(0);
             DataFormatter dataFormatter = new DataFormatter();
 
-            LeitorExcel leitorExcel = new LeitorExcel(); 
+            LeitorExcel leitorExcel = new LeitorExcel();
 
             
             List<Filme> filmesExtraidos = leitorExcel.extrairFilmes(sheet, dataFormatter);

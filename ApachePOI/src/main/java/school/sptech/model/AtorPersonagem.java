@@ -1,7 +1,4 @@
-package school.sptech;
-
-import java.util.ArrayList;
-import java.util.List;
+package school.sptech.model;
 
 public class AtorPersonagem {
     private String ator;
