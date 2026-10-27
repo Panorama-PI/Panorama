@@ -9,10 +9,6 @@ import java.util.List;
 
 public class FilmeDAO {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/filmes_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-    private static final String USER = "David";
-    private static final String PASS = "David@2020";
-
     public void salvarFilmes(List<Filme> filmes) {
         String sqlFilme = "INSERT INTO filme (nome, data_lancamento, score, sinopse, titulo_original, status_filme, idioma_original, orcamento, receita, pais) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlGenero = "INSERT INTO filme_genero (filme_id, genero) VALUES (?, ?)";

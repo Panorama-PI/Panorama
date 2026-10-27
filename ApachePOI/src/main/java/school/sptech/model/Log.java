@@ -67,7 +67,7 @@ public class Log {
 
     @Override
     public String toString() {
-        return "[" + nivel + "|" + origem + "|" + mensagem + "|" +
-                dataHora.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + "]";
+        return "[ " + nivel + " ] [ " + origem + " ] [ " + mensagem + " ] [ " +
+                dataHora.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + " ]";
     }
 }
