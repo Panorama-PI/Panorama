@@ -1,16 +1,27 @@
 package school.sptech.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.*;
+import school.sptech.dao.LogDao;
 import school.sptech.model.Filme;
+import school.sptech.model.Log;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LeitorExcel {
 
-    public List<Filme> extrairFilmes(Sheet sheet, DataFormatter formatador) {
+    private static final Logger log = LogManager.getLogger(LeitorExcel.class);
+
+    public List<Filme> extrairFilmes(Sheet sheet, DataFormatter formatador) throws SQLException {
         List<Filme> listaDeFilmes = new ArrayList<>();
 
+        LogDao logDao = new LogDao();
+        Log log = new Log("INFO", "LeitorExcel", "Iniciando importação da base de dados");
+        logDao.inserirLog(log);
+        System.out.println(log);
         
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             Row linha = sheet.getRow(i);
@@ -54,6 +65,10 @@ public class LeitorExcel {
                 filme.setPais(lerTexto(linha.getCell(11), formatador));
 
                 listaDeFilmes.add(filme);
+            }else{
+                Log logNull = new Log("WARN", "LeitorExcel", "A linha da base está nula");
+                logDao.inserirLog(log);
+                System.out.println(log);
             }
         }
 

@@ -1,14 +1,16 @@
 package school.sptech.config;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Conexao {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/filmes_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-    private static final String USER = "David";
-    private static final String PASS = "David@2020";
+    private static final String URL = Dotenv.load().get("DATABASE_URL");
+    private static final String USER = Dotenv.load().get("DATABASE_USER");
+    private static final String PASS = Dotenv.load().get("DATABASE_PASS");
 
     public static Connection Conexao(){
         try{

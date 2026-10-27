@@ -10,6 +10,7 @@ import school.sptech.util.LeitorExcel;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 public class Main {
@@ -35,6 +36,8 @@ public class Main {
 
         } catch (IOException e) {
             System.err.println("Erro ao abrir ou ler o arquivo: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Erro ao salvar o arquivo no banco: " + e.getMessage());
         }
     }
 }
