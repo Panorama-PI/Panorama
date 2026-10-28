@@ -1,3 +1,7 @@
+//Qualquer falha inesperada no servidor, 
+//queda de banco de dados ou bug no código. 
+//Este erro é capturado automaticamente pelo nosso handler global para não derrubar a aplicação nem expor dados sensíveis do servidor.
+
 class AppError extends Error{
     constructor(message, statusCode = 500, details = null){
         super(message);
