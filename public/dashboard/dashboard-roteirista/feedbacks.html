@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panorama | Feedbacks</title>
+
+    <link rel="shortcut icon" href="../../assets/icon/favicon2.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../css/feedbacks.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Proteção de página: redireciona para o login se não houver sessão -->
+    <script src="../../js/sessao.js"></script>
+    <script>validarSessao();</script>
+</head>
+
+<body class="body-feedbacks">
+
+    <aside class="aside-left">
+        <div class="usuario-side">
+            <img src="../../assets/imgs/matheus.jpg" alt="Foto do usuário">
+
+            <h2 id="a_usuario">Usuário</h2>
+            <h3 id="b_cargo">Roteirista</h3>
+            <h4 id="c_email">email@gmail.com</h4>
+        </div>
+        <div class="btns-side">
+            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
+            <a href="./dashboard-geral.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
+            <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
+            <a href="./anotacoes.html"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
+            <a href="./pesquisa.html"><img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
+            <a href="./publicacoes.html"><img src="../../assets/icon/publicacao.png" alt="">Publicações</a>
+            <a href="./feedbacks.html" class="active" aria-current="page"><img src="../../assets/icon/mail-icon.png" alt="">Feedbacks</a>
+        </div>
+    </aside>
+
+    <main class="home-feedbacks">
+
+        <header class="feedbacks-header">
+
+            <div class="feedbacks-titulo">
+                <h1>Meus feedbacks</h1>
+                <p>
+                    Veja o que os produtores acharam das suas publicações
+                    e use as sugestões para melhorar os seus projetos.
+                </p>
+            </div>
+
+            <!-- Controle de notificações: aparece só para o roteirista -->
+            <section class="sino-painel sino-ativo" id="sino-painel" aria-labelledby="sino-titulo">
+
+                <button type="button" class="sino-botao" id="sino-botao" role="switch" aria-checked="true"
+                    aria-labelledby="sino-titulo" aria-describedby="sino-descricao sino-status">
+
+                    <!-- Sino ligado -->
+                    <svg class="sino-icone-ativado" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+
+                    <!-- Sino desligado (cortado) -->
+                    <svg class="sino-icone-desativado" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        <path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path>
+                        <path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path>
+                        <path d="M18 8a6 6 0 0 0-9.33-5"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                </button>
+
+                <div class="sino-textos">
+                    <div class="sino-linha-titulo">
+                        <h2 class="sino-titulo" id="sino-titulo">Notificações por e-mail</h2>
+                        <span class="sino-estado" id="sino-estado">Ativado</span>
+                    </div>
+
+                    <p class="sino-descricao" id="sino-descricao">
+                        O sininho controla se você recebe avisos por e-mail sobre novos feedbacks.
+                        Seus feedbacks continuam disponíveis aqui, com o sininho ligado ou desligado.
+                    </p>
+
+                    <p class="sino-status" id="sino-status">Você optou por receber notificações por e-mail.</p>
+                </div>
+
+            </section>
+
+        </header>
+
+        <!-- Mensagem que aparece depois de mexer no sininho -->
+        <p class="sino-mensagem" id="sino-mensagem" role="status" aria-live="polite"></p>
+
+        <!-- Aviso geral da página (por exemplo: feedback não encontrado) -->
+        <p class="feedbacks-aviso" id="aviso-pagina" role="status" aria-live="polite" hidden></p>
+
+
+        <!-- ========================= LISTAGEM ========================= -->
+        <section id="tela-lista" aria-labelledby="titulo-lista" aria-busy="true">
+
+            <div class="feedbacks-lista-topo">
+                <h2 id="titulo-lista">Feedbacks recebidos</h2>
+                <span class="feedbacks-contador" id="contador-feedbacks"></span>
+            </div>
+
+            <!-- Estado: carregando -->
+            <div id="estado-carregando" role="status">
+                <ul class="feedbacks-carregando-lista" aria-hidden="true">
+                    <li class="feedback-esqueleto"><span></span><span></span><span></span></li>
+                    <li class="feedback-esqueleto"><span></span><span></span><span></span></li>
+                    <li class="feedback-esqueleto"><span></span><span></span><span></span></li>
+                </ul>
+                <p class="feedbacks-carregando-texto">Carregando feedbacks...</p>
+            </div>
+
+            <!-- Estado: nenhum feedback -->
+            <div class="feedbacks-estado" id="estado-vazio" hidden>
+                <svg class="feedbacks-estado-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <h3>Você ainda não recebeu feedbacks</h3>
+                <p>
+                    Quando um produtor avaliar uma das suas publicações, o feedback aparecerá aqui.
+                    Continue publicando seus projetos para receber avaliações.
+                </p>
+            </div>
+
+            <!-- Estado: erro ao carregar -->
+            <div class="feedbacks-estado feedbacks-estado-erro" id="estado-erro" role="alert" hidden>
+                <svg class="feedbacks-estado-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <h3>Não foi possível carregar os feedbacks</h3>
+                <p>Algo deu errado ao buscar as informações. Tente novamente em instantes.</p>
+                <button type="button" class="feedbacks-btn-principal" id="btn-tentar-novamente">Tentar novamente</button>
+            </div>
+
+            <!-- Lista de feedbacks (preenchida pelo JavaScript) -->
+            <ul class="feedbacks-lista" id="lista-feedbacks" hidden></ul>
+
+        </section>
+
+
+        <!-- =================== VISUALIZAÇÃO DETALHADA =================== -->
+        <section id="tela-detalhe" aria-labelledby="detalhe-titulo" hidden>
+
+            <div class="feedbacks-detalhe-topo">
+                <button type="button" class="feedbacks-btn-secundario" id="btn-voltar">
+                    ← Voltar para os feedbacks
+                </button>
+            </div>
+
+            <article class="feedback-detalhe">
+                <span class="feedbacks-etiqueta">Feedback recebido</span>
+                <h2 id="detalhe-titulo" tabindex="-1"></h2>
+
+                <dl class="feedback-detalhe-dados">
+                    <div>
+                        <dt>Publicação</dt>
+                        <dd id="detalhe-publicacao"></dd>
+                    </div>
+                    <div>
+                        <dt>Produtor</dt>
+                        <dd id="detalhe-produtor"></dd>
+                    </div>
+                    <div>
+                        <dt>Data do feedback</dt>
+                        <dd id="detalhe-data"></dd>
+                    </div>
+                </dl>
+
+                <h3 class="feedback-detalhe-conteudo-titulo">Conteúdo do feedback</h3>
+                <p class="feedback-detalhe-texto" id="detalhe-texto"></p>
+            </article>
+
+        </section>
+
+    </main>
+
+    <script src="../../js/feedbacks.js"></script>
+
+</body>
+
+</html>
