@@ -38,6 +38,7 @@ body {
   align-items: center;
   border-right: 2px solid var(--cor-cinza-canto);
   background-color: var(--cor-fundo-side);
+  overflow-y: auto;
 }
 
 .usuario-side{
@@ -70,22 +71,22 @@ body {
 
 .btns-side a {
   box-sizing: border-box; 
-  font-size: 23px;
+  font-size: clamp(15px, 2.6vh, 23px);
   display: flex;
   align-items: center;
   color: var(--cor-cinza-claro);
   background-color: var(--cor-fundo-side);
   border: 1px solid transparent;
   border-radius: 20px;
-  padding: 0.8rem;
+  padding: clamp(0.4rem, 1.2vh, 0.8rem);
   text-align: left;
   width: 15rem;
-  margin: 0.5rem;
+  margin: clamp(0.15rem, 0.7vh, 0.5rem) 0.5rem;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   cursor: pointer;
 
   img {
-    height: 1.5rem;
+    height: clamp(1.1rem, 2.6vh, 1.5rem);
     padding-right: 0.5rem;
   }
 }
@@ -195,7 +196,7 @@ body {
   height: 0.3rem; 
   margin-bottom: 3rem; 
 }
-#pesquisa-bar{
+#pesquisa_bar{
   width: 40rem;
   height: 0.1rem;
   color: white;
@@ -204,7 +205,7 @@ body {
   width: 4.5rem;
   height: 0.1rem;
 }
-#pesquisa-bar p{
+#pesquisa_bar p{
   color:white;
 }
 #filtro-bar p{

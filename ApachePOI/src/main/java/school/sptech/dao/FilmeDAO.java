@@ -1,20 +1,20 @@
-package school.sptech;
+package school.sptech.dao;
+
+import school.sptech.config.Conexao;
+import school.sptech.model.Filme;
+import school.sptech.model.AtorPersonagem;
 
 import java.sql.*;
 import java.util.List;
 
 public class FilmeDAO {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/Panorama?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-    private static final String USER = "root";
-    private static final String PASS = "@Chokito5"; 
-
     public void salvarFilmes(List<Filme> filmes) {
         String sqlFilme = "INSERT INTO filme (nome, data_lancamento, score, sinopse, titulo_original, status_filme, idioma_original, orcamento, receita, pais) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlGenero = "INSERT INTO filme_genero (filme_id, genero) VALUES (?, ?)";
         String sqlElenco = "INSERT INTO filme_elenco (filme_id, ator, personagem) VALUES (?, ?, ?)";
 
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASS);
+        try (Connection conn = Conexao.Conexao();
              PreparedStatement stmtFilme = conn.prepareStatement(sqlFilme, Statement.RETURN_GENERATED_KEYS);
              PreparedStatement stmtGenero = conn.prepareStatement(sqlGenero);
              PreparedStatement stmtElenco = conn.prepareStatement(sqlElenco)) {

@@ -1,11 +1,9 @@
-package school.sptech;
+package school.sptech.util;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.apache.poi.ss.usermodel.*;
+
+import school.sptech.model.AtorPersonagem;
 
 public class TratamentoUtils {
 
