@@ -250,6 +250,23 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
 
+-- -----------------------------------------------------
+-- Table `filmes_db`.`log_execucao`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `filmes_db`.`log_execucao` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `nivel` VARCHAR(10) NOT NULL,              
+    `origem` VARCHAR(100) NOT NULL,           
+    `mensagem` VARCHAR(255) NOT NULL,          
+    `data_hora` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+ENGINE = InnoDB
+AUTO_INCREMENT = 4
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
+;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
