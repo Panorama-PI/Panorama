@@ -18,7 +18,7 @@ function verificarTokenExiste(token){
     return database.executar(sql);
 }
 
-function salvarToken(token,idEmpresa){
+function salvarToken(token,idEmpresa, email){
     console.log(
             "ACESSEI O TOKEN MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n" +
             " \t\t >> verifique suas credenciais de acesso ao banco\n" +
@@ -30,9 +30,9 @@ function salvarToken(token,idEmpresa){
     let sql = `
         INSERT INTO 
             token 
-            (codigo, status_enviado, expiracao, id_empresa) 
+            (codigo, status_enviado, expiracao, id_empresa, email_destinatario) 
         VALUES 
-            ('${token}', 0, NOW() + INTERVAL 15 MINUTE, ${idEmpresa});
+            ('${token}', 0, NOW() + INTERVAL 15 MINUTE, ${idEmpresa}, '${email}');
     `
 
     return database.executar(sql)

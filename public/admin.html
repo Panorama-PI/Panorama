@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
@@ -8,50 +8,46 @@
     <title>Panorama | Tela Administrativa</title>
 
     <link rel="stylesheet" href="./css/admin.css">
-
 </head>
 
 <body>
 
-
+    <!-- =========================
+         SIDEBAR
+    ========================= -->
     <aside class="sidebar">
 
         <div class="usuario-side">
-
-            <img src="assets/imgs/nathan.jpg" alt="Foto do administrador">
+            <img src="" alt="Foto do administrador" id="foto-admin">
 
             <h2>Nathan Fioravanti</h2>
             <h3>Administrador</h3>
             <h4>admin@exemplo.com</h4>
-
         </div>
 
         <div class="btns-side menu-principal">
-
             <a href="#" class="active">
                 <img src="assets/icon/home-icon.png" alt="">
                 Painel
             </a>
 
-            <a href="#">
-                <img src="assets/icon/settings-icon.png" alt="">
-                Configurações
-            </a>
-
         </div>
 
         <div class="btns-side menu-sair">
-
             <a href="#" onclick="limparSessao(); return false;">
                 <img src="assets/icon/sair-icon.png" alt="">
                 Sair
             </a>
-
         </div>
 
     </aside>
 
+
+    <!-- =========================
+         CONTEÚDO PRINCIPAL
+    ========================= -->
     <main class="admin-content">
+
         <h1>Administração da Empresa</h1>
 
         <p>
@@ -60,6 +56,7 @@
 
         <div class="cards-superiores">
 
+            <!-- Código da empresa -->
             <div class="card-codigo">
                 <h2>
                     <img src="assets/icon/pesquisa-icon.png" alt="">
@@ -68,40 +65,44 @@
 
                 <div class="codigo-empresa">
                     <img src="assets/icon/recarregar-icon.png" alt="">
-                    <p>7F3A-9C2D</p>
+                    <p id="codigo-empresa-texto">—</p>
                     <button class="btn-info-codigo">
                         <img src="assets/icon/info-icon.png" alt="">
                     </button>
                 </div>
 
-                <button class="btn-email" onclick="gerarTokenSalvar(1,'matheus.san.dev@gmail.com')">
-                    <img src="assets/icon/mail-icon.png" alt="">
-                    Enviar por e-mail
-                </button>
+<!-- Seção do Código da Empresa -->
+<div class="codigo-empresa-container">
+    <div class="codigo-display">
+    </div>
+    
+    <!-- Novo input de e-mail -->
+    <div class="input-email-container">
+        <input type="email" id="input-email-convite" placeholder="Digite o e-mail do funcionário" required>
+        <button type="button" class="btn-enviar-email" onclick="solicitarEnvioToken()">
+            <img src="assets/icon/email-icon.png" alt=""> Enviar por e-mail
+        </button>
+    </div>
+    <p id="mensagem" class="mensagem-status"></p>
+</div>
             </div>
 
+            <!-- Informações da empresa -->
             <div class="card-informacoes">
                 <div class="titulo-informacoes">
                     <h2>
                         <img src="assets/icon/empresa-icon.png" alt="">
                         Informações da Empresa
                     </h2>
-                    <button>
-                        <img src="assets/icon/lapis-icon.png" alt="">
-                        Editar
-                    </button>
+                    
                 </div>
 
-                <div class="informacoes">
-
-
-
-                </div>
+                <div class="informacoes"></div>
             </div>
-
 
         </div>
 
+        <!-- Funcionários -->
         <section class="funcionarios">
 
             <h2>Funcionários cadastrados</h2>
@@ -113,8 +114,8 @@
                     <option value="">Todos</option>
                     <option value="Produtor">Produtor</option>
                     <option value="Roteirista">Roteirista</option>
-                    <option value="Roteirista">Ativo</option>
-                    <option value="Roteirista">Inativo</option>
+                    <option value="Ativo">Ativo</option>
+                    <option value="Inativo">Inativo</option>
                 </select>
 
                 <select>
@@ -135,14 +136,16 @@
                 <span>Ações</span>
             </div>
 
-            <div id="lista-funcionarios">
-
-            </div>
+            <div id="lista-funcionarios"></div>
 
         </section>
 
     </main>
 
+
+    <!-- =========================
+         MODAL: COMO FUNCIONA O CÓDIGO
+    ========================= -->
     <div id="modal-codigo" class="modal-codigo">
 
         <div class="conteudo-modal">
@@ -153,9 +156,7 @@
 
             <div class="passo-modal">
                 <span>1</span>
-                <p>
-                    Compartilhe o código da empresa com seus funcionários.
-                </p>
+                <p>Compartilhe o código da empresa com seus funcionários.</p>
             </div>
 
             <div class="passo-modal">
@@ -186,9 +187,64 @@
 
     </div>
 
+
+    <!-- =========================
+         MODAL: EDITAR FUNCIONÁRIO
+    ========================= -->
+        <div id="modal-editar" class="modal-overlay" onclick="if (event.target === this) fecharModal('modal-editar')">
+        <div class="modal-box">
+            <h2>Editar funcionário</h2>
+
+            <input type="hidden" id="editar-id">
+
+            <label for="editar-nome">Nome</label>
+            <input type="text" id="editar-nome">
+
+            <label for="editar-email">E-mail</label>
+            <input type="email" id="editar-email">
+
+            <label for="editar-cargo">Cargo</label>
+            <select id="editar-cargo">
+                <option value="Produtor">Produtor</option>
+                <option value="Roteirista">Roteirista</option>
+            </select>
+
+            <label for="editar-status">Status</label>
+            <select id="editar-status">
+                <option value="ativo">Ativo</option>
+                <option value="inativo">Inativo</option>
+            </select>
+
+            <p id="erro-editar" class="modal-erro"></p>
+
+            <div class="modal-acoes">
+                <button type="button" class="btn-cancelar" onclick="fecharModal('modal-editar')">Cancelar</button>
+                <button type="button" class="btn-salvar" onclick="salvarEdicao()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =========================
+         MODAL: EXCLUIR FUNCIONÁRIO
+    ========================= -->
+    <div id="modal-excluir" class="modal-overlay" onclick="if (event.target === this) fecharModal('modal-excluir')">
+        <div class="modal-box modal-pequeno">
+            <h2>Excluir funcionário</h2>
+            <p>Você tem certeza que deseja excluir <strong id="excluir-nome"></strong>?</p>
+
+            <p id="erro-excluir" class="modal-erro"></p>
+
+            <div class="modal-acoes">
+                <button type="button" class="btn-cancelar" onclick="fecharModal('modal-excluir')">Cancelar</button>
+                <button type="button" class="btn-confirmar-excluir" onclick="confirmarExclusao()">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+
     <script src="./js/admin.js"></script>
     <script src="./js/token.js"></script>
-    <script>buscarEmpresas();</script>
 
 </body>
 

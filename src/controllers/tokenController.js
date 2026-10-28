@@ -3,7 +3,7 @@ var hora = require("../../public/js/hora");
 
 function verificaTokenExiste(req,res){
     let token = req.params.token;
-
+    
     if(!token || !token.trim()){
         res.status(400).json({
             sucesso: false,
@@ -34,15 +34,14 @@ function verificaTokenExiste(req,res){
                     sucesso: false,
                     mensagem: "Erro interno no servidor"
             });
-        }
-        );
+        });
     }
 }
 
 function salvarToken(req,res){
     let token = req.body.token;
     let idEmpresa = req.body.idEmpresa;
-    let email = req.body.email;
+    let email = req.body.email; // Variável capturada do frontend
 
     if(!token || !token.trim()){
         res.status(400).json({
@@ -60,7 +59,8 @@ function salvarToken(req,res){
             mensagem: "O parametro 'idEmpresa' invalido ou não informado"
         });
     }else{
-        tokenModel.salvarToken(token,idEmpresa)
+        // CORREÇÃO APLICADA AQUI: Envio do 'email' para o tokenModel
+        tokenModel.salvarToken(token, idEmpresa, email)
         .then((salvar)=>{
             if(salvar){
                 console.log("["+ hora.obterDataHoraFormatada() + "] SUCESSO 201: Token Salvo com sucesso!");
@@ -77,16 +77,14 @@ function salvarToken(req,res){
                     mensagem: "Não foi possivel salvar o Token no banco"
                 });
             }
-        }
-        ).catch((erro)=>{
+        }).catch((erro)=>{
             console.log("["+ hora.obterDataHoraFormatada() + "] ERRO 500: " + erro)
 
             res.status(500).json({
                     sucesso: false,
                     mensagem: "Erro interno no servidor"
             });
-        }
-        );
+        });
     }
 }
 
@@ -116,16 +114,14 @@ function autenticar(req,res){
                     mensagem: "Token inválido ou expirado"
                 });
             }
-        }
-        ).catch((erro)=>{
+        }).catch((erro)=>{
             console.log("["+ hora.obterDataHoraFormatada() + "] ERRO 500: " + erro)
 
             res.status(500).json({
                     sucesso: false,
                     mensagem: "Erro interno no servidor"
             });
-        }
-        );
+        });
     }
 }
 
@@ -161,16 +157,14 @@ function atualizarToken(req,res){
                     mensagem: "Não foi possivel atualizar o Token no banco"
                 });
             }
-        }
-        ).catch((erro)=>{
+        }).catch((erro)=>{
             console.log("["+ hora.obterDataHoraFormatada() + "] ERRO 500: " + erro)
 
             res.status(500).json({
                     sucesso: false,
                     mensagem: "Erro interno no servidor"
             });
-        }
-        );
+        });
     }
 }
 
@@ -179,4 +173,4 @@ module.exports = {
     salvarToken,
     autenticar,
     atualizarToken
-}
+};

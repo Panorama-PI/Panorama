@@ -65,7 +65,33 @@ function listar(req, res) {
         });
 }
 
+function buscarPorId(req, res) {
+    var idEmpresa = Number(req.params.id);
+
+    if (isNaN(idEmpresa)) {
+        return res.status(400).json({ mensagem: "ID da empresa inválido." });
+    }
+
+    empresaModel.buscarPorId(idEmpresa)
+        .then(function (resultado) {
+            if (resultado.length === 0) {
+                return res.status(404).json({ mensagem: "Empresa não encontrada." });
+            }
+
+            return res.status(200).json(resultado[0]);
+        })
+        .catch(function (erro) {
+            console.error("Erro ao buscar empresa:", erro.code || "ERRO_INTERNO");
+
+            return res.status(500).json({
+                mensagem: "Não foi possível buscar a empresa."
+            });
+        });
+}
+
+
 module.exports = {
     cadastrar,
-    listar
+    listar,
+    buscarPorId
 };
