@@ -1,4 +1,4 @@
-const AppError = require("AppError");
+const AppError = require("./AppError");
 
 //Sintaxe inválida, campos ausentes obrigatórios ou tipos incompatíveis (ex.: texto onde se esperava número).
 class BadRequestError extends AppError{

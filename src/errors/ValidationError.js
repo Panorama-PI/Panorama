@@ -1,4 +1,4 @@
-const AppError = require("AppError");
+const AppError = require("./AppError");
 
 //Sintaxe correta, mas falha nas regras de negócio/schema (ex.: validação com Zod ou Joi).
 class ValidationError extends AppError{

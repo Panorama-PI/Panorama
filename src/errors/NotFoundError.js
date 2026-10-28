@@ -1,4 +1,4 @@
-const AppError = require("AppError");
+const AppError = require("./AppError");
 
 //Recurso não existe no banco de dados ou rota inexistente.
 class NotFoundError extends AppError{

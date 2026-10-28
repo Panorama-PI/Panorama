@@ -28,6 +28,7 @@ var relatoriosRouter = require("./src/routes/relatorios");
 // Importa o interceptor global de erros no server
 const errorHandler = require("./src/middleware/ErrorHandler");
 const NotFoundError = require("./src/errors/NotFoundError");
+const AppError = require("./src/errors/AppError");
 // Permite que a aplicação receba dados enviados no formato JSON
 // e também dados enviados por formulários.
 app.use(express.json());

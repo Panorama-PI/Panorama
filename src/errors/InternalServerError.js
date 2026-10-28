@@ -1,4 +1,4 @@
-const AppError = require("AppError");
+const AppError = require("./AppError");
 
 //Falhas imprevistas, queda de banco de dados ou erros de código não tratados.
 class InternalServerError extends AppError{
