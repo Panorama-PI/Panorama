@@ -273,7 +273,8 @@ COLLATE = utf8mb4_unicode_ci;
 
 ALTER TABLE usuario ADD COLUMN notificacao TINYINT;
 ALTER TABLE token ADD COLUMN email_destinatario VARCHAR(255);
-
+ALTER TABLE feedback ADD COLUMN autor_id INT NOT NULL;
+ALTER TABLE feedback ADD CONSTRAINT fk_feedback_usuario FOREIGN KEY (autor_id) REFERENCES usuario(id);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
