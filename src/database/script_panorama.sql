@@ -250,9 +250,14 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
 
--- -----------------------------------------------------
--- Table `filmes_db`.`log_execucao`
--- -----------------------------------------------------
+CREATE TABLE feedback(
+id INT PRIMARY KEY AUTO_INCREMENT,
+texto TEXT ,
+status_enviado TINYINT,
+publicacao_id INT NOT NULL,
+CONSTRAINT fk_publicacao_feedback FOREIGN KEY (publicacao_id) REFERENCES publicacao(id)
+);
+
 CREATE TABLE IF NOT EXISTS `filmes_db`.`log_execucao` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `nivel` VARCHAR(10) NOT NULL,              
@@ -265,6 +270,9 @@ AUTO_INCREMENT = 4
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 ;
+
+ALTER TABLE usuario ADD COLUMN notificacao TINYINT;
+ALTER TABLE token ADD COLUMN email_destinatario VARCHAR(255);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
