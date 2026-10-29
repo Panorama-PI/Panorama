@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Panorama | Feedbacks do Produtor</title>
+
+    <link rel="shortcut icon" href="../../assets/icon/favicon2.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../css/feedbacks.css">
+    <link rel="stylesheet" href="../../css/feedbacks-produtor.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="../../js/sessao.js"></script>
+    <script>validarSessao();</script>
+</head>
+
+<body class="body-feedbacks">
+
+    <aside class="aside-left">
+        <div class="usuario-side">
+            <img src="../../assets/imgs/matheus.jpg" alt="Foto do usuário">
+
+            <h2 id="a_usuario">Usuário</h2>
+            <h3 id="b_cargo">Produtor</h3>
+            <h4 id="c_email">email@gmail.com</h4>
+        </div>
+
+        <div class="btns-side">
+            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
+            <a href="./dashboard-geral.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
+            <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão
+                Específica</a>
+            <a href="./pesquisa.html"><img src="../../assets/icon/pesquisa-icon.png" alt=""
+                    id="limpar_pesquisa">Pesquisa</a>
+            <a href="./publicacao.html"><img src="../../assets/icon/publicacao.png" alt="">Publicações</a>
+            <a href="" class="active"><img src="../../assets/icon/mail-icon.png" alt="">Feedbacks</a>
+        </div>
+    </aside>
+
+    <main class="home-feedbacks">
+
+        <!-- CABEÇALHO -->
+        <header class="feedbacks-header">
+            <div class="feedbacks-titulo">
+                <h1>Meus feedbacks</h1>
+                <p>
+                    Gerencie os feedbacks enviados aos roteiristas
+                    e acompanhe suas avaliações.
+                </p>
+            </div>
+
+            <button class="feedbacks-btn-principal" id="btn-adicionar" onclick="abrirFormulario()">
+                + Adicionar feedback
+            </button>
+        </header>
+
+        <p class="feedbacks-aviso" id="aviso-pagina" hidden></p>
+
+        <!-- LISTAGEM -->
+        <section id="tela-lista">
+
+            <div class="feedbacks-lista-topo">
+                <h2>Feedbacks enviados</h2>
+                <span class="feedbacks-contador" id="contador-feedbacks"></span>
+            </div>
+
+            <div class="feedbacks-estado" id="estado-vazio" hidden>
+                <h3>Você ainda não enviou feedbacks</h3>
+                <p>
+                    Clique em Adicionar feedback para avaliar
+                    uma publicação de um roteirista.
+                </p>
+            </div>
+
+            <div class="feedbacks-tabela-container" id="container-tabela">
+                <table class="feedbacks-tabela">
+                    <thead>
+                        <tr>
+                            <th>Publicação</th>
+                            <th>Roteirista</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="lista-feedbacks">
+                        <!-- Preenchido pelo JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+
+        <!-- VISUALIZAÇÃO DETALHADA -->
+        <section id="tela-detalhe" hidden>
+
+            <div class="feedbacks-detalhe-topo">
+                <button class="feedbacks-btn-secundario" onclick="voltarLista()">
+                    ← Voltar para os feedbacks
+                </button>
+            </div>
+
+            <article class="feedback-detalhe">
+
+                <span class="feedbacks-etiqueta">Feedback enviado</span>
+
+                <h2 id="detalhe-titulo"></h2>
+
+                <dl class="feedback-detalhe-dados">
+                    <div>
+                        <dt>Publicação</dt>
+                        <dd id="detalhe-publicacao"></dd>
+                    </div>
+
+                    <div>
+                        <dt>Roteirista</dt>
+                        <dd id="detalhe-roteirista"></dd>
+                    </div>
+
+                    <div>
+                        <dt>Status</dt>
+                        <dd id="detalhe-status"></dd>
+                    </div>
+                </dl>
+
+                <h3 class="feedback-detalhe-conteudo-titulo">
+                    Conteúdo do feedback
+                </h3>
+
+                <p class="feedback-detalhe-texto" id="detalhe-texto"></p>
+
+            </article>
+
+        </section>
+
+        <!-- FORMULÁRIO DE ADICIONAR / EDITAR -->
+        <section id="tela-formulario" hidden>
+
+            <div class="feedbacks-detalhe-topo">
+                <button class="feedbacks-btn-secundario" onclick="voltarLista()">
+                    ← Voltar para os feedbacks
+                </button>
+            </div>
+
+            <div class="feedback-detalhe">
+
+                <h2 id="titulo-formulario">Adicionar novo feedback</h2>
+
+                <div class="feedbacks-campo">
+                    <label for="select-publicacao">Publicação *</label>
+
+                    <select id="select-publicacao">
+                        <option value="">Selecione uma publicação</option>
+                    </select>
+                </div>
+
+                <div class="feedbacks-campo">
+                    <label for="input-feedback">Seu feedback *</label>
+
+                    <textarea id="input-feedback" maxlength="2000"
+                        placeholder="Escreva seu feedback para o roteirista..." oninput="contarCaracteres()"></textarea>
+
+                    <span class="feedbacks-caracteres" id="contador-caracteres">
+                        0 / 2000 caracteres
+                    </span>
+                </div>
+
+                <div class="feedbacks-formulario-botoes">
+                    <button class="feedbacks-btn-secundario" onclick="voltarLista()">
+                        Cancelar
+                    </button>
+
+                    <button class="feedbacks-btn-principal" id="btn-salvar" onclick="salvarFeedback()">
+                        Enviar feedback
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script src="../../js/feedbacks-produtor.js"></script>
+
+</body>
+
+</html>

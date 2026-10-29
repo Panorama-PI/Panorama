@@ -1,0 +1,200 @@
+
+/* =========================================
+   FEEDBACKS DO PRODUTOR
+   ========================================= */
+
+/* BOTÃO ADICIONAR */
+
+#btn-adicionar {
+    align-self: flex-start;
+    margin-top: 30px;
+}
+
+/* =========================================
+   TABELA DE FEEDBACKS
+   ========================================= */
+
+.feedbacks-tabela-container {
+    width: 100%;
+    overflow-x: auto;
+    background: #161616;
+    border: 1px solid #3C3C41;
+    border-radius: 12px;
+}
+
+.feedbacks-tabela {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.feedbacks-tabela thead {
+    background: #27272A;
+}
+
+.feedbacks-tabela th {
+    padding: 1.2rem;
+    color: #A1A1AA;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+}
+
+.feedbacks-tabela td {
+    padding: 1.2rem;
+    color: #F4F4F5;
+    font-size: 0.95rem;
+    border-top: 1px solid #3C3C41;
+}
+
+.feedbacks-tabela tbody tr:hover {
+    background: #202020;
+}
+
+/* =========================================
+   STATUS
+   ========================================= */
+
+.feedbacks-status {
+    display: inline-block;
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.status-enviado {
+    color: #4ADE80;
+    background: rgba(74, 222, 128, 0.12);
+}
+
+.status-enviando {
+    color: #FBBF24;
+    background: rgba(251, 191, 36, 0.12);
+}
+
+/* =========================================
+   BOTÕES DA TABELA
+   ========================================= */
+
+.feedbacks-acoes {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.feedbacks-btn-editar,
+.feedbacks-btn-excluir {
+    padding: 0.5rem 0.8rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.feedbacks-btn-editar {
+    color: #F4F4F5;
+    background: #27272A;
+    border: 1px solid #3C3C41;
+}
+
+.feedbacks-btn-editar:hover {
+    border-color: #FF383C;
+}
+
+.feedbacks-btn-excluir {
+    color: #FF6B6B;
+    background: transparent;
+    border: 1px solid #FF383C;
+}
+
+.feedbacks-btn-excluir:hover {
+    color: white;
+    background: #FF383C;
+}
+
+/* =========================================
+   FORMULÁRIO
+   ========================================= */
+
+.feedbacks-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+}
+
+.feedbacks-campo label {
+    color: #F4F4F5;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.feedbacks-campo select,
+.feedbacks-campo textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.9rem 1rem;
+    color: #F4F4F5;
+    background: #0B0B0C;
+    border: 1px solid #3C3C41;
+    border-radius: 8px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.95rem;
+}
+
+.feedbacks-campo select:focus,
+.feedbacks-campo textarea:focus {
+    outline: none;
+    border-color: #FF383C;
+}
+
+.feedbacks-campo select option {
+    background: #161616;
+}
+
+.feedbacks-campo textarea {
+    min-height: 180px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.feedbacks-caracteres {
+    align-self: flex-end;
+    color: #A1A1AA;
+    font-size: 0.8rem;
+}
+
+.feedbacks-formulario-botoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* LINHAS CLICÁVEIS */
+
+.feedback-linha-clicavel {
+    cursor: pointer;
+}
+
+.feedback-linha-clicavel:hover {
+    background: #27272A;
+}
+
+/* =========================================
+   RESPONSIVIDADE
+   ========================================= */
+
+@media (max-width: 760px) {
+
+    .feedbacks-tabela {
+        min-width: 600px;
+    }
+
+    .feedbacks-formulario-botoes {
+        flex-direction: column;
+    }
+
+    .feedbacks-formulario-botoes button {
+        width: 100%;
+    }
+}
