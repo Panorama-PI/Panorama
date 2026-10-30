@@ -1,10 +1,7 @@
 package com.panorama.mail.dao;
 
 import com.panorama.mail.config.ConnectionProvider;
-import com.panorama.mail.model.Empresa;
-import com.panorama.mail.model.PendenciaEmailEnvio;
-import com.panorama.mail.model.Token;
-import com.panorama.mail.model.Usuario;
+import com.panorama.mail.model.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
@@ -16,31 +13,34 @@ public class EmailDao {
 
     public List<PendenciaEmailEnvio> verificarEmailPendente(){
         String sql = """
-                SELECT 
-                    e.nome AS empresa_nome,
-                    t.email_destinatario AS usuario_email,
-                    t.codigo AS codigo_token,
-                    t.status_enviado AS status_enviado,
-                    t.expiracao AS expiracao
-                FROM token t
-                INNER JOIN empresa e ON t.id_empresa = e.id
-                WHERE t.status_enviado = false AND t.expiracao > CURRENT_TIMESTAMP
+                SELECT *
+                FROM vw_emails_pendentes
+                WHERE status_enviado = 0 AND notificacao = 1;
                 """;
 
 
         return jdbcTemplate.query(sql, (rs, row) ->{
+            String tipo = rs.getString("tipo");
+
             Empresa empresa = new Empresa(
-                    rs.getString("empresa_nome")
+                    rs.getString("nome_empresa")
             );
-            Usuario usuario = new Usuario(
-                    rs.getString("usuario_email")
+            Usuario produtor = new Usuario(
+                    rs.getString("nome_produtor")
+            );
+            Usuario roteirista = new Usuario(
+                    rs.getString("nome_roteirista"),
+                    rs.getString("email_destinatario")
+            );
+            Feedback feedback = new Feedback(
+                    rs.getString("texto_feedback")
             );
             Token token = new Token(
-                    rs.getString("codigo_token"),
+                    rs.getString("codigo"),
                     rs.getTimestamp("expiracao").toLocalDateTime()
             );
 
-            return new PendenciaEmailEnvio(empresa, usuario, token);
+            return new PendenciaEmailEnvio(tipo,empresa,produtor,roteirista,feedback,token);
 
         });
     }
