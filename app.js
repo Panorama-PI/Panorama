@@ -24,6 +24,7 @@ var anotacoesRouter = require("./src/routes/anotacoes");
 var tokensRouter = require("./src/routes/tokens");
 var filmesRouter = require("./src/routes/filmes");
 var publicacaoRRouter = require("./src/routes/publicacaoR");
+var publicacaoPRouter = require("./src/routes/publicacoes");
 var relatoriosRouter = require("./src/routes/relatorios");
 // Importa o interceptor global de erros no server
 const errorHandler = require("./src/middleware/ErrorHandler");
@@ -50,6 +51,7 @@ app.use("/anotacoes", anotacoesRouter);
 app.use("/tokens", tokensRouter);  
 app.use("/filmes", filmesRouter);  
 app.use("/publicacoes", publicacaoRRouter);
+app.use("/publicacoes/produtor", publicacaoPRouter);
 app.use("/relatorios", relatoriosRouter);
 
 app.all("*", (req, res, next) => {

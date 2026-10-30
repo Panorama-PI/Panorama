@@ -5,7 +5,7 @@ var dadosPublicacoes = [];
 function buscarPublicacoes() {
     var idEmpresa = sessionStorage.ID_EMPRESA;
 
-    fetch("/publicacoes/empresa/" + idEmpresa)
+    fetch("/publicacoes/produtor/empresa/" + idEmpresa)
         .then(function (resposta) {
             if (resposta.ok) {
                 resposta.json().then(function (dados) {
@@ -181,7 +181,7 @@ function abrirModal(id) {
     exibirModal(pub);
 
     // Busca as anotações atualizadas no backend
-    fetch("/publicacoes/" + id + "/anotacoes")
+    fetch("/publicacoes/produtor/" + id + "/anotacoes")
         .then(function (resposta) {
             if (resposta.ok) {
                 resposta.json().then(function (dados) {
