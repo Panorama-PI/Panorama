@@ -1,7 +1,7 @@
 // Define o ambiente em que a aplicação será executada.
 // O ambiente escolhido determina qual arquivo .env será utilizado.
-//var ambiente_processo = 'producao';
-var ambiente_processo = 'desenvolvimento';
+var ambiente_processo = 'producao';
+// var ambiente_processo = 'desenvolvimento';
 
 // Seleciona o arquivo de configurações de acordo com o ambiente.
 var caminho_env = ambiente_processo === 'producao' ? '.env' : '.env.dev';
@@ -26,6 +26,7 @@ var filmesRouter = require("./src/routes/filmes");
 var publicacaoRRouter = require("./src/routes/publicacaoR");
 var publicacaoPRouter = require("./src/routes/publicacoes");
 var relatoriosRouter = require("./src/routes/relatorios");
+var feedbackProdutorRouter = require("./src/routes/feedbackProdutor");
 // Importa o interceptor global de erros no server
 const errorHandler = require("./src/middleware/ErrorHandler");
 const NotFoundError = require("./src/errors/NotFoundError");
@@ -53,6 +54,7 @@ app.use("/filmes", filmesRouter);
 app.use("/publicacoes", publicacaoRRouter);
 app.use("/publicacoes/produtor", publicacaoPRouter);
 app.use("/relatorios", relatoriosRouter);
+app.use("/feedbacks/produtor", feedbackProdutorRouter);
 
 app.all("*", (req, res, next) => {
   next(new NotFoundError(`Rota ${req.originalUrl} não encontrada.`));
