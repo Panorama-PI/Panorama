@@ -44,13 +44,4 @@ public class EmailDao {
 
         });
     }
-
-    public void marcarComoEnviado(String codigo){
-        String sql = """
-                UPDATE token SET status_enviado = true WHERE codigo = ?
-        """;
-
-        jdbcTemplate.update(sql, codigo);
-    }
-
 }

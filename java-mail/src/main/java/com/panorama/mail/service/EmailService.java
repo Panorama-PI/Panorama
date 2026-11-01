@@ -1,6 +1,9 @@
 package com.panorama.mail.service;
 
 import com.panorama.mail.config.EmailConfig;
+import com.panorama.mail.dao.EmailDao;
+import com.panorama.mail.dao.FeedbackDao;
+import com.panorama.mail.dao.TokenDao;
 import com.panorama.mail.model.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.*;
@@ -10,6 +13,7 @@ import java.util.Properties;
 
 public class EmailService {
     private final EmailConfig config;
+    private EmailDao emailDao;
 
     public EmailService(EmailConfig config){
         this.config = config;
@@ -33,6 +37,8 @@ public class EmailService {
 
 
         if (tipo == "TOKEN"){
+            TokenDao tokenDao = new TokenDao();
+
             Usuario roteirista = pendenciaEmailEnvio.getRoteirista();
             Empresa empresa = pendenciaEmailEnvio.getEmpresa();
             Token token = pendenciaEmailEnvio.getToken();
@@ -54,7 +60,11 @@ public class EmailService {
             message.setContent(htmlContent, "text/html; charset=utf-8");
 
             Transport.send(message);
+
+            tokenDao.marcarComoEnviado(token.getToken());
         }else if(tipo == "FEEDBACK"){
+            FeedbackDao feedbackDao = new FeedbackDao();
+
             Usuario produtor = pendenciaEmailEnvio.getProdutor();
             Usuario roteirista = pendenciaEmailEnvio.getRoteirista();
             Feedback feedback = pendenciaEmailEnvio.getFeedback();
@@ -78,6 +88,8 @@ public class EmailService {
             message.setContent(htmlContent, "text/html; charset=utf-8");
 
             Transport.send(message);
+
+            feedbackDao.marcarComoEnviado(feedback.getId());
         }
 
     }
