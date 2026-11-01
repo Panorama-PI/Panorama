@@ -1,6 +1,15 @@
 var usuarioModel = require("../models/usuarioModel");
 var tokenModel = require("../models/tokenModel");
 
+// Importe as classes de erro
+const { 
+    BadRequestError, 
+    NotFoundError, 
+    ConflictError, 
+    UnauthorizedError, 
+    ForbiddenError 
+} = require("../errors");
+
 // Token de convite: 4 a 64 caracteres (letras, números, _ e -).
 // Evita que texto estranho chegue na query do token.
 var FORMATO_TOKEN = /^[A-Za-z0-9_-]{4,64}$/;
@@ -44,7 +53,7 @@ function idValido(valor) {
 // Cadastra um novo usuário.
 // Valida os campos, confere o token e descobre a empresa
 // vinculada a ele antes de encaminhar os dados para o model.
-function cadastrar(req, res) {
+function cadastrar(req, res, next) { // <-- Adicionado 'next'
     var corpo = req.body || {};
 
     var nome = corpo.nomeServer;
@@ -55,34 +64,34 @@ function cadastrar(req, res) {
 
     // Verifica se todos os campos necessários foram preenchidos.
     if (nome == undefined) {
-        return res.status(400).send("Seu nome está undefined!");
+        return next(new BadRequestError("Seu nome está undefined!"));
     }
 
     if (email == undefined) {
-        return res.status(400).send("Seu email está undefined!");
+        return next(new BadRequestError("Seu email está undefined!"));
     }
 
     if (senha == undefined) {
-        return res.status(400).send("Sua senha está undefined!");
+        return next(new BadRequestError("Sua senha está undefined!"));
     }
 
     if (perfil_id == null) {
-        return res.status(400).send("Seu cargo é inválido!");
+        return next(new BadRequestError("Seu cargo é inválido!"));
     }
 
     if (token == undefined) {
-        return res.status(400).send("Seu token está undefined!");
+        return next(new BadRequestError("Seu token está undefined!"));
     }
 
     if (!FORMATO_TOKEN.test(token)) {
-        return res.status(400).send("Token em formato inválido!");
+        return next(new BadRequestError("Token em formato inválido!"));
     }
 
     // Busca o token válido e descobre a empresa vinculada a ele.
     tokenModel.autenticar(token)
         .then(function (resultadoToken) {
             if (resultadoToken.length == 0) {
-                return res.status(401).send("Token inválido ou expirado!");
+                return next(new UnauthorizedError("Token inválido ou expirado!"));
             }
 
             var id_empresa = resultadoToken[0].id_empresa;
@@ -101,17 +110,17 @@ function cadastrar(req, res) {
             console.log("\nHouve um erro ao realizar o cadastro! Erro: ", erro.sqlMessage || erro);
 
             if (erro.code === "ER_DUP_ENTRY") {
-                return res.status(409).send("Este e-mail já está cadastrado!");
+                return next(new ConflictError("Este e-mail já está cadastrado!"));
             }
 
-            res.status(500).json(erro.sqlMessage);
+            next(erro); // Repassa o erro 500
         });
 }
 
 
 // Realiza a autenticação do usuário.
 // Retorna as informações do usuário quando email e senha são válidos.
-function autenticar(req, res) {
+function autenticar(req, res, next) { // <-- Adicionado 'next'
     var corpo = req.body || {};
 
     var email = corpo.emailServer;
@@ -119,11 +128,11 @@ function autenticar(req, res) {
 
     // Verifica se email e senha foram informados.
     if (email == undefined) {
-        return res.status(400).send("Seu email está undefined!");
+        return next(new BadRequestError("Seu email está undefined!"));
     }
 
     if (senha == undefined) {
-        return res.status(400).send("Sua senha está indefinida!");
+        return next(new BadRequestError("Sua senha está indefinida!"));
     }
 
     usuarioModel.autenticar(email, senha)
@@ -132,19 +141,19 @@ function autenticar(req, res) {
 
             // Nenhum usuário com os dados informados.
             if (resultadoAutenticar.length == 0) {
-                return res.status(403).send("Email e/ou senha inválido(s)");
+                return next(new ForbiddenError("Email e/ou senha inválido(s)"));
             }
 
             // Vários usuários com os mesmos dados de login.
             if (resultadoAutenticar.length > 1) {
-                return res.status(403).send("Mais de um usuário com o mesmo login e senha!");
+                return next(new ConflictError("Mais de um usuário com o mesmo login e senha!"));
             }
 
             var usuario = resultadoAutenticar[0];
 
             return usuarioModel.buscarUsuariosPorEmpresa(usuario.empresaId)
                 .then(function (resultadoUsuarios) {
-                    // Empresa sem usuários cadastrados.
+                    // Empresa sem usuários cadastrados (Status 204 é sucesso sem conteúdo, não precisa de classe de erro)
                     if (resultadoUsuarios.length == 0) {
                         return res.status(204).end();
                     }
@@ -160,7 +169,7 @@ function autenticar(req, res) {
         })
         .catch(function (erro) {
             console.log("\nHouve um erro ao realizar o login! Erro: ", erro.sqlMessage || erro);
-            res.status(500).json(erro.sqlMessage);
+            next(erro); // Repassa o erro 500
         });
 }
 
@@ -171,7 +180,7 @@ function autenticar(req, res) {
 
 // Busca os usuários vinculados a uma determinada empresa.
 // O ID da empresa é recebido na URL (/:empresaId).
-function buscarUsuariosPorEmpresa(req, res) {
+function buscarUsuariosPorEmpresa(req, res, next) { // <-- Adicionado 'next'
     var idEmpresa = req.params.empresaId;
 
     usuarioModel.buscarUsuariosPorEmpresa(idEmpresa)
@@ -180,11 +189,11 @@ function buscarUsuariosPorEmpresa(req, res) {
                 return res.status(200).json(resultado);
             }
 
-            res.status(204).end();
+            res.status(204).end(); // Sucesso sem conteúdo
         })
         .catch(function (erro) {
             console.log("Houve um erro ao buscar os usuários: ", erro.sqlMessage || erro);
-            res.status(500).json(erro.sqlMessage);
+            next(erro); // Repassa o erro 500
         });
 }
 
@@ -195,11 +204,11 @@ function buscarUsuariosPorEmpresa(req, res) {
 ========================= */
 
 // Lista os funcionários (sem os administradores) de uma empresa.
-function listarPorEmpresa(req, res) {
+function listarPorEmpresa(req, res, next) { // <-- Adicionado 'next'
     var idEmpresa = idValido(req.params.idEmpresa);
 
     if (idEmpresa == null) {
-        return res.status(400).json({ mensagem: "ID da empresa inválido." });
+        return next(new BadRequestError("ID da empresa inválido."));
     }
 
     usuarioModel.listarPorEmpresa(idEmpresa)
@@ -208,17 +217,14 @@ function listarPorEmpresa(req, res) {
         })
         .catch(function (erro) {
             console.error("Erro ao listar funcionários:", erro.code || "ERRO_INTERNO");
-
-            res.status(500).json({
-                mensagem: "Não foi possível listar os funcionários."
-            });
+            next(erro); // Repassa o erro 500
         });
 }
 
 
 // Edita nome, e-mail, cargo e status de um funcionário.
 // O idEmpresa vem no body e garante que o usuário é daquela empresa.
-function editar(req, res) {
+function editar(req, res, next) { // <-- Adicionado 'next'
     var corpo = req.body || {};
 
     var idUsuario = idValido(req.params.idUsuario);
@@ -228,22 +234,21 @@ function editar(req, res) {
     var perfilId = perfilDoCargo(corpo.cargo);
 
     if (idUsuario == null || idEmpresa == null) {
-        return res.status(400).json({ mensagem: "Identificadores inválidos." });
+        return next(new BadRequestError("Identificadores inválidos."));
     }
 
     if (nome === "" || email.indexOf("@") === -1) {
-        return res.status(400).json({ mensagem: "Informe um nome e um e-mail válidos." });
+        return next(new BadRequestError("Informe um nome e um e-mail válidos."));
     }
 
-      if (perfilId == null) {
-        return res.status(400).json({ mensagem: "Cargo inválido." });
+    if (perfilId == null) {
+        return next(new BadRequestError("Cargo inválido."));
     }
-
 
     usuarioModel.editar(idUsuario, idEmpresa, nome, email, perfilId)
         .then(function (resultado) {
             if (resultado.affectedRows === 0) {
-                return res.status(404).json({ mensagem: "Funcionário não encontrado." });
+                return next(new NotFoundError("Funcionário não encontrado."));
             }
 
             res.status(200).json({ mensagem: "Funcionário atualizado com sucesso." });
@@ -252,41 +257,34 @@ function editar(req, res) {
             console.error("Erro ao editar funcionário:", erro.code || "ERRO_INTERNO");
 
             if (erro.code === "ER_DUP_ENTRY") {
-                return res.status(409).json({
-                    mensagem: "Este e-mail já está cadastrado. Utilize outro e-mail."
-                });
+                return next(new ConflictError("Este e-mail já está cadastrado. Utilize outro e-mail."));
             }
 
-            res.status(500).json({
-                mensagem: "Não foi possível atualizar o funcionário."
-            });
+            next(erro); // Repassa o erro 500
         });
 }
 
 
 // Exclui um funcionário da empresa.
-function excluir(req, res) {
+function excluir(req, res, next) { // <-- Adicionado 'next'
     var idUsuario = idValido(req.params.idUsuario);
     var idEmpresa = idValido(req.params.idEmpresa);
 
     if (idUsuario == null || idEmpresa == null) {
-        return res.status(400).json({ mensagem: "Identificadores inválidos." });
+        return next(new BadRequestError("Identificadores inválidos."));
     }
 
     usuarioModel.excluir(idUsuario, idEmpresa)
         .then(function (resultado) {
             if (resultado.affectedRows === 0) {
-                return res.status(404).json({ mensagem: "Funcionário não encontrado." });
+                return next(new NotFoundError("Funcionário não encontrado."));
             }
 
             res.status(200).json({ mensagem: "Funcionário excluído com sucesso." });
         })
         .catch(function (erro) {
             console.error("Erro ao excluir funcionário:", erro.code || "ERRO_INTERNO");
-
-            res.status(500).json({
-                mensagem: "Não foi possível excluir o funcionário."
-            });
+            next(erro); // Repassa o erro 500
         });
 }
 
