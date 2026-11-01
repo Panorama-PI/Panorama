@@ -4,6 +4,8 @@ const httpErrorNames = {
   409: 'Conflict',
   422: 'Unprocessable Entity',
   500: 'Internal Server Error',
+  401: 'Unauthorized', // Adicionado para cobrir a classe que criamos
+  403: 'Forbidden'    // Adicionado para cobrir a classe que criamos
 };
 
 // Interceptor global de erros de requisições
@@ -11,7 +13,7 @@ const errorHandler = (err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   const isProduction = process.env.AMBIENTE_PROCESSO === "producao";
 
-  console.error(`[${new Date().toISOString()}] Erro em ${req.method} ${req.orginalUrl}:`, {
+  console.error(`[${new Date().toISOString()}] Erro em ${req.method} ${req.originalUrl}:`, {
     message: err.message,
     stack: isProduction ? undefined : err.stack,
   });

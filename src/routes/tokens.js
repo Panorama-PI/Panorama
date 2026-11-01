@@ -1,23 +1,14 @@
 var express = require('express');
-
 var router = express.Router();
 
 var tokenController = require("../controllers/tokenController");
 
-router.get("/:token", function(req,res){
-    tokenController.verificaTokenExiste(req,res);
-});
+router.get("/:token", tokenController.verificaTokenExiste);
 
-router.post("/", function(req,res){
-    tokenController.salvarToken(req,res);
-})
+router.post("/", tokenController.salvarToken);
 
-router.get("/autenticar/:token", function(req,res){
-    tokenController.autenticar(req,res);
-})
+router.get("/autenticar/:token", tokenController.autenticar);
 
-router.put("/", function(req,res){
-    tokenController.atualizarToken(req,res);
-})
+router.put("/", tokenController.atualizarToken);
 
 module.exports = router;

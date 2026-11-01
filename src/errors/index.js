@@ -6,6 +6,8 @@ const ConflictError = require("./ConflictError");
 const InternalServerError = require("./InternalServerError");
 const NotFoundError = require("./NotFoundError");
 const ValidationError = require("./ValidationError");
+const UnauthorizedError = require("./UnauthorizedError");
+const ForbiddenError = require("./ForbiddenError");
 
 module.exports = {
     AppError,
@@ -13,5 +15,7 @@ module.exports = {
     ConflictError,
     InternalServerError,
     NotFoundError,
-    ValidationError
+    ValidationError,
+    UnauthorizedError,
+    ForbiddenError
 }
