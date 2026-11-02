@@ -1,15 +1,15 @@
-
 var relatorioModel = require("../models/relatorioModel");
 
-function cadastrar(req, res) {
+// Importe as classes de erro
+const { BadRequestError, NotFoundError } = require("../errors");
+
+function cadastrar(req, res, next) { // <-- Adicionado 'next'
     var usuarioId = req.body.usuarioId;
     var titulo = req.body.titulo;
     var criterios = req.body.criterios;
 
     if (!usuarioId || !titulo || !criterios) {
-        return res.status(400).json({
-            mensagem: "Informe o usuário, o título e os critérios."
-        });
+        return next(new BadRequestError("Informe o usuário, o título e os critérios."));
     }
 
     relatorioModel.cadastrar(usuarioId, titulo, criterios)
@@ -21,13 +21,11 @@ function cadastrar(req, res) {
         })
         .catch(function (erro) {
             console.log(erro);
-            res.status(500).json({
-                mensagem: "Erro ao salvar o filtro."
-            });
+            next(erro); // Repassa o erro 500
         });
 }
 
-function listar(req, res) {
+function listar(req, res, next) { // <-- Adicionado 'next'
     relatorioModel.listar(req.params.usuarioId)
         .then(function (resultado) {
             var filtros = [];
@@ -53,40 +51,32 @@ function listar(req, res) {
         })
         .catch(function (erro) {
             console.log(erro);
-            res.status(500).json({
-                mensagem: "Erro ao listar os filtros."
-            });
+            next(erro); // Repassa o erro 500
         });
 }
 
-function buscarPorId(req, res) {
+function buscarPorId(req, res, next) { // <-- Adicionado 'next'
     relatorioModel.buscarPorId(req.params.id, req.params.usuarioId)
         .then(function (resultado) {
             if (resultado.length == 0) {
-                return res.status(404).json({
-                    mensagem: "Filtro não encontrado."
-                });
+                return next(new NotFoundError("Filtro não encontrado."));
             }
 
             res.json(resultado[0]);
         })
         .catch(function (erro) {
             console.log(erro);
-            res.status(500).json({
-                mensagem: "Erro ao buscar o filtro."
-            });
+            next(erro); // Repassa o erro 500
         });
 }
 
-function atualizar(req, res) {
+function atualizar(req, res, next) { // <-- Adicionado 'next'
     var usuarioId = req.body.usuarioId;
     var titulo = req.body.titulo;
     var criterios = req.body.criterios;
 
     if (!usuarioId || !titulo || !criterios) {
-        return res.status(400).json({
-            mensagem: "Informe o usuário, o título e os critérios."
-        });
+        return next(new BadRequestError("Informe o usuário, o título e os critérios."));
     }
 
     relatorioModel.atualizar(
@@ -97,9 +87,7 @@ function atualizar(req, res) {
     )
         .then(function (resultado) {
             if (resultado.affectedRows == 0) {
-                return res.status(404).json({
-                    mensagem: "Filtro não encontrado."
-                });
+                return next(new NotFoundError("Filtro não encontrado."));
             }
 
             res.json({
@@ -108,19 +96,15 @@ function atualizar(req, res) {
         })
         .catch(function (erro) {
             console.log(erro);
-            res.status(500).json({
-                mensagem: "Erro ao atualizar o filtro."
-            });
+            next(erro); // Repassa o erro 500
         });
 }
 
-function excluir(req, res) {
+function excluir(req, res, next) { // <-- Adicionado 'next'
     relatorioModel.excluir(req.params.id, req.params.usuarioId)
         .then(function (resultado) {
             if (resultado.affectedRows == 0) {
-                return res.status(404).json({
-                    mensagem: "Filtro não encontrado."
-                });
+                return next(new NotFoundError("Filtro não encontrado."));
             }
 
             res.json({
@@ -129,9 +113,7 @@ function excluir(req, res) {
         })
         .catch(function (erro) {
             console.log(erro);
-            res.status(500).json({
-                mensagem: "Erro ao excluir o filtro."
-            });
+            next(erro); // Repassa o erro 500
         });
 }
 

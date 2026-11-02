@@ -1,68 +1,47 @@
 
-// ==========================================
-// DADOS MOCKADOS
-// ==========================================
-
-// Publicações disponíveis da empresa
-var publicacoes = [
-    {
-        id: 1,
-        titulo: "Entre Sombras",
-        roteirista: "Ana Martins"
-    },
-    {
-        id: 2,
-        titulo: "Última Estação",
-        roteirista: "Rafael Costa"
-    },
-    {
-        id: 3,
-        titulo: "Cidade Submersa",
-        roteirista: "Júlia Mendes"
-    },
-    {
-        id: 4,
-        titulo: "Além do Horizonte",
-        roteirista: "Mariana Souza"
-    },
-    {
-        id: 5,
-        titulo: "O Último Capítulo",
-        roteirista: "Pedro Oliveira"
-    }
-];
-
-// Feedbacks enviados pelo produtor
-var feedbacks = [
-    {
-        id: 1,
-        idPublicacao: 1,
-        texto: "Gostei da proposta do roteiro. Sugiro desenvolver melhor o conflito da protagonista.",
-        status: "Enviado"
-    },
-    {
-        id: 2,
-        idPublicacao: 2,
-        texto: "A história está bem estruturada, mas acredito que o final poderia ser mais desenvolvido.",
-        status: "Enviado"
-    },
-    {
-        id: 3,
-        idPublicacao: 3,
-        texto: "A ambientação está muito boa. Seria interessante aprofundar os personagens secundários.",
-        status: "Enviado"
-    }
-];
-
-// Guarda o ID do feedback que está sendo editado
+var feedbacks = [];
 var idEditando = null;
-
-
-// ==========================================
-// LISTAR FEEDBACKS
-// ==========================================
+var salvando = false;
 
 function listarFeedbacks() {
+    var idProdutor = sessionStorage.ID_USUARIO;
+    var lista = document.getElementById("lista-feedbacks");
+    var contador = document.getElementById("contador-feedbacks");
+
+    lista.innerHTML = "";
+    contador.innerHTML = "Carregando feedbacks...";
+
+    document.getElementById("estado-vazio").hidden = true;
+    document.getElementById("container-tabela").hidden = true;
+
+    fetch("/feedbacks/produtor/" + idProdutor)
+        .then(function (resposta) {
+            if (resposta.ok) {
+                resposta.json().then(function (dados) {
+                    console.log("Feedbacks recebidos:", dados);
+
+                    feedbacks = dados.feedbacks || [];
+
+                    renderizarFeedbacks();
+                });
+            } else {
+                console.log("Erro ao buscar feedbacks.");
+
+                contador.innerHTML = "Erro ao carregar feedbacks";
+
+                alert("Não foi possível carregar os feedbacks.");
+            }
+        })
+        .catch(function (erro) {
+            console.log("Erro na requisição:", erro);
+
+            contador.innerHTML = "Erro ao carregar feedbacks";
+
+            alert("Erro ao conectar com o servidor.");
+        });
+}
+
+function renderizarFeedbacks() {
     var lista = document.getElementById("lista-feedbacks");
     var contador = document.getElementById("contador-feedbacks");
 
@@ -79,72 +58,45 @@ function listarFeedbacks() {
 
         for (var i = 0; i < feedbacks.length; i++) {
             var feedback = feedbacks[i];
-            var publicacao = buscarPublicacao(feedback.idPublicacao);
 
-            if (publicacao != null) {
-                var classeStatus = "status-enviado";
-
-                if (feedback.status == "Enviando") {
-                    classeStatus = "status-enviando";
-                }
-
-                lista.innerHTML += `
+            lista.innerHTML += `
                 <tr class="feedback-linha-clicavel"
-                onclick="visualizarFeedback(${feedback.id})">
-                        <td>${publicacao.titulo}</td>
+                    onclick="visualizarFeedback(${feedback.id})">
 
-                        <td>${publicacao.roteirista}</td>
+                    <td>${feedback.titulo}</td>
 
-                        <td>
-                            <span class="feedbacks-status ${classeStatus}">
-                                ${feedback.status}
-                            </span>
-                        </td>
+                    <td>${feedback.roteirista}</td>
 
-                        <td>
-                            <div class="feedbacks-acoes">
-                               <button class="feedbacks-btn-editar"
-                                    onclick="event.stopPropagation(); editarFeedback(${feedback.id})">
-                                    Editar
-                                </button>
+                    <td>
+                        <span class="feedbacks-status status-enviado">
+                            Enviado
+                        </span>
+                    </td>
 
-                                <button class="feedbacks-btn-excluir"
-                                    onclick="event.stopPropagation(); excluirFeedback(${feedback.id})">
-                                    Excluir
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }
+                    <td>
+                        <div class="feedbacks-acoes">
+                            <button class="feedbacks-btn-editar"
+                                onclick="event.stopPropagation(); editarFeedback(${feedback.id})">
+                                Editar
+                            </button>
+
+                            <button class="feedbacks-btn-excluir"
+                                onclick="event.stopPropagation(); excluirFeedback(${feedback.id})">
+                                Excluir
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
         }
     }
 }
-
-
-// ==========================================
-// BUSCAR PUBLICAÇÃO PELO ID
-// ==========================================
-
-function buscarPublicacao(id) {
-    for (var i = 0; i < publicacoes.length; i++) {
-        if (publicacoes[i].id == id) {
-            return publicacoes[i];
-        }
-    }
-
-    return null;
-}
-
-
-// ==========================================
-// ABRIR FORMULÁRIO
-// ==========================================
 
 function abrirFormulario() {
     idEditando = null;
 
     document.getElementById("tela-lista").hidden = true;
+    document.getElementById("tela-detalhe").hidden = true;
     document.getElementById("tela-formulario").hidden = false;
 
     document.getElementById("btn-adicionar").hidden = true;
@@ -157,50 +109,66 @@ function abrirFormulario() {
 
     document.getElementById("input-feedback").value = "";
 
-    carregarPublicacoes();
     contarCaracteres();
+    carregarPublicacoes();
 }
 
-
-// ==========================================
-// CARREGAR PUBLICAÇÕES NO SELECT
-// ==========================================
-
 function carregarPublicacoes() {
+    var idProdutor = sessionStorage.ID_USUARIO;
     var select = document.getElementById("select-publicacao");
 
     select.innerHTML =
-        '<option value="">Selecione uma publicação</option>';
+        '<option value="">Carregando publicações...</option>';
 
-    for (var i = 0; i < publicacoes.length; i++) {
-        var jaAvaliada = false;
+    select.disabled = true;
 
-        // Verifica se já existe feedback para a publicação
-        for (var j = 0; j < feedbacks.length; j++) {
-            if (feedbacks[j].idPublicacao == publicacoes[i].id) {
-                jaAvaliada = true;
+    fetch("/feedbacks/produtor/" + idProdutor + "/publicacoes-disponiveis")
+        .then(function (resposta) {
+            if (resposta.ok) {
+                resposta.json().then(function (dados) {
+                    var publicacoes = dados.publicacoes || [];
+
+                    select.innerHTML =
+                        '<option value="">Selecione uma publicação</option>';
+
+                    if (publicacoes.length == 0) {
+                        select.innerHTML =
+                            '<option value="">Nenhuma publicação disponível</option>';
+                        return;
+                    }
+
+                    for (var i = 0; i < publicacoes.length; i++) {
+                        var publicacao = publicacoes[i];
+
+                        var opcao = document.createElement("option");
+
+                        opcao.value = publicacao.id;
+                        opcao.textContent =
+                            publicacao.titulo + " — " + publicacao.roteirista;
+
+                        select.appendChild(opcao);
+                    }
+
+                    select.disabled = false;
+                });
+            } else {
+                console.log("Erro ao buscar publicações.");
+
+                select.innerHTML =
+                    '<option value="">Erro ao carregar publicações</option>';
+
+                alert("Não foi possível carregar as publicações.");
             }
-        }
+        })
+        .catch(function (erro) {
+            console.log("Erro na requisição:", erro);
 
-        // Mostra apenas publicações sem feedback
-        if (jaAvaliada == false) {
-            var opcao = document.createElement("option");
+            select.innerHTML =
+                '<option value="">Erro ao carregar publicações</option>';
 
-            opcao.value = publicacoes[i].id;
-            opcao.textContent = publicacoes[i].titulo +
-                " — " + publicacoes[i].roteirista;
-
-            select.appendChild(opcao);
-        }
-    }
-
-    select.disabled = false;
+            alert("Erro ao conectar com o servidor.");
+        });
 }
-
-
-// ==========================================
-// CONTADOR DE CARACTERES
-// ==========================================
 
 function contarCaracteres() {
     var texto = document.getElementById("input-feedback").value;
@@ -209,16 +177,17 @@ function contarCaracteres() {
         texto.length + " / 2000 caracteres";
 }
 
-
-// ==========================================
-// SALVAR FEEDBACK
-// ==========================================
-
 function salvarFeedback() {
+    if (salvando == true) {
+        return;
+    }
+
+    var idProdutor = sessionStorage.ID_USUARIO;
     var idPublicacao = document.getElementById("select-publicacao").value;
     var texto = document.getElementById("input-feedback").value.trim();
+    var botao = document.getElementById("btn-salvar");
 
-    if (idPublicacao == "") {
+    if (idEditando == null && idPublicacao == "") {
         alert("Selecione uma publicação.");
         return;
     }
@@ -233,165 +202,190 @@ function salvarFeedback() {
         return;
     }
 
-    if (idEditando == null) {
+    var url = "/feedbacks/produtor/" + idProdutor;
+    var metodo = "POST";
+    var corpo = {
+        idPublicacao: Number(idPublicacao),
+        texto: texto
+    };
 
-        // Impede feedback duplicado
-        for (var i = 0; i < feedbacks.length; i++) {
-            if (feedbacks[i].idPublicacao == idPublicacao) {
-                alert("Você já enviou um feedback para esta publicação.");
-                return;
-            }
-        }
+    if (idEditando != null) {
+        url += "/" + idEditando;
+        metodo = "PUT";
 
-        // Gera um ID para o novo feedback
-        var novoId = 1;
-
-        for (var i = 0; i < feedbacks.length; i++) {
-            if (feedbacks[i].id >= novoId) {
-                novoId = feedbacks[i].id + 1;
-            }
-        }
-
-        var novoFeedback = {
-            id: novoId,
-            idPublicacao: Number(idPublicacao),
-            texto: texto,
-            status: "Enviado"
+        corpo = {
+            texto: texto
         };
-
-        feedbacks.push(novoFeedback);
-
-        alert("Feedback enviado com sucesso!");
-
-    } else {
-
-        // Atualiza o feedback existente
-        for (var i = 0; i < feedbacks.length; i++) {
-            if (feedbacks[i].id == idEditando) {
-                feedbacks[i].texto = texto;
-            }
-        }
-
-        alert("Feedback atualizado com sucesso!");
     }
 
-    voltarLista();
+    salvando = true;
+    botao.disabled = true;
+    botao.innerHTML = "Enviando...";
+
+    fetch(url, {
+        method: metodo,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(corpo)
+    })
+        .then(function (resposta) {
+            return resposta.json().then(function (dados) {
+                if (resposta.ok) {
+                    alert(dados.mensagem || "Feedback salvo com sucesso!");
+
+                    voltarLista();
+                } else {
+                    alert(
+                        dados.message ||
+                        dados.mensagem ||
+                        "Não foi possível salvar o feedback."
+                    );
+                }
+            });
+        })
+        .catch(function (erro) {
+            console.log("Erro ao salvar feedback:", erro);
+            alert("Erro ao conectar com o servidor.");
+        })
+        .finally(function () {
+            salvando = false;
+            botao.disabled = false;
+
+            if (idEditando == null) {
+                botao.innerHTML = "Enviar feedback";
+            } else {
+                botao.innerHTML = "Salvar alterações";
+            }
+        });
 }
-
-
-// ==========================================
-// VISUALIZAR FEEDBACK
-// ==========================================
 
 function visualizarFeedback(id) {
-    for (var i = 0; i < feedbacks.length; i++) {
+    var idProdutor = sessionStorage.ID_USUARIO;
 
-        if (feedbacks[i].id == id) {
+    fetch("/feedbacks/produtor/" + idProdutor + "/" + id)
+        .then(function (resposta) {
+            if (resposta.ok) {
+                resposta.json().then(function (dados) {
+                    var feedback = dados.feedback;
 
-            var feedback = feedbacks[i];
-            var publicacao = buscarPublicacao(feedback.idPublicacao);
+                    document.getElementById("tela-lista").hidden = true;
+                    document.getElementById("tela-formulario").hidden = true;
+                    document.getElementById("tela-detalhe").hidden = false;
 
-            document.getElementById("tela-lista").hidden = true;
-            document.getElementById("tela-formulario").hidden = true;
-            document.getElementById("tela-detalhe").hidden = false;
+                    document.getElementById("btn-adicionar").hidden = true;
 
-            document.getElementById("btn-adicionar").hidden = true;
+                    document.getElementById("detalhe-titulo").textContent =
+                        feedback.titulo;
 
-            document.getElementById("detalhe-titulo").textContent =
-                publicacao.titulo;
+                    document.getElementById("detalhe-publicacao").textContent =
+                        feedback.titulo;
 
-            document.getElementById("detalhe-publicacao").textContent =
-                publicacao.titulo;
+                    document.getElementById("detalhe-roteirista").textContent =
+                        feedback.roteirista;
 
-            document.getElementById("detalhe-roteirista").textContent =
-                publicacao.roteirista;
+                    document.getElementById("detalhe-status").textContent =
+                        "Enviado";
 
-            document.getElementById("detalhe-status").textContent =
-                feedback.status;
-
-            document.getElementById("detalhe-texto").textContent =
-                feedback.texto;
-
-            break;
-        }
-    }
+                    document.getElementById("detalhe-texto").textContent =
+                        feedback.texto;
+                });
+            } else {
+                alert("Não foi possível carregar o feedback.");
+            }
+        })
+        .catch(function (erro) {
+            console.log("Erro ao buscar feedback:", erro);
+            alert("Erro ao conectar com o servidor.");
+        });
 }
-
-// ==========================================
-// EDITAR FEEDBACK
-// ==========================================
 
 function editarFeedback(id) {
-    for (var i = 0; i < feedbacks.length; i++) {
-        if (feedbacks[i].id == id) {
-            idEditando = id;
+    var idProdutor = sessionStorage.ID_USUARIO;
 
-            document.getElementById("tela-lista").hidden = true;
-            document.getElementById("tela-formulario").hidden = false;
+    fetch("/feedbacks/produtor/" + idProdutor + "/" + id)
+        .then(function (resposta) {
+            if (resposta.ok) {
+                resposta.json().then(function (dados) {
+                    var feedback = dados.feedback;
 
-            document.getElementById("btn-adicionar").hidden = true;
+                    idEditando = id;
 
-            document.getElementById("titulo-formulario").innerHTML =
-                "Editar feedback";
+                    document.getElementById("tela-lista").hidden = true;
+                    document.getElementById("tela-detalhe").hidden = true;
+                    document.getElementById("tela-formulario").hidden = false;
 
-            document.getElementById("btn-salvar").innerHTML =
-                "Salvar alterações";
+                    document.getElementById("btn-adicionar").hidden = true;
 
-            // Carrega a publicação do feedback
-            var publicacao = buscarPublicacao(feedbacks[i].idPublicacao);
+                    document.getElementById("titulo-formulario").innerHTML =
+                        "Editar feedback";
 
-            var select = document.getElementById("select-publicacao");
+                    document.getElementById("btn-salvar").innerHTML =
+                        "Salvar alterações";
 
-            select.innerHTML = "";
+                    var select = document.getElementById("select-publicacao");
 
-            var opcao = document.createElement("option");
-            opcao.value = publicacao.id;
-            opcao.textContent = publicacao.titulo +
-                " — " + publicacao.roteirista;
+                    select.innerHTML = "";
 
-            select.appendChild(opcao);
+                    var opcao = document.createElement("option");
 
-            // Não permite trocar a publicação durante a edição
-            select.disabled = true;
+                    opcao.value = feedback.idPublicacao;
+                    opcao.textContent =
+                        feedback.titulo + " — " + feedback.roteirista;
 
-            document.getElementById("input-feedback").value =
-                feedbacks[i].texto;
+                    select.appendChild(opcao);
 
-            contarCaracteres();
+                    select.disabled = true;
 
-            break;
-        }
-    }
+                    document.getElementById("input-feedback").value =
+                        feedback.texto;
+
+                    contarCaracteres();
+                });
+            } else {
+                alert("Não foi possível carregar o feedback para edição.");
+            }
+        })
+        .catch(function (erro) {
+            console.log("Erro ao buscar feedback:", erro);
+            alert("Erro ao conectar com o servidor.");
+        });
 }
-
-
-// ==========================================
-// EXCLUIR FEEDBACK
-// ==========================================
 
 function excluirFeedback(id) {
     var confirmar = confirm(
         "Tem certeza que deseja excluir este feedback?"
     );
 
-    if (confirmar == true) {
-        for (var i = 0; i < feedbacks.length; i++) {
-            if (feedbacks[i].id == id) {
-                feedbacks.splice(i, 1);
-                break;
-            }
-        }
-
-        listarFeedbacks();
-
-        alert("Feedback excluído com sucesso!");
+    if (confirmar == false) {
+        return;
     }
+
+    var idProdutor = sessionStorage.ID_USUARIO;
+
+    fetch("/feedbacks/produtor/" + idProdutor + "/" + id, {
+        method: "DELETE"
+    })
+        .then(function (resposta) {
+            return resposta.json().then(function (dados) {
+                if (resposta.ok) {
+                    alert(dados.mensagem || "Feedback excluído com sucesso!");
+
+                    voltarLista();
+                } else {
+                    alert(
+                        dados.message ||
+                        dados.mensagem ||
+                        "Não foi possível excluir o feedback."
+                    );
+                }
+            });
+        })
+        .catch(function (erro) {
+            console.log("Erro ao excluir feedback:", erro);
+            alert("Erro ao conectar com o servidor.");
+        });
 }
-
-
-// ==========================================
-// VOLTAR PARA A LISTAGEM
-// ==========================================
 
 function voltarLista() {
     document.getElementById("tela-lista").hidden = false;
@@ -405,9 +399,8 @@ function voltarLista() {
     listarFeedbacks();
 }
 
-
-// ==========================================
-// INICIAR PÁGINA
-// ==========================================
-
-listarFeedbacks();
+if (sessionStorage.ID_USUARIO == null) {
+    window.location.replace("/login.html");
+} else {
+    listarFeedbacks();
+}
