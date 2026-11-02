@@ -4,6 +4,8 @@ import com.panorama.mail.config.ConnectionProvider;
 import com.panorama.mail.model.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class EmailDao {
@@ -15,31 +17,40 @@ public class EmailDao {
         String sql = """
                 SELECT *
                 FROM vw_emails_pendentes
-                WHERE status_enviado = 0 AND notificacao = 1;
+                WHERE status_enviado = 0 AND (notificacao = 1 OR notificacao IS NULL);
                 """;
 
 
         return jdbcTemplate.query(sql, (rs, row) ->{
             String tipo = rs.getString("tipo");
 
-            Empresa empresa = new Empresa(
-                    rs.getString("nome_empresa")
-            );
-            Usuario produtor = new Usuario(
-                    rs.getString("nome_produtor")
-            );
-            Usuario roteirista = new Usuario(
-                    rs.getString("nome_roteirista"),
-                    rs.getString("email_destinatario")
-            );
-            Feedback feedback = new Feedback(
-                    rs.getString("texto_feedback")
-            );
-            Token token = new Token(
-                    rs.getString("codigo"),
-                    rs.getTimestamp("expiracao").toLocalDateTime()
-            );
+            String nomeEmpresa = rs.getString("nome_empresa");
+            Empresa empresa = (nomeEmpresa != null) ? new Empresa(nomeEmpresa) : null;
 
+            String nomeProdutor = rs.getString("nome_produtor");
+            Usuario produtor = (nomeProdutor != null) ? new Usuario(nomeProdutor) : null;
+
+            String nomeRoteirista = rs.getString("nome_roteirista");
+            String emailDestinatario = rs.getString("email_destinatario");
+            Usuario roteirista = new Usuario(nomeRoteirista, emailDestinatario);
+
+            Feedback feedback = null;
+            Object idFeedbackObj = rs.getObject("id_feedback");
+            if (idFeedbackObj != null) {
+                feedback = new Feedback(
+                        ((Number) idFeedbackObj).intValue(),
+                        rs.getString("texto_feedback")
+                );
+            }
+
+            Token token = null;
+            String codigoToken = rs.getString("codigo");
+            Timestamp expiracaoTs = rs.getTimestamp("expiracao");
+
+            if (codigoToken != null) {
+                LocalDateTime expiracao = (expiracaoTs != null) ? expiracaoTs.toLocalDateTime() : null;
+                token = new Token(codigoToken, expiracao);
+            }
             return new PendenciaEmailEnvio(tipo,empresa,produtor,roteirista,feedback,token);
 
         });

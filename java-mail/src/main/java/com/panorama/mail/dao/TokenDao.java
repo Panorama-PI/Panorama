@@ -10,7 +10,7 @@ public class TokenDao {
 
     public void marcarComoEnviado(String codigo){
         String sql = """
-                UPDATE token SET status_enviado = true WHERE codigo = ?
+                UPDATE token SET status_enviado = 1 WHERE codigo = ?
         """;
 
         jdbcTemplate.update(sql, codigo);

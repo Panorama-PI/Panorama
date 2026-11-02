@@ -3,7 +3,7 @@ package com.panorama.mail.service;
 import com.panorama.mail.config.EmailConfig;
 import com.panorama.mail.dao.EmailDao;
 import com.panorama.mail.dao.FeedbackDao;
-import com.panorama.mail.dao.TokenDao;
+import com.panorama.mail.dao.*;
 import com.panorama.mail.model.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.*;
@@ -36,7 +36,7 @@ public class EmailService {
         String tipo = pendenciaEmailEnvio.getTipo();
 
 
-        if (tipo == "TOKEN"){
+        if (tipo.equals("TOKEN")){
             TokenDao tokenDao = new TokenDao();
 
             Usuario roteirista = pendenciaEmailEnvio.getRoteirista();
@@ -62,7 +62,7 @@ public class EmailService {
             Transport.send(message);
 
             tokenDao.marcarComoEnviado(token.getToken());
-        }else if(tipo == "FEEDBACK"){
+        }else if(tipo.equals("FEEDBACK")){
             FeedbackDao feedbackDao = new FeedbackDao();
 
             Usuario produtor = pendenciaEmailEnvio.getProdutor();
@@ -72,8 +72,8 @@ public class EmailService {
             Token token = pendenciaEmailEnvio.getToken();
 
             EmailMessage emailMessage = new EmailMessage(
-                    "Um produtor da sua empresa te mandou uma publicação",
-                    "Olá! Acesse o site para ver a publicação"
+                    "Um produtor da sua empresa te mandou um feedback",
+                    "Olá! Acesse o site para ver o feedback"
             );
 
             Message message = new MimeMessage(session);
@@ -114,17 +114,6 @@ public class EmailService {
                 "<p style=\"color: #b3b3b3; font-size: 15px; line-height: 1.5; margin-top: 0; margin-bottom: 30px;\">" +
                 "Olá, <strong>" + roteirista.getNome() + "</strong>! A empresa <strong>" + empresa.getNome() + "</strong> informou que há um novo feedback feito pelo produtor <strong>" + produtor.getNome() + "</strong> na sua publicação." +
                 "</p>" +
-
-                // <!-- CAIXA DESTAQUE DO FEEDBACK -->
-                "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\" style=\"background-color: #1f1f1f; border: 2px dashed #e50914; border-radius: 8px; margin: 0 auto; width: 100%;\">" +
-                "<tr>" +
-                "<td style=\"padding: 20px 30px; text-align: left;\">" +
-                "<p style=\"font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 15px; color: #ffffff; line-height: 1.6; margin: 0; word-break: break-word;\">" +
-                "&ldquo;" + feedback.getTexto() + "&rdquo;" +
-                "</p>" +
-                "</td>" +
-                "</tr>" +
-                "</table>" +
 
                 "<p style=\"color: #888888; font-size: 13px; margin-top: 30px; margin-bottom: 10px;\">" +
                 "Acesse a plataforma <strong>Panorama</strong> para conferir os detalhes e interagir." +

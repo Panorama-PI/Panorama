@@ -35,10 +35,7 @@ public class Main {
                     emailService.enviarEmail(pendente);
                     System.out.println("E-mail enviado com sucesso!");
                 }
-            } catch (NullPointerException e){
-                System.err.println("Algum valor está nulo " + e.getMessage());
-                e.printStackTrace();
-            } catch (Exception e) {
+            }catch (Exception e) {
                 System.err.println("Erro ao enviar e-mail: " + e.getMessage());
                 e.printStackTrace();
             }
