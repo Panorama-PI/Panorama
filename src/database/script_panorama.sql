@@ -276,6 +276,44 @@ ALTER TABLE token ADD COLUMN email_destinatario VARCHAR(255);
 ALTER TABLE feedback ADD COLUMN autor_id INT NOT NULL;
 ALTER TABLE feedback ADD CONSTRAINT fk_feedback_usuario FOREIGN KEY (autor_id) REFERENCES usuario(id);
 
+CREATE VIEW vw_emails_pendentes AS
+SELECT 
+    t.id AS id_token,
+    NULL AS id_feedback,
+    e.nome AS nome_empresa,
+    NULL AS nome_produtor,
+    NULL AS nome_roteirista,
+    'TOKEN' AS tipo,
+    t.status_enviado,
+    t.email_destinatario,
+    t.codigo AS codigo,
+    t.expiracao AS expiracao,
+    NULL AS texto_feedback,
+    NULL AS notificacao
+FROM token t
+INNER JOIN empresa e ON t.id_empresa = e.id
+
+UNION ALL
+
+SELECT 
+    NULL AS id_token,
+    f.id AS id_feedback,
+    e.nome AS nome_empresa,
+    produtor.nome AS nome_produtor,
+    roteirista.nome AS nome_roteirista,
+    'FEEDBACK' AS tipo,
+    f.status_enviado,
+    roteirista.email AS email_destinatario, 
+    NULL AS codigo,
+    NULL AS expiracao,     
+    f.texto AS texto_feedback,
+    roteirista.notificacao AS notificacao
+FROM feedback f
+INNER JOIN publicacao p ON f.publicacao_id = p.id
+INNER JOIN usuario roteirista ON p.usuario_id = roteirista.id
+INNER JOIN usuario produtor ON f.autor_id = produtor.id
+INNER JOIN empresa e ON produtor.id_empresa = e.id;
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
