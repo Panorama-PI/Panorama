@@ -17,7 +17,7 @@ public class EmailDao {
         String sql = """
                 SELECT *
                 FROM vw_emails_pendentes
-                WHERE status_enviado = 0 AND (notificacao = 1 OR notificacao IS NULL);
+                WHERE (status_enviado = 0 OR status_enviado > 1) AND (notificacao = 1 OR notificacao IS NULL);
                 """;
 
 
