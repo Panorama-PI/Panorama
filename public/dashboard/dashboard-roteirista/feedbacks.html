@@ -16,7 +16,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Proteção de página: redireciona para o login se não houver sessão -->
     <script src="../../js/sessao.js"></script>
     <script>validarSessao();</script>
 </head>
@@ -190,8 +189,328 @@
 
     </main>
 
-    <script src="../../js/feedbacks.js"></script>
-
 </body>
 
 </html>
+
+<script>
+    var idUsuario = sessionStorage.ID_USUARIO;
+    var ehProdutor = sessionStorage.PERFIL_ID_USUARIO == 1;
+
+    var feedbacksAtuais = [];
+
+    var telaLista = document.getElementById("tela-lista");
+    var telaDetalhe = document.getElementById("tela-detalhe");
+    var estadoCarregando = document.getElementById("estado-carregando");
+    var estadoVazio = document.getElementById("estado-vazio");
+    var estadoErro = document.getElementById("estado-erro");
+    var listaFeedbacks = document.getElementById("lista-feedbacks");
+    var contador = document.getElementById("contador-feedbacks");
+    var avisoPagina = document.getElementById("aviso-pagina");
+
+    var sinoPainel = document.getElementById("sino-painel");
+    var sinoBotao = document.getElementById("sino-botao");
+    var sinoEstado = document.getElementById("sino-estado");
+    var sinoStatus = document.getElementById("sino-status");
+    var sinoMensagem = document.getElementById("sino-mensagem");
+
+
+    // ----- Utilidades -----
+
+    function formatarData(valor) {
+        if (!valor) {
+            return "";
+        }
+
+        var data = new Date(String(valor).replace(" ", "T"));
+
+        if (isNaN(data.getTime())) {
+            return "";
+        }
+
+        return data.toLocaleDateString("pt-BR");
+    }
+
+    function lerErro(resposta, mensagemPadrao) {
+        return resposta.json()
+            .then(function (corpo) {
+                throw new Error(corpo.mensagem || corpo.erro || mensagemPadrao);
+            }, function () {
+                throw new Error(mensagemPadrao);
+            });
+    }
+
+    function mostrarAviso(texto) {
+        avisoPagina.textContent = texto;
+        avisoPagina.hidden = false;
+    }
+
+    function esconderAviso() {
+        avisoPagina.textContent = "";
+        avisoPagina.hidden = true;
+    }
+
+
+    // ----- Barra lateral -----
+
+    function preencherUsuario() {
+        document.getElementById("a_usuario").textContent =
+            sessionStorage.NOME_USUARIO || "Usuário";
+
+        document.getElementById("c_email").textContent =
+            sessionStorage.EMAIL_USUARIO || "";
+
+        document.getElementById("b_cargo").textContent =
+            ehProdutor ? "Produtor" : "Roteirista";
+    }
+
+
+    // ----- Estados da listagem -----
+
+    function mostrarEstado(estado) {
+        estadoCarregando.hidden = estado != "carregando";
+        estadoVazio.hidden = estado != "vazio";
+        estadoErro.hidden = estado != "erro";
+        listaFeedbacks.hidden = estado != "lista";
+
+        telaLista.setAttribute("aria-busy", estado == "carregando" ? "true" : "false");
+
+        if (estado != "lista") {
+            contador.textContent = "";
+        }
+    }
+
+
+    // ----- Listagem -----
+
+    function obterFeedbacks() {
+        mostrarEstado("carregando");
+
+        fetch("/feedbacks/roteirista/" + idUsuario, { cache: "no-store" })
+            .then(function (resposta) {
+                if (resposta.ok) {
+                    return resposta.json();
+                }
+
+                return lerErro(resposta, "Erro ao buscar feedbacks.");
+            })
+            .then(function (corpo) {
+                feedbacksAtuais = corpo.feedbacks;
+                renderizarFeedbacks();
+            })
+            .catch(function (erro) {
+                console.error("Erro ao obter feedbacks: " + erro.message);
+                mostrarEstado("erro");
+            });
+    }
+
+    function renderizarFeedbacks() {
+    listaFeedbacks.innerHTML = "";
+
+    if (feedbacksAtuais.length == 0) {
+        mostrarEstado("vazio");
+        return;
+    }
+
+    for (var i = 0; i < feedbacksAtuais.length; i++) {
+        var feedback = feedbacksAtuais[i];
+
+        var item = document.createElement("li");
+        item.className = "feedback-item";
+
+        var corpo = document.createElement("div");
+        corpo.className = "feedback-item-corpo";
+
+        var titulo = document.createElement("h3");
+        titulo.className = "feedback-item-titulo";
+        titulo.textContent = feedback.titulo_publicacao || "Publicação sem título";
+
+        var meta = document.createElement("p");
+        meta.className = "feedback-item-meta";
+
+        var rotuloProdutor = document.createElement("strong");
+        rotuloProdutor.textContent = feedback.nome_produtor || "";
+
+        var data = formatarData(feedback.criado_em);
+
+        meta.appendChild(document.createTextNode("Produtor: "));
+        meta.appendChild(rotuloProdutor);
+
+        if (data) {
+            meta.appendChild(document.createTextNode(" • " + data));
+        }
+
+        var previa = document.createElement("p");
+        previa.className = "feedback-item-previa";
+        previa.textContent = feedback.texto || "";
+
+        corpo.appendChild(titulo);
+        corpo.appendChild(meta);
+        corpo.appendChild(previa);
+
+        var botao = document.createElement("button");
+        botao.type = "button";
+        botao.className = "feedbacks-btn-secundario";
+        botao.textContent = "Ver feedback";
+
+        botao.onclick = (function (id) {
+            return function () {
+                abrirDetalhe(id);
+            };
+        })(feedback.id);
+
+        item.appendChild(corpo);
+        item.appendChild(botao);
+
+        listaFeedbacks.appendChild(item);
+    }
+
+    contador.textContent = feedbacksAtuais.length == 1
+        ? "1 feedback"
+        : feedbacksAtuais.length + " feedbacks";
+
+    mostrarEstado("lista");
+}
+
+
+    // ----- Visualização detalhada -----
+
+    function abrirDetalhe(idFeedback) {
+        esconderAviso();
+
+        fetch("/feedbacks/roteirista/" + idUsuario + "/" + idFeedback, { cache: "no-store" })
+            .then(function (resposta) {
+                if (resposta.ok) {
+                    return resposta.json();
+                }
+
+                return lerErro(resposta, "Erro ao buscar o feedback.");
+            })
+            .then(function (corpo) {
+                var feedback = corpo.feedback;
+
+                document.getElementById("detalhe-titulo").textContent =
+                    feedback.titulo_publicacao || "Publicação sem título";
+                document.getElementById("detalhe-publicacao").textContent =
+                    feedback.titulo_publicacao || "";
+                document.getElementById("detalhe-produtor").textContent =
+                    feedback.nome_produtor || "";
+                document.getElementById("detalhe-data").textContent =
+                    formatarData(feedback.criado_em);
+                document.getElementById("detalhe-texto").textContent =
+                    feedback.texto || "";
+
+                telaLista.hidden = true;
+                telaDetalhe.hidden = false;
+
+                document.getElementById("detalhe-titulo").focus();
+            })
+            .catch(function (erro) {
+                console.error("Erro ao abrir feedback: " + erro.message);
+                mostrarAviso(erro.message);
+
+                // O feedback pode ter sido removido: recarrega a lista
+                obterFeedbacks();
+            });
+    }
+
+    function voltarParaLista() {
+        telaDetalhe.hidden = true;
+        telaLista.hidden = false;
+    }
+
+
+    // ----- Sininho (notificações por e-mail) -----
+
+    function desenharSino(ativo) {
+        sinoPainel.classList.toggle("sino-ativo", ativo);
+        sinoBotao.setAttribute("aria-checked", ativo ? "true" : "false");
+
+        sinoEstado.textContent = ativo ? "Ativado" : "Desativado";
+
+        sinoStatus.textContent = ativo
+            ? "Você optou por receber notificações por e-mail."
+            : "Você optou por não receber notificações por e-mail.";
+    }
+
+    function obterNotificacao() {
+        fetch("/feedbacks/roteirista/" + idUsuario + "/notificacao", { cache: "no-store" })
+            .then(function (resposta) {
+                if (resposta.ok) {
+                    return resposta.json();
+                }
+
+                return lerErro(resposta, "Erro ao buscar a preferência de notificação.");
+            })
+            .then(function (corpo) {
+                desenharSino(corpo.notificacao);
+                sinoBotao.disabled = false;
+            })
+            .catch(function (erro) {
+                console.error("Erro ao obter notificação: " + erro.message);
+                sinoMensagem.textContent = "Não foi possível carregar a sua preferência de notificação.";
+            });
+    }
+
+    function alternarSino() {
+        var estavaAtivo = sinoBotao.getAttribute("aria-checked") == "true";
+        var novoValor = !estavaAtivo;
+
+        sinoBotao.disabled = true;
+        sinoMensagem.textContent = "";
+
+        fetch("/feedbacks/roteirista/" + idUsuario + "/notificacao", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ ativo: novoValor })
+        })
+            .then(function (resposta) {
+                if (resposta.ok) {
+                    return resposta.json();
+                }
+
+                return lerErro(resposta, "Não foi possível atualizar as notificações.");
+            })
+            .then(function (corpo) {
+                // Só muda a tela depois que o banco confirmou
+                desenharSino(corpo.notificacao);
+                sinoMensagem.textContent = corpo.mensagem;
+            })
+            .catch(function (erro) {
+                console.error("Erro ao atualizar notificação: " + erro.message);
+                desenharSino(estavaAtivo);
+                sinoMensagem.textContent = "Não foi possível atualizar as notificações. Tente novamente.";
+            })
+            .finally(function () {
+                sinoBotao.disabled = false;
+            });
+    }
+
+
+    // ----- Eventos -----
+
+    document.getElementById("btn-tentar-novamente")
+        .addEventListener("click", obterFeedbacks);
+
+    document.getElementById("btn-voltar")
+        .addEventListener("click", voltarParaLista);
+
+    sinoBotao.addEventListener("click", alternarSino);
+
+
+    // ----- Inicialização -----
+
+    preencherUsuario();
+
+    if (ehProdutor) {
+        // O sininho é só do roteirista
+        sinoPainel.hidden = true;
+    } else {
+        sinoBotao.disabled = true;
+        obterNotificacao();
+    }
+
+    obterFeedbacks();
+</script>

@@ -1,9 +1,5 @@
 -- MySQL Workbench Forward Engineering
 
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
-
 -- -----------------------------------------------------
 -- Schema mydb
 -- -----------------------------------------------------
@@ -275,6 +271,144 @@ ALTER TABLE usuario ADD COLUMN notificacao TINYINT;
 ALTER TABLE token ADD COLUMN email_destinatario VARCHAR(255);
 ALTER TABLE feedback ADD COLUMN autor_id INT NOT NULL;
 ALTER TABLE feedback ADD CONSTRAINT fk_feedback_usuario FOREIGN KEY (autor_id) REFERENCES usuario(id);
+ALTER TABLE feedback DROP COLUMN status_enviado;
+ALTER TABLE feedback ADD COLUMN status TINYINT NOT NULL;
+ALTER TABLE feedback ADD COLUMN criado_em  DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL;
+
+
+CREATE VIEW vw_emails_pendentes AS
+SELECT 
+    t.id AS id_token,
+    NULL AS id_feedback,
+    e.nome AS nome_empresa,
+    NULL AS nome_produtor,
+    NULL AS nome_roteirista,
+    'TOKEN' AS tipo,
+    t.status_enviado,
+    t.email_destinatario,
+    t.codigo AS codigo,
+    t.expiracao AS expiracao,
+    NULL AS texto_feedback,
+    NULL AS notificacao
+FROM token t
+INNER JOIN empresa e ON t.id_empresa = e.id
+
+UNION ALL
+
+SELECT 
+    NULL AS id_token,
+    f.id AS id_feedback,
+    e.nome AS nome_empresa,
+    produtor.nome AS nome_produtor,
+    roteirista.nome AS nome_roteirista,
+    'FEEDBACK' AS tipo,
+    f.status,
+    roteirista.email AS email_destinatario, 
+    NULL AS codigo,
+    NULL AS expiracao,     
+    f.texto AS texto_feedback,
+    roteirista.notificacao AS notificacao
+FROM feedback f
+INNER JOIN publicacao p ON f.publicacao_id = p.id
+INNER JOIN usuario roteirista ON p.usuario_id = roteirista.id
+INNER JOIN usuario produtor ON f.autor_id = produtor.id
+INNER JOIN empresa e ON produtor.id_empresa = e.id;
+
+
+
+
+-- PROJETO → USUARIO
+ALTER TABLE projeto
+DROP FOREIGN KEY fk_projeto_usuario;
+
+ALTER TABLE projeto
+ADD CONSTRAINT fk_projeto_usuario
+FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+ON DELETE CASCADE;
+
+
+-- OBSERVACAO → PROJETO
+ALTER TABLE observacao
+DROP FOREIGN KEY fk_observacoes_projeto;
+
+ALTER TABLE observacao
+ADD CONSTRAINT fk_observacoes_projeto
+FOREIGN KEY (projeto_id) REFERENCES projeto(id)
+ON DELETE CASCADE;
+
+
+-- PUBLICACAO → PROJETO
+ALTER TABLE publicacao
+DROP FOREIGN KEY fk_publicacao_projeto;
+
+ALTER TABLE publicacao
+ADD CONSTRAINT fk_publicacao_projeto
+FOREIGN KEY (projeto_id) REFERENCES projeto(id)
+ON DELETE CASCADE;
+
+
+-- PUBLICACAO → USUARIO
+ALTER TABLE publicacao
+DROP FOREIGN KEY fk_publicacao_usuario;
+
+ALTER TABLE publicacao
+ADD CONSTRAINT fk_publicacao_usuario
+FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+ON DELETE CASCADE;
+
+
+-- PUBLICACAO_OBSERVACAO → PUBLICACAO
+ALTER TABLE publicacao_observacao
+DROP FOREIGN KEY fk_publicacao_obs;
+
+ALTER TABLE publicacao_observacao
+ADD CONSTRAINT fk_publicacao_obs
+FOREIGN KEY (id_publicacao) REFERENCES publicacao(id)
+ON DELETE CASCADE;
+
+-- PUBLICACAO_OBSERVACAO → OBSERVACAO
+ALTER TABLE publicacao_observacao
+DROP FOREIGN KEY fk_obs_publicacao;
+
+ALTER TABLE publicacao_observacao
+ADD CONSTRAINT fk_obs_publicacao
+FOREIGN KEY (id_observacao) REFERENCES observacao(id)
+ON DELETE CASCADE;
+
+
+-- RELATORIO → USUARIO
+ALTER TABLE relatorio
+DROP FOREIGN KEY fk_relatorios_usuario;
+
+ALTER TABLE relatorio
+ADD CONSTRAINT fk_relatorios_usuario
+FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+ON DELETE CASCADE;
+
+
+-- FEEDBACK → PUBLICACAO
+ALTER TABLE feedback
+DROP FOREIGN KEY fk_publicacao_feedback;
+
+ALTER TABLE feedback
+ADD CONSTRAINT fk_publicacao_feedback
+FOREIGN KEY (publicacao_id) REFERENCES publicacao(id)
+ON DELETE CASCADE;
+
+
+-- FEEDBACK → USUARIO (AUTOR)
+ALTER TABLE feedback
+DROP FOREIGN KEY fk_feedback_usuario;
+
+ALTER TABLE feedback
+ADD CONSTRAINT fk_feedback_usuario
+FOREIGN KEY (autor_id) REFERENCES usuario(id)
+ON DELETE CASCADE;
+
+
+
+
+
 
 CREATE VIEW vw_emails_pendentes AS
 SELECT 
