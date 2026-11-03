@@ -284,7 +284,7 @@ SELECT
     NULL AS nome_produtor,
     NULL AS nome_roteirista,
     'TOKEN' AS tipo,
-    t.status_enviado,
+    t.status_enviado AS status_enviado,
     t.email_destinatario,
     t.codigo AS codigo,
     t.expiracao AS expiracao,
@@ -302,7 +302,7 @@ SELECT
     produtor.nome AS nome_produtor,
     roteirista.nome AS nome_roteirista,
     'FEEDBACK' AS tipo,
-    f.status,
+    f.status AS status_enviado,
     roteirista.email AS email_destinatario, 
     NULL AS codigo,
     NULL AS expiracao,     
@@ -409,6 +409,44 @@ ON DELETE CASCADE;
 
 
 
+
+CREATE VIEW vw_emails_pendentes AS
+SELECT 
+    t.id AS id_token,
+    NULL AS id_feedback,
+    e.nome AS nome_empresa,
+    NULL AS nome_produtor,
+    NULL AS nome_roteirista,
+    'TOKEN' AS tipo,
+    t.status_enviado,
+    t.email_destinatario,
+    t.codigo AS codigo,
+    t.expiracao AS expiracao,
+    NULL AS texto_feedback,
+    NULL AS notificacao
+FROM token t
+INNER JOIN empresa e ON t.id_empresa = e.id
+
+UNION ALL
+
+SELECT 
+    NULL AS id_token,
+    f.id AS id_feedback,
+    e.nome AS nome_empresa,
+    produtor.nome AS nome_produtor,
+    roteirista.nome AS nome_roteirista,
+    'FEEDBACK' AS tipo,
+    f.status_enviado,
+    roteirista.email AS email_destinatario, 
+    NULL AS codigo,
+    NULL AS expiracao,     
+    f.texto AS texto_feedback,
+    roteirista.notificacao AS notificacao
+FROM feedback f
+INNER JOIN publicacao p ON f.publicacao_id = p.id
+INNER JOIN usuario roteirista ON p.usuario_id = roteirista.id
+INNER JOIN usuario produtor ON f.autor_id = produtor.id
+INNER JOIN empresa e ON produtor.id_empresa = e.id;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
