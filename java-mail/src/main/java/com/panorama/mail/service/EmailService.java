@@ -34,6 +34,7 @@ public class EmailService {
         });
 
         String tipo = pendenciaEmailEnvio.getTipo();
+        Integer status = pendenciaEmailEnvio.getStatus();
 
 
         if (tipo.equals("TOKEN")){
@@ -63,38 +64,67 @@ public class EmailService {
 
             tokenDao.marcarComoEnviado(token.getToken());
         }else if(tipo.equals("FEEDBACK")){
-            FeedbackDao feedbackDao = new FeedbackDao();
 
-            Usuario produtor = pendenciaEmailEnvio.getProdutor();
-            Usuario roteirista = pendenciaEmailEnvio.getRoteirista();
-            Feedback feedback = pendenciaEmailEnvio.getFeedback();
-            Empresa empresa = pendenciaEmailEnvio.getEmpresa();
-            Token token = pendenciaEmailEnvio.getToken();
+            if(status.equals(2)){
+                FeedbackDao feedbackDao = new FeedbackDao();
 
-            EmailMessage emailMessage = new EmailMessage(
-                    "Um produtor da sua empresa te mandou um feedback",
-                    "Olá! Acesse o site para ver o feedback"
-            );
+                Usuario produtor = pendenciaEmailEnvio.getProdutor();
+                Usuario roteirista = pendenciaEmailEnvio.getRoteirista();
+                Feedback feedback = pendenciaEmailEnvio.getFeedback();
+                Empresa empresa = pendenciaEmailEnvio.getEmpresa();
 
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(config.getUsername()));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(roteirista.getEmail()));
-            message.setSubject(emailMessage.getSubject());
+                EmailMessage emailMessage = new EmailMessage(
+                        "Um produtor da sua empresa te mandou um feedback",
+                        "Olá! Acesse o site para ver o feedback"
+                );
 
-
-            String htmlContent = htmlFeedback(roteirista,produtor,feedback,empresa);
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(config.getUsername()));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(roteirista.getEmail()));
+                message.setSubject(emailMessage.getSubject());
 
 
-            message.setContent(htmlContent, "text/html; charset=utf-8");
+                String htmlContent = htmlFeedback(roteirista,produtor,empresa);
 
-            Transport.send(message);
 
-            feedbackDao.marcarComoEnviado(feedback.getId());
+                message.setContent(htmlContent, "text/html; charset=utf-8");
+
+                Transport.send(message);
+
+                feedbackDao.marcarComoEnviado(feedback.getId());
+            } else if(status.equals(3)){
+                FeedbackDao feedbackDao = new FeedbackDao();
+
+                Usuario produtor = pendenciaEmailEnvio.getProdutor();
+                Usuario roteirista = pendenciaEmailEnvio.getRoteirista();
+                Feedback feedback = pendenciaEmailEnvio.getFeedback();
+                Empresa empresa = pendenciaEmailEnvio.getEmpresa();
+
+                EmailMessage emailMessage = new EmailMessage(
+                        "Um produtor da sua empresa te editou um feedback",
+                        "Olá! Acesse o site para ver o feedback editado"
+                );
+
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(config.getUsername()));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(roteirista.getEmail()));
+                message.setSubject(emailMessage.getSubject());
+
+
+                String htmlContent = htmlFeedbackEditado(roteirista,produtor,empresa);
+
+
+                message.setContent(htmlContent, "text/html; charset=utf-8");
+
+                Transport.send(message);
+
+                feedbackDao.marcarComoEnviado(feedback.getId());
+            }
         }
 
     }
 
-    public String htmlFeedback(Usuario roteirista, Usuario produtor, Feedback feedback, Empresa empresa){
+    public String htmlFeedback(Usuario roteirista, Usuario produtor, Empresa empresa){
         return "<div style=\"background-color: #0b0b0b; padding: 30px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e0e0e0;\">" +
                 "<table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"background-color: #141414; border: 1px solid #222222; border-radius: 8px; overflow: hidden;\">" +
 
@@ -117,6 +147,51 @@ public class EmailService {
 
                 "<p style=\"color: #888888; font-size: 13px; margin-top: 30px; margin-bottom: 10px;\">" +
                 "Acesse a plataforma <strong>Panorama</strong> para conferir os detalhes e interagir." +
+                "</p>" +
+                "<p style=\"color: #777777; font-size: 13px; margin: 0; line-height: 1.4;\">" +
+                "Esta é uma mensagem automática, por favor não responda a este e-mail." +
+                "</p>" +
+
+                "</td>" +
+                "</tr>" +
+
+                // <!-- RODAPÉ -->
+                "<tr>" +
+                "<td align=\"center\" style=\"background-color: #000000; padding: 20px; border-top: 1px solid #222222;\">" +
+                "<p style=\"color: #666666; font-size: 12px; margin: 0;\">" +
+                "© 2026 Panorama. Todos os direitos reservados." +
+                "</p>" +
+                "</td>" +
+                "</tr>" +
+
+                "</table>" +
+                "</div>";
+    }
+
+
+    public String htmlFeedbackEditado(Usuario roteirista, Usuario produtor, Empresa empresa){
+        return "<div style=\"background-color: #0b0b0b; padding: 30px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e0e0e0;\">" +
+                "<table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"background-color: #141414; border: 1px solid #222222; border-radius: 8px; overflow: hidden;\">" +
+
+                // <!-- CABEÇALHO -->
+                "<tr>" +
+                "<td align=\"center\" style=\"background-color: #000000; padding: 25px 20px; border-bottom: 3px solid #e50914;\">" +
+                "<h1 style=\"color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 2px; text-transform: uppercase;\">" +
+                "Panorama" +
+                "</h1>" +
+                "</td>" +
+                "</tr>" +
+
+                // <!-- CONTEÚDO PRINCIPAL -->
+                "<tr>" +
+                "<td style=\"padding: 40px 30px; background-color: #141414; text-align: center;\">" +
+                "<h2 style=\"color: #ffffff; font-size: 20px; margin-top: 0; margin-bottom: 10px;\">Feedback Editado</h2>" +
+                "<p style=\"color: #b3b3b3; font-size: 15px; line-height: 1.5; margin-top: 0; margin-bottom: 30px;\">" +
+                "Olá, <strong>" + roteirista.getNome() + "</strong>! A empresa <strong>" + empresa.getNome() + "</strong> informou que o feedback feito pelo produtor <strong>" + produtor.getNome() + "</strong> na sua publicação foi atualizado." +
+                "</p>" +
+
+                "<p style=\"color: #888888; font-size: 13px; margin-top: 30px; margin-bottom: 10px;\">" +
+                "Acesse diretamente a plataforma <strong>Panorama</strong> para conferir as alterações." +
                 "</p>" +
                 "<p style=\"color: #777777; font-size: 13px; margin: 0; line-height: 1.4;\">" +
                 "Esta é uma mensagem automática, por favor não responda a este e-mail." +

@@ -47,11 +47,13 @@ public class EmailDao {
             String codigoToken = rs.getString("codigo");
             Timestamp expiracaoTs = rs.getTimestamp("expiracao");
 
+            Integer status = rs.getInt("status_enviado");
+
             if (codigoToken != null) {
                 LocalDateTime expiracao = (expiracaoTs != null) ? expiracaoTs.toLocalDateTime() : null;
                 token = new Token(codigoToken, expiracao);
             }
-            return new PendenciaEmailEnvio(tipo,empresa,produtor,roteirista,feedback,token);
+            return new PendenciaEmailEnvio(tipo,status,empresa,produtor,roteirista,feedback,token);
 
         });
     }

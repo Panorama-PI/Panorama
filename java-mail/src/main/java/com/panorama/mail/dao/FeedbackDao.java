@@ -10,7 +10,7 @@ public class FeedbackDao {
 
     public void marcarComoEnviado(Integer id){
         String sql = """
-                UPDATE feedback SET status_enviado = 1 WHERE id = ?;
+                UPDATE feedback SET status = 1 WHERE id = ?;
         """;
 
         jdbcTemplate.update(sql, id);

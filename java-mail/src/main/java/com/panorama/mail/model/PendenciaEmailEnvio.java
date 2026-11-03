@@ -2,14 +2,16 @@ package com.panorama.mail.model;
 
 public class PendenciaEmailEnvio {
     private String tipo;
+    private Integer status;
     private Empresa empresa;
     private Usuario produtor;
     private Usuario roteirista;
     private Feedback feedback;
     private Token token;
 
-    public PendenciaEmailEnvio(String tipo, Empresa empresa, Usuario produtor, Usuario roteirista, Feedback feedback, Token token) {
+    public PendenciaEmailEnvio(String tipo, Integer status, Empresa empresa, Usuario produtor, Usuario roteirista, Feedback feedback, Token token) {
         this.tipo = tipo;
+        this.status = status;
         this.empresa = empresa;
         this.produtor = produtor;
         this.roteirista = roteirista;
@@ -63,5 +65,13 @@ public class PendenciaEmailEnvio {
 
     public void setFeedback(Feedback feedback) {
         this.feedback = feedback;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }
