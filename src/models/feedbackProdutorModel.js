@@ -1,4 +1,3 @@
-
 var database = require("../database/config");
 
 function listarFeedbacks(idProdutor) {
@@ -8,6 +7,7 @@ function listarFeedbacks(idProdutor) {
         SELECT
             f.id,
             f.texto,
+            f.status,
             f.publicacao_id AS idPublicacao,
             p.titulo,
             u.nome AS roteirista
@@ -33,6 +33,7 @@ function buscarFeedback(idFeedback, idProdutor) {
         SELECT
             f.id,
             f.texto,
+            f.status,
             f.publicacao_id AS idPublicacao,
             p.titulo,
             u.nome AS roteirista
@@ -84,14 +85,14 @@ function cadastrarFeedback(idProdutor, idPublicacao, texto) {
     let sql = `
         INSERT INTO feedback (
             texto,
-            status_enviado,
+            status,
             publicacao_id,
             autor_id
         )
         SELECT
             '${texto}',
             CASE
-                WHEN roteirista.notificacao = 1 THEN 0
+                WHEN roteirista.notificacao = 1 THEN 2
                 ELSE 1
             END,
             p.id,
@@ -129,8 +130,8 @@ function editarFeedback(idFeedback, idProdutor, texto) {
             ON f.autor_id = produtor.id
         SET
             f.texto = '${texto}',
-            f.status_enviado = CASE
-                WHEN roteirista.notificacao = 1 THEN 0
+            f.status = CASE
+                WHEN roteirista.notificacao = 1 THEN 3
                 ELSE 1
             END
         WHERE f.id = ${idFeedback}
