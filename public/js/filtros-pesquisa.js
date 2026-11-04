@@ -16,9 +16,10 @@ var tituloTabela = document.getElementById("titulo");
 
 var usuarioId = sessionStorage.ID_USUARIO;
 
-if (typeof preencherUsuario == "function") {
-    preencherUsuario();
-}
+// Chama a função que preenche a side bar
+if (typeof preencherUsuario === "function") {
+        preencherUsuario();
+    }
 
 document.getElementById("filtro-lucro-container").style.display =
     tipoVisao == "produtor" ? "block" : "none";
@@ -412,6 +413,13 @@ function excluirFiltro(idFiltro) {
         console.log(erro);
         alert("Erro ao excluir o filtro.");
     });
+}
+
+function preencherUsuario() {
+    const nome = sessionStorage.NOME_USUARIO;
+    const email = sessionStorage.EMAIL_USUARIO;
+    if (nome) document.getElementById('a_usuario').innerHTML = nome;
+    if (email) document.getElementById('c_email').innerHTML = email;
 }
 
 function limpar_pesquisa() {

@@ -28,6 +28,7 @@ const containerInfos = document.querySelector(".informacoes");
 ========================= */
 
 // evita que um nome com HTML dentro quebre (ou ataque) a página
+// Chama a função que preenche a side bar
 function escapar(texto) {
     const div = document.createElement("div");
     div.textContent = texto === null || texto === undefined ? "" : texto;
@@ -290,3 +291,16 @@ function limparSessao() {
     sessionStorage.clear();
     window.location.replace("login.html");
 }
+if (typeof preencherUsuario === "function") {
+        preencherUsuario();
+    }
+function preencherUsuario() {
+        document.getElementById("a_usuario").textContent =
+            sessionStorage.NOME_USUARIO || "Usuário";
+
+        document.getElementById("c_email").textContent =
+            sessionStorage.EMAIL_USUARIO || "";
+
+        document.getElementById("b_cargo").textContent =
+            ehProdutor ? "Produtor" : "Roteirista";
+    }

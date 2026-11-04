@@ -1,3 +1,8 @@
+// Chama a função que preenche a side bar
+if (typeof preencherUsuario === "function") {
+        preencherUsuario();
+    }
+
 // Lista de publicações carregadas do banco de dados
 var dadosPublicacoes = [];
 
@@ -353,6 +358,13 @@ window.abrirModal = abrirModal;
 window.fecharModal = fecharModal;
 window.fecharModalExterno = fecharModalExterno;
 
+
+function preencherUsuario() {
+    const nome = sessionStorage.NOME_USUARIO;
+    const email = sessionStorage.EMAIL_USUARIO;
+    if (nome) document.getElementById('a_usuario').innerHTML = nome;
+    if (email) document.getElementById('c_email').innerHTML = email;
+}
 // Inicia quando o documento estiver carregado
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", inicializar);
