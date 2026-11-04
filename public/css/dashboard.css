@@ -88,8 +88,10 @@ body {
   img {
     height: clamp(1.1rem, 2.6vh, 1.5rem);
     padding-right: 0.5rem;
+    filter: grayscale(100%) brightness(0.7);
   }
 }
+
 
 .btns-side a.active {
   background-color: #FF383C;
