@@ -1,37 +1,30 @@
 var database = require("../database/config");
 
-function buscarPublicacoes(idEmpresa){
-    console.log(
-            "ACESSEI O PUBLICACOES MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n" +
-            " \t\t >> verifique suas credenciais de acesso ao banco\n" +
-            " \t\t >> e se o servidor de seu BD está rodando corretamente. \n\n" +
-            " function buscarPublicacoes(): ", 
-            idEmpresa
-    );
+function buscarPublicacoes(idEmpresa) {
+    console.log("ACESSEI O PUBLICACOES MODEL \n function buscarPublicacoes(): ", idEmpresa);
 
     let sql = `
         SELECT 
+            p.id,
             p.titulo,
             p.descricao,
+            DATE_FORMAT(p.criado_em, '%Y-%m-%d') AS data,
             p.criado_em,
-            p.atualizado_em
+            u.nome AS roteirista,
+            proj.nome AS nome_projeto
         FROM
             publicacao AS p
         INNER JOIN usuario AS u ON u.id = p.usuario_id
-        WHERE p.id_empresa = ${idEmpresa};
+        LEFT JOIN projeto AS proj ON proj.id = p.projeto_id
+        WHERE u.id_empresa = ${idEmpresa}
+        ORDER BY p.criado_em DESC;
     `;
 
     return database.executar(sql);
 }
 
-function buscarPublicacoes(idEmpresa){
-    console.log(
-            "ACESSEI O PUBLICACOES MODEL \n \n\t\t >> Se aqui der erro de 'Error: connect ECONNREFUSED',\n" +
-            " \t\t >> verifique suas credenciais de acesso ao banco\n" +
-            " \t\t >> e se o servidor de seu BD está rodando corretamente. \n\n" +
-            " function buscarPublicacoes(): ", 
-            idEmpresa
-    );
+function buscarPublicacoesAnotacoes(idPublicacao) {
+    console.log("ACESSEI O PUBLICACOES MODEL \n function buscarPublicacoesAnotacoes(): ", idPublicacao);
 
     let sql = `
         SELECT 
@@ -52,12 +45,27 @@ function buscarPublicacoes(idEmpresa){
         LEFT JOIN publicacao_observacao po ON pub.id = po.id_publicacao
         LEFT JOIN observacao obs ON po.id_observacao = obs.id
         LEFT JOIN usuario u_obs ON proj.usuario_id = u_obs.id
-        WHERE pub.id = ?;
+        WHERE pub.id = ${idPublicacao};
     `;
 
-    database.executar(sql);
+    return database.executar(sql);
+}
+
+function buscarRoteiristas(idEmpresa) {
+    console.log("ACESSEI O PUBLICACOES MODEL \n function buscarRoteiristas(): ", idEmpresa);
+
+    let sql = `
+        SELECT DISTINCT u.id, u.nome
+        FROM usuario u
+        WHERE u.id_empresa = ${idEmpresa} AND u.perfil_id = 2
+        ORDER BY u.nome;
+    `;
+
+    return database.executar(sql);
 }
 
 module.exports = {
-    buscarPublicacoes
-}
+    buscarPublicacoes,
+    buscarPublicacoesAnotacoes,
+    buscarRoteiristas
+};

@@ -64,13 +64,16 @@ async function cadastrar(dados) {
 // }
   
 
-// Busca uma empresa pelo ID.
-// Essa função será utilizada posteriormente.
-// function buscarPorId(id) {
-//    var instrucaoSql = `
-//      SELECT * FROM empresa 
-//      WHERE id = '${id}'
-//    `;
+function buscarPorId(idEmpresa) {
+    return database.executarTransacao(async function ({ query }) {
+        return await query(
+            `SELECT id, nome, cnpj, telefone
+             FROM empresa
+             WHERE id = ?`,
+            [idEmpresa]
+        );
+    });
+}
   
 //    return database.executar(instrucaoSql);
 // }
@@ -93,5 +96,6 @@ module.exports = {
   // buscarPorCnpj,
   // buscarPorId,
   cadastrar,
-  listar
+  listar,
+  buscarPorId
 };

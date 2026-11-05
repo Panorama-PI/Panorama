@@ -113,8 +113,8 @@ body.body-anotacoes {
     align-items: center;
 
     width: 15rem;
-    margin: 0.5rem;
-    padding: 0.8rem;
+    margin: clamp(0.15rem, 0.7vh, 0.5rem) 0.5rem;
+    padding: clamp(0.4rem, 1.2vh, 0.8rem);
 
     border: 1px solid transparent;
     border-radius: 20px;
@@ -122,7 +122,7 @@ body.body-anotacoes {
     color: var(--cor-cinza-claro);
     background: var(--cor-fundo-side);
 
-    font-size: 1.2rem;
+    font-size: clamp(0.95rem, 2.4vh, 1.2rem);
     text-align: left;
     cursor: pointer;
 
@@ -134,8 +134,8 @@ body.body-anotacoes {
 
 .btns-side a img {
     flex-shrink: 0;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: clamp(1.1rem, 2.6vh, 1.5rem);
+    height: clamp(1.1rem, 2.6vh, 1.5rem);
     margin-right: 0.5rem;
     object-fit: contain;
 }

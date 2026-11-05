@@ -12,7 +12,7 @@
     <script src="../../js/sessao.js"></script>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../js/dashboard.js"></script>
@@ -25,19 +25,20 @@
     <aside class="aside-left">
 
         <div class="usuario-side">
-            <img src="../../assets/imgs/matheus.jpg" alt="Foto do usuário">
+            <img src="../../assets/imgs/foto-usuario.png" alt="Foto do usuário">
             <h2 id="a_usuario">Usuário</h2>
             <h3 id="b_produtor">Roteirista</h3>
             <h4 id="c_email">email@gmail.com</h4>
         </div>
 
         <div class="btns-side">
-            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
             <a href="./dashboard-geral.html" class="active"><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
             <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
-            <a href="./anotacoes.html"><img src="../../assets/icon/observacoes-icon.png" alt="">Observações</a>
+            <a href="./anotacoes.html"><img src="../../assets/icon/observacoes-icon.png" alt="">Anotações</a>
             <a href="./pesquisa.html"><img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa</a>
             <a href="./publicacoes.html"><img src="../../assets/icon/publicacao.png" alt="">Publicações</a>
+            <a href="./feedbacks.html"><img src="../../assets/icon/mail-icon.png" alt="">Feedbacks</a>
+            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Sair</a>
         </div>
 
     </aside>
@@ -45,7 +46,7 @@
     <main class="dash">
 
         <section class="filter">
-            <h2>Dashboard de Roteirista - Visão Geral</h2>
+            <h2>Dashboard de Roteirista - Visão Geral &nbsp; (1903-2023)</h2>
         </section>
 
         <!-- KPIs gerais -->
@@ -55,13 +56,13 @@
             <div class="card kpi-card">
                 <p>Gênero com melhor média de avaliações</p>
                 <h2>Romance</h2>
-                <span id="melhor-genero">Nota média: 8,4</span>
+                <span id="melhor-genero">Nota média: 84</span>
             </div>
 
             <div class="card kpi-card">
                 <p>País com melhor média de avaliações</p>
                 <h2>Estados Unidos</h2>
-                <span id="melhor-pais">Nota média: 8,2</span>
+                <span id="melhor-pais">Nota média: 82</span>
             </div>
 
             <div class="card kpi-card">
@@ -120,13 +121,98 @@
      * ORDER BY media_avaliacao DESC;
      */
 
+     // Plugin de linha de média para todos os gráficos
+const pluginMedia = {
+    id: 'pluginMedia',
+
+    afterDraw(chart) {
+
+        const valores = chart.data.datasets[0].data;
+
+        if (!valores || valores.length === 0) return;
+
+        let soma = 0;
+        let quantidade = 0;
+
+        for (let i = 0; i < valores.length; i++) {
+            if (typeof valores[i] === 'number') {
+                soma += valores[i];
+                quantidade++;
+            }
+        }
+
+        if (quantidade === 0) return;
+
+        const media = soma / quantidade;
+
+        const ctx = chart.ctx;
+        const area = chart.chartArea;
+
+        // Identifica a orientação do gráfico
+        const horizontal = chart.config.type === 'bar' &&
+            chart.options.indexAxis === 'y';
+
+        // Identifica o valor da média no eixo
+        const posicao = horizontal
+            ? chart.scales.x.getPixelForValue(media)
+            : chart.scales.y.getPixelForValue(media);
+
+        // Formatação do valor conforme o gráfico
+        let sufixo = '';
+
+        if (chart.canvas.id === 'chartLucroGenero') sufixo = 'B';
+        if (chart.canvas.id === 'chartRoiGenero') sufixo = 'x';
+        if (chart.canvas.id === 'chartTaxaSucesso') sufixo = '%';
+        if (chart.canvas.id === 'chartOrcamentoGenero') sufixo = 'M';
+        if (chart.canvas.id === 'chartPeriodoGeral') sufixo = 'M';
+
+        const texto = `Média: ${media.toFixed(1).replace('.', ',')}${sufixo}`;
+
+        ctx.save();
+
+        // Desenha a linha verde pontilhada
+        ctx.beginPath();
+        ctx.setLineDash([6, 5]);
+        ctx.strokeStyle = '#00C853';
+        ctx.lineWidth = 2;
+
+        if (horizontal) {
+            ctx.moveTo(posicao, area.top);
+            ctx.lineTo(posicao, area.bottom);
+        } else {
+            ctx.moveTo(area.left, posicao);
+            ctx.lineTo(area.right, posicao);
+        }
+
+        ctx.stroke();
+
+        // Escreve o valor da média
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#00C853';
+        ctx.font = 'bold 11px Arial';
+
+        if (horizontal) {
+            ctx.textAlign = 'left';
+            ctx.fillText(texto, posicao + 5, area.top + 12);
+        } else {
+            ctx.textAlign = 'left';
+            ctx.fillText(texto, area.left + 5, posicao - 6);
+        }
+
+        ctx.restore();
+    }
+};
+
+// Registra o plugin globalmente
+Chart.register(pluginMedia);
+
     new Chart(document.getElementById('chartAvaliacaoGenero'), {
         type: 'bar',
 
         data: {
             labels: ['Drama', 'Comédia', 'Romance', 'Ficção', 'Ação', 'Terror', 'Aventura'],
             datasets: [{
-                data: [7.1, 7.8, 8.4, 8.1, 7.3, 6.8, 7.9],
+                data: [71, 78, 84, 81, 73, 68, 79],
                 backgroundColor: COR_ROSA_BARRA,
                 borderRadius: { topLeft: 8, topRight: 8 },
                 borderSkipped: false,
@@ -152,7 +238,7 @@
 
                 title: {
                     display: true,
-                    text: 'Avaliação média por gênero',
+                    text: 'Avaliação Média x Gênero',
                     color: '#FFFFFF',
                     font: {
                         size: 16,
@@ -175,9 +261,9 @@
             scales: {
                 y: {
                     min: 0,
-                    max: 10,
+                    max: 100,
                     grid: { color: COR_LINHA_GRID },
-                    ticks: { stepSize: 2,
+                    ticks: {
                         color: '#dfdfdf'
                      }
                 },
@@ -205,15 +291,15 @@
      * ORDER BY media_avaliacao DESC
      * LIMIT 5;
      */
-
+    const formatarNota = (valor) => `${valor.toFixed().replace('.', ',')}`;
     new Chart(document.getElementById('chartAvaliacaoPaisGeral'), {
         type: 'bar',
-
+        plugins:[pluginRotuloFimBarra(formatarNota)],
         data: {
             labels: ['Brasil', 'França', 'Reino Unido', 'Coreia do Sul', 'Estados Unidos'],
 
             datasets: [{
-                data: [7.2, 7.5, 7.7, 8.0, 8.2],
+                data: [72, 75, 77, 80, 82],
 
                 backgroundColor: 'rgba(255, 107, 107, 0.16)',
                 borderColor: COR_ROSA_BARRA,
@@ -231,11 +317,11 @@
 
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Avaliação média por país de origem'),
+                title: tituloGrafico('Avaliação média x País de origem'),
 
                 tooltip: {
                     callbacks: {
-                        label: (ctx) => ` ${ctx.parsed.x.toFixed(1).replace('.', ',')}/10`
+                        label: (ctx) => ` ${ctx.parsed.x.toFixed(1).replace('.', ',')}/100`
                     }
                 }
             },
@@ -243,9 +329,9 @@
             scales: {
                 x: {
                     min: 0,
-                    max: 10,
+                    max: 100,
                     grid: { color: COR_LINHA_GRID },
-                    ticks: { stepSize: 2,
+                    ticks: { 
                         color: '#dfdfdf'
                      }
                 },
@@ -275,16 +361,14 @@
      * Caso os elementos estejam dentro do texto da sinopse,
      * será necessário tratar o texto antes da consulta.
      */
-
+    const formatarQuantidade = (valor) => `${valor.toFixed().replace('.', ',')}x`;
     new Chart(document.getElementById('chartElementosGeral'), {
         type: 'bar',
-
+ plugins:[pluginRotuloFimBarra(formatarQuantidade)],
         data: {
             labels: ['Família', 'Segredo', 'Vingança', 'Amizade', 'Destino', 'Genialidade'],
-
             datasets: [{
                 data: [42, 48, 53, 58, 61, 76],
-
                 /* Barra com fundo fosco e borda */
                 backgroundColor: 'rgba(255, 107, 107, 0.10)',
                 borderColor: COR_ROSA_BARRA,
@@ -302,7 +386,7 @@
 
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Elementos mais frequentes nas sinopses'),
+                title: tituloGrafico('Palavras mais frequentes nas sinopses'),
 
                 tooltip: {
                     callbacks: {
@@ -313,10 +397,13 @@
 
             scales: {
                 x: {
+                    min: 0,
+                    max: 100,
                     grid: { color: COR_LINHA_GRID },
                     ticks: { precision: 0,
                         color: '#dfdfdf'
-                     }
+                     },
+                     title: { display: true, text: 'Quantidade de Aparições (x)', color: '#828282', font: { size: 10 } }
                 },
 
                 y: {

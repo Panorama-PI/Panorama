@@ -1,51 +1,46 @@
 let publicacaoModel = require("../models/publicacaoModel");
 var hora = require("../../public/js/hora");
 
-function buscarPublicacoes(req,res){
+// Importe as classes de erro
+const { BadRequestError, NotFoundError } = require("../errors");
 
+function buscarPublicacoes(req, res, next) { // <-- Adicionado 'next'
     let idEmpresa = req.params.idEmpresa;
 
-    if(!idEmpresa){
-        res.status(400).json({
-            sucesso: false,
-            mensagem: "O parametro 'idEmpresa' é obrigatorio e não pode estar vazio"
-        })
-
-    }else{
-        publicacaoModel.buscarPublicacoes(idEmpresa)
-        .then((resultado)=>{
-            if(resultado){
-                console.log("["+ hora.obterDataHoraFormatada() + "] SUCESSO 200: publicações foram encontradas!");
+    if (!idEmpresa) {
+        // Erro 400 substituído
+        return next(new BadRequestError("O parametro 'idEmpresa' é obrigatorio e não pode estar vazio"));
+    } 
+    
+    publicacaoModel.buscarPublicacoes(idEmpresa)
+        .then((resultado) => {
+            if (resultado) {
+                console.log("[" + hora.obterDataHoraFormatada() + "] SUCESSO 200: publicações foram encontradas!");
                 res.status(200).json({
                     sucesso: true,
                     publicacoes: resultado
                 });
             }
-        }
-        ).catch((erro)=>{
-            console.log("["+ hora.obterDataHoraFormatada() + "] ERRO 500: " + erro)
-            res.status(500).json({
-                sucesso: false,
-                mensagem: "Erro interno no servidor"
-            })
-        }
-        );
-    }
+        })
+        .catch((erro) => {
+            console.log("[" + hora.obterDataHoraFormatada() + "] ERRO ao buscar publicações: " + erro);
+            // Erro 500 repassado
+            next(erro);
+        });
 }
 
-function buscarPublicacoesAnotacoes(req,res){
+function buscarPublicacoesAnotacoes(req, res, next) { // <-- Adicionado 'next'
     let id = req.params.id;
 
-    if(!id){
-        res.status(400).json({
-            sucesso: false,
-            mensagem: "O parametro 'id' é obrigatorio e não pode estar vazio"
-        });
-    }else{
-        publicacaoModel.buscarPublicacoesAnotacoes(id)
-        .then((resultado)=>{
-            if(resultado.length > 0){
-                console.log("["+ hora.obterDataHoraFormatada() + "] SUCESSO 200: As anotações da publicação foram encontradas");
+    if (!id) {
+        // Erro 400 substituído
+        return next(new BadRequestError("O parametro 'id' é obrigatorio e não pode estar vazio"));
+    } 
+    
+    publicacaoModel.buscarPublicacoesAnotacoes(id)
+        .then((resultado) => {
+            if (resultado.length > 0) {
+                console.log("[" + hora.obterDataHoraFormatada() + "] SUCESSO 200: As anotações da publicação foram encontradas");
                 const primeiraLinha = resultado[0];
 
                 const response = {
@@ -74,24 +69,43 @@ function buscarPublicacoesAnotacoes(req,res){
                     sucesso: true,
                     publicacao: response
                 });
-            }else{
-                res.status(404).json({
-                    sucesso: true,
-                    mensagem: "publicação não encontrada"
-                });
+            } else {
+                // Erro 404 substituído
+                return next(new NotFoundError("Publicação não encontrada"));
             }
-        }).catch((erro)=>{
-            console.log("["+ hora.obterDataHoraFormatada() + "] ERRO 500: " + erro)
-            res.status(500).json({
-                sucesso: false,
-                mensagem: "Erro interno no servidor"
-            })
+        })
+        .catch((erro) => {
+            console.log("[" + hora.obterDataHoraFormatada() + "] ERRO ao buscar anotações da publicação: " + erro);
+            // Erro 500 repassado
+            next(erro);
         });
+}
+
+function buscarRoteiristas(req, res, next) { // <-- Adicionado 'next'
+    let idEmpresa = req.query.idEmpresa || req.params.idEmpresa;
+
+    if (!idEmpresa) {
+        // Erro 400 substituído
+        return next(new BadRequestError("O parametro 'idEmpresa' é obrigatorio e não pode estar vazio"));
     }
 
+    publicacaoModel.buscarRoteiristas(idEmpresa)
+        .then((resultado) => {
+            console.log("[" + hora.obterDataHoraFormatada() + "] SUCESSO 200: Roteiristas encontrados!");
+            res.status(200).json({
+                sucesso: true,
+                roteiristas: resultado
+            });
+        })
+        .catch((erro) => {
+            console.log("[" + hora.obterDataHoraFormatada() + "] ERRO ao buscar roteiristas: " + erro);
+            // Erro 500 repassado
+            next(erro);
+        });
 }
 
 module.exports = {
     buscarPublicacoes,
-    buscarPublicacoesAnotacoes
-}
+    buscarPublicacoesAnotacoes,
+    buscarRoteiristas
+};

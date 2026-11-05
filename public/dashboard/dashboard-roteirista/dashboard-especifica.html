@@ -12,10 +12,11 @@
     <script src="../../js/sessao.js"></script>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script src="../../js/dashboard.js"></script>
 
     <!-- Font Awesome -->
@@ -27,7 +28,7 @@
     <aside class="aside-left">
 
         <div class="usuario-side">
-            <img src="../../assets/imgs/matheus.jpg" alt="Foto do usuário">
+            <img src="../../assets/imgs/foto-usuario.png" alt="Foto do usuário">
             <h2 id="a_usuario">Usuário</h2>
             <h3 id="b_produtor">Roteirista</h3>
             <h4 id="c_email">email@gmail.com</h4>
@@ -35,7 +36,6 @@
 
         <div class="btns-side">
             
-            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Home</a>
             <a href="./dashboard-geral.html">
                 <img src="../../assets/icon/chart-icon.png" alt="">Visão Geral
             </a>
@@ -45,13 +45,15 @@
             </a>
 
             <a href="./anotacoes.html">
-                <img src="../../assets/icon/observacoes-icon.png" alt="">Observações
+                <img src="../../assets/icon/observacoes-icon.png" alt="">Anotações
             </a>
 
             <a href="./pesquisa.html">
                 <img src="../../assets/icon/pesquisa-icon.png" alt="">Pesquisa
             </a>
             <a href="./publicacoes.html"><img src="../../assets/icon/publicacao.png" alt="">Publicações</a>
+            <a href="./feedbacks.html"><img src="../../assets/icon/mail-icon.png" alt="">Feedbacks</a>
+            <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Sair</a>
         </div>
 
     </aside>
@@ -60,7 +62,7 @@
 
         <section class="filter">
 
-            <h2>Dashboard de Roteirista - Visão Específica</h2>
+            <h2>Dashboard de Roteirista - Visão Específica &nbsp; (1903-2023)</h2>
 
             <label for="select_genero">
                 Gênero selecionado:
@@ -84,13 +86,13 @@
             <div class="card kpi-card">
                 <p>Percentual de avaliações positivas</p>
                 <h2>72%</h2>
-                <span>avaliação acima de 80%</span>
+                <span>Positivas: Avaliações acima de 80</span>
             </div>
 
             <div class="card kpi-card">
                 <p>País com melhor média de avaliações</p>
                 <h2>Estados Unidos</h2>
-                <span>Nota média: 8,7</span>
+                <span>Nota média: 87</span>
             </div>
 
             <div class="card kpi-card">
@@ -166,13 +168,58 @@
      * LIMIT 5;
      */
 
+     /* Plugin para ancora */
+     const linhaReferencia80 = {
+    id: 'linhaReferencia80',
+
+    afterDraw(chart) {
+        const valores = chart.data.datasets[0].data;
+
+        let soma = 0;
+
+        for (let i = 0; i < valores.length; i++) {
+            soma += valores[i];
+        }
+
+        const media = soma / valores.length;
+
+        const ctx = chart.ctx;
+        const area = chart.chartArea;
+        const y = chart.scales.y.getPixelForValue(media);
+
+        ctx.save();
+
+        // Linha de referência
+        ctx.beginPath();
+        ctx.moveTo(area.left, y);
+        ctx.lineTo(area.right, y);
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#34C759';
+        ctx.setLineDash([6, 4]);
+        ctx.stroke();
+
+        // Legenda da média
+        ctx.fillStyle = '#34C759';
+        ctx.font = "bold 11px 'Barlow', sans-serif";
+        ctx.textAlign = 'left';
+        ctx.fillText(
+            `Média: ${media.toFixed(1).replace('.', ',')}`,
+            area.left + 5,
+            y - 7
+        );
+
+        ctx.restore();
+    }
+};
+
     const chartPaisAvaliacao = new Chart(document.getElementById('chartPaisAvaliacao'), {
         type: 'bar',
 
         data: {
             labels: ['Brasil', 'Canadá', 'Reino Unido', 'Japão', 'Estados Unidos'],
             datasets: [{
-                data: [7.2, 7.6, 8.0, 8.3, 8.7],
+                data: [72, 76, 80, 83, 87],
                 backgroundColor: COR_ROSA_BARRA,
                 borderRadius: { topLeft: 8, topRight: 8 },
                 borderSkipped: false,
@@ -180,13 +227,15 @@
             }]
         },
 
+        plugins: [linhaReferencia80],
+
         options: {
             responsive: true,
             maintainAspectRatio: false,
 
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Avaliação média por país de origem'),
+                title: tituloGrafico('Avaliação média x País de origem'),
                 subtitle: subtituloGrafico(selectGenero.value),
 
                 tooltip: {
@@ -199,9 +248,9 @@
             scales: {
                 y: {
                     min: 0,
-                    max: 10,
+                    max: 100,
                     grid: { color: COR_LINHA_GRID },
-                    ticks: { stepSize: 2,
+                    ticks: {
                           color: '#dfdfdf'
                      }
                 },
@@ -231,10 +280,11 @@
      * ORDER BY quantidade DESC
      * LIMIT 5;
      */
-
+    const formatarPorcentagem = (valor) => `${valor.toFixed().replace('.', ',')}%`;
     const chartGenerosRelacionados = new Chart(document.getElementById('chartGenerosRelacionados'), {
         type: 'bar',
-
+        plugins:[pluginRotuloFimBarra(formatarPorcentagem)],
+        
         data: {
             labels: ['Drama', 'Comédia', 'Terror', 'Ação', 'Aventura'],
             datasets: [{
@@ -253,7 +303,7 @@
 
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Gêneros relacionados'),
+                title: tituloGrafico('Proporção de Gêneros Associados (%) '),
                 subtitle: subtituloGrafico(selectGenero.value),
 
                 tooltip: {
@@ -301,10 +351,10 @@
      * ORDER BY quantidade DESC
      * LIMIT 5;
      */
-
+    const formatarQuantidade = (valor) => `${valor.toFixed().replace('.', ',')}x`;
     const chartElementosSinopse = new Chart(document.getElementById('chartElementosSinopse'), {
         type: 'bar',
-
+        plugins:[pluginRotuloFimBarra(formatarQuantidade)],
         data: {
             labels: ['Curiosidade', 'Investigação', 'Passado', 'Surpresa', 'Genialidade'],
             datasets: [{
@@ -335,11 +385,14 @@
 
             scales: {
                 x: {
+                    min: 0,
+                    max: 100,
                     beginAtZero: true,
                     grid: { color: COR_LINHA_GRID },
                     ticks: { precision: 0,
                         color: '#dfdfdf'
-                     }
+                     },
+                     title: { display: true, text: 'Quantidade de ocorrências nas sinopses', color: '#828282', font: { size: 10 } }
                 },
 
                 y: {
@@ -377,45 +430,60 @@
      * ORDER BY faixa_avaliacao;
      */
 
-    const chartDistribuicaoAvaliacoes = new Chart(document.getElementById('chartDistribuicaoAvaliacoes'), {
-        type: 'doughnut',
+   const chartDistribuicaoAvaliacoes = new Chart(document.getElementById('chartDistribuicaoAvaliacoes'), {
+    type: 'doughnut',
 
-        data: {
-            labels: ['0–20', '21–40', '41–60', '61–80', '81–100'],
-            datasets: [{
-                data: [12, 25, 31, 26, 6],
-                backgroundColor: ['#7C2D35', '#C94F58', COR_ROSA_BARRA, '#FF8585', '#f1a37f'],
-                borderColor: '#27272A',
-                borderWidth: 3
-            }]
-        },
+    data: {
+        labels: ['0–20', '21–40', '41–60', '61–80', '81–100'],
+        datasets: [{
+            data: [12, 25, 31, 26, 6],
+            backgroundColor: ['#7C2D35', '#C94F58', COR_ROSA_BARRA, '#FF8585', '#f1a37f'],
+            borderColor: '#27272A',
+            borderWidth: 3
+        }]
+    },
 
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '62%',
+    // Ativa o plugin nativamente para este gráfico de rosca
+    plugins: [ChartDataLabels],
 
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        color: '#D4D4D8',
-                        padding: 12
-                    }
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '62%',
+
+        plugins: {
+            datalabels: {
+                color: '#FFFFFF',
+                font: {
+                    weight: 'bold',
+                    size: 11
                 },
+                anchor: 'center',
+                align: 'center',
+                formatter: (value) => {
+                    return value > 5 ? `${value}%` : '';
+                }
+            },
 
-                title: tituloGrafico('Distribuição das avaliações'),
-                subtitle: subtituloGrafico(selectGenero.value),
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: '#D4D4D8',
+                    padding: 12
+                }
+            },
 
-                tooltip: {
-                    callbacks: {
-                        label: (ctx) => ` ${ctx.label}: ${ctx.parsed}%`
-                    }
+            title: tituloGrafico('Distribuição das avaliações'),
+            subtitle: subtituloGrafico(selectGenero.value),
+
+            tooltip: {
+                callbacks: {
+                    label: (ctx) => ` ${ctx.label}: ${ctx.parsed}%`
                 }
             }
         }
-    });
-
+    }
+});
 
     /*
      * ============================================================

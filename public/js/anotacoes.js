@@ -26,7 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
     var telaProjetos = document.getElementById("tela-projetos");
     var telaDetalhes = document.getElementById("tela-detalhes");
 
-    if (typeof preencherUsuario === "function") {
+    // Chama a função que preenche a side bar
+if (typeof preencherUsuario === "function") {
         preencherUsuario();
     }
 
@@ -877,6 +878,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 mostrarErro("Erro ao excluir a anotação.", erro);
             });
     }
+    function preencherUsuario() {
+    const nome = sessionStorage.NOME_USUARIO;
+    const email = sessionStorage.EMAIL_USUARIO;
+    if (nome) document.getElementById('a_usuario').innerHTML = nome;
+    if (email) document.getElementById('c_email').innerHTML = email;
+}
 
     // =========================
     // INICIALIZAÇÃO
