@@ -91,7 +91,7 @@
             <div class="card kpi-card">
                 <p>País com melhor média de avaliações</p>
                 <h2>Estados Unidos</h2>
-                <span>Nota média: 8,7</span>
+                <span>Nota média: 87</span>
             </div>
 
             <div class="card kpi-card">
@@ -167,6 +167,32 @@
      * LIMIT 5;
      */
 
+     /* Plugin para ancora */
+     const linhaReferencia80 = {
+    id: 'linhaReferencia80',
+
+    afterDraw(chart) {
+        const { ctx, chartArea, scales } = chart;
+
+        const y = scales.y.getPixelForValue(80);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(chartArea.left, y);
+        ctx.lineTo(chartArea.right, y);
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#34C759';
+        ctx.setLineDash([6, 4]);
+        ctx.stroke();
+
+        ctx.fillStyle = '#34C759';
+        ctx.font = "bold 11px 'Barlow', sans-serif";
+
+        ctx.restore();
+    }
+};
+
     const chartPaisAvaliacao = new Chart(document.getElementById('chartPaisAvaliacao'), {
         type: 'bar',
 
@@ -180,6 +206,8 @@
                 barThickness: 28
             }]
         },
+
+        plugins: [linhaReferencia80],
 
         options: {
             responsive: true,
@@ -202,7 +230,7 @@
                     min: 0,
                     max: 100,
                     grid: { color: COR_LINHA_GRID },
-                    ticks: { stepSize: 2,
+                    ticks: {
                           color: '#dfdfdf'
                      }
                 },
@@ -336,6 +364,8 @@
 
             scales: {
                 x: {
+                    min: 0,
+                    max: 100,
                     beginAtZero: true,
                     grid: { color: COR_LINHA_GRID },
                     ticks: { precision: 0,

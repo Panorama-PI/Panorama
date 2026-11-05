@@ -46,7 +46,7 @@
     <main class="dash">
 
         <section class="filter">
-            <h2>Dashboard de Roteirista - Visão Geral</h2>
+            <h2>Dashboard de Roteirista - Visão Geral &nbsp; (1903-2023)</h2>
         </section>
 
         <!-- KPIs gerais -->
@@ -56,13 +56,13 @@
             <div class="card kpi-card">
                 <p>Gênero com melhor média de avaliações</p>
                 <h2>Romance</h2>
-                <span id="melhor-genero">Nota média: 8,4</span>
+                <span id="melhor-genero">Nota média: 84</span>
             </div>
 
             <div class="card kpi-card">
                 <p>País com melhor média de avaliações</p>
-                <h2>Estados Unidos</h2>
-                <span id="melhor-pais">Nota média: 8,2</span>
+                <h2>EUA</h2>
+                <span id="melhor-pais">Nota média: 82</span>
             </div>
 
             <div class="card kpi-card">
@@ -178,7 +178,7 @@
                     min: 0,
                     max: 100,
                     grid: { color: COR_LINHA_GRID },
-                    ticks: { stepSize: 2,
+                    ticks: {
                         color: '#dfdfdf'
                      }
                 },
@@ -214,7 +214,7 @@
             labels: ['Brasil', 'França', 'Reino Unido', 'Coreia do Sul', 'Estados Unidos'],
 
             datasets: [{
-                data: [7.2, 7.5, 7.7, 8.0, 8.2],
+                data: [72, 75, 77, 80, 82],
 
                 backgroundColor: 'rgba(255, 107, 107, 0.16)',
                 borderColor: COR_ROSA_BARRA,
@@ -244,9 +244,9 @@
             scales: {
                 x: {
                     min: 0,
-                    max: 10,
+                    max: 100,
                     grid: { color: COR_LINHA_GRID },
-                    ticks: { stepSize: 2,
+                    ticks: { 
                         color: '#dfdfdf'
                      }
                 },
@@ -314,6 +314,8 @@
 
             scales: {
                 x: {
+                    min: 0,
+                    max: 100,
                     grid: { color: COR_LINHA_GRID },
                     ticks: { precision: 0,
                         color: '#dfdfdf'
