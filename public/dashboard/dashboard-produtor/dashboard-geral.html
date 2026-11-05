@@ -48,28 +48,30 @@
 
     <main class="dash">
         <section class="filter">
-            <h2>Dashboard Produtor - Visão Geral</h2>
+            <h2>Dashboard Produtor - Visão Geral &nbsp; (1903-2023)</h2>
+            
         </section>
 
         <section class="kpi-cards">
             <div class="card kpi-card">
                 <p>Gênero Mais Lucrativo Geral</p>
                 <h2>Romance</h2>
+                <span id="roi-genero">Soma dos lucros - $ 4,8B</span>
             </div>
             <div class="card kpi-card">
                 <p>Gênero com Maior Retorno (ROI)</p>
                 <h2>Terror</h2>
                 <span id="roi-genero">4,2x o orçamento</span>
             </div>
-            <div class="card kpi-card"> 
+            <div class="card kpi-card">
                 <p>Melhor Mês para Lançar filmes</p> 
                 <h2 id="melhor-mes">Dezembro</h2> 
-                <span id="melhor-mes-lucro">maior lucro médio</span> 
+                <span id="melhor-mes-lucro">Maior lucro médio</span> 
             </div>
             <div class="card kpi-card">
-                <p>Gênero de Maior Risco</p>
+                <p>Gênero de Maior Risco &nbsp;(ROI &nbsp;<&nbsp; 2,5 x)</p>
                 <h2>Ação</h2>
-                <span id="risco-genero">45% dos filmes com prejuízo</span>
+                <span id="risco-genero">45% dos filmes</span>
             </div>
         </section>
 
@@ -109,6 +111,92 @@
     // sem filtro. Ver as consultas sugeridas no comentário de cada gráfico.
 
     // Lucro x Gênero (Quais gêneros estão lucrando mais)
+
+    // Plugin de linha de média para todos os gráficos
+const pluginMedia = {
+    id: 'pluginMedia',
+
+    afterDraw(chart) {
+
+        const valores = chart.data.datasets[0].data;
+
+        if (!valores || valores.length === 0) return;
+
+        let soma = 0;
+        let quantidade = 0;
+
+        for (let i = 0; i < valores.length; i++) {
+            if (typeof valores[i] === 'number') {
+                soma += valores[i];
+                quantidade++;
+            }
+        }
+
+        if (quantidade === 0) return;
+
+        const media = soma / quantidade;
+
+        const ctx = chart.ctx;
+        const area = chart.chartArea;
+
+        // Identifica a orientação do gráfico
+        const horizontal = chart.config.type === 'bar' &&
+            chart.options.indexAxis === 'y';
+
+        // Identifica o valor da média no eixo
+        const posicao = horizontal
+            ? chart.scales.x.getPixelForValue(media)
+            : chart.scales.y.getPixelForValue(media);
+
+        // Formatação do valor conforme o gráfico
+        let sufixo = '';
+
+        if (chart.canvas.id === 'chartLucroGenero') sufixo = 'B';
+        if (chart.canvas.id === 'chartRoiGenero') sufixo = 'x';
+        if (chart.canvas.id === 'chartTaxaSucesso') sufixo = '%';
+        if (chart.canvas.id === 'chartOrcamentoGenero') sufixo = 'M';
+        if (chart.canvas.id === 'chartPeriodoGeral') sufixo = 'M';
+
+        const texto = `Média: ${media.toFixed(1).replace('.', ',')}${sufixo}`;
+
+        ctx.save();
+
+        // Desenha a linha verde pontilhada
+        ctx.beginPath();
+        ctx.setLineDash([6, 5]);
+        ctx.strokeStyle = '#00C853';
+        ctx.lineWidth = 2;
+
+        if (horizontal) {
+            ctx.moveTo(posicao, area.top);
+            ctx.lineTo(posicao, area.bottom);
+        } else {
+            ctx.moveTo(area.left, posicao);
+            ctx.lineTo(area.right, posicao);
+        }
+
+        ctx.stroke();
+
+        // Escreve o valor da média
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#00C853';
+        ctx.font = 'bold 11px Arial';
+
+        if (horizontal) {
+            ctx.textAlign = 'left';
+            ctx.fillText(texto, posicao + 5, area.top + 12);
+        } else {
+            ctx.textAlign = 'left';
+            ctx.fillText(texto, area.left + 5, posicao - 6);
+        }
+
+        ctx.restore();
+    }
+};
+
+// Registra o plugin globalmente
+Chart.register(pluginMedia);
+    
     new Chart(document.getElementById('chartLucroGenero'), {
         type: 'bar',
         data: {
@@ -138,11 +226,11 @@
             },
             scales: {
                 y: {
-                    max: 5.5,
+                    max: 5,
                     grid: { color: COR_LINHA_GRID },
                     ticks: {
                         color: '#dfdfdf',
-                        callback: (value) => value === 0 ? '0' : `R$ ${value}B`
+                        callback: (value) => value === 0 ? '0' : `$ ${value}B`
                     }
                 },
                 x: { 
@@ -205,8 +293,10 @@
     // % de filmes que deram lucro, por gênero (mede risco)
     // SQL: SELECT genero, ROUND(100 * SUM(receita > orcamento) / COUNT(*), 1) AS pct_lucro
     //      FROM filme WHERE orcamento > 0 GROUP BY genero ORDER BY pct_lucro DESC;
+     const formatarPorcentagem = (valor) => `${valor.toFixed(1).replace('.', ',')}%`;
     new Chart(document.getElementById('chartTaxaSucesso'), {
         type: 'bar',
+        plugins:[pluginRotuloFimBarra(formatarPorcentagem)],
         data: {
             labels: ['Ação', 'Drama', 'Ficção', 'Comédia', 'Romance', 'Terror'],
             datasets: [{
@@ -223,7 +313,7 @@
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Gênero x Filmes com Lucro'),
+                title: tituloGrafico('Gênero x % Filmes com Lucro'),
                 datalabels: { display: false }
             },
             scales: {
@@ -233,7 +323,7 @@
                     ticks: { stepSize: 20, callback: (val) => `${val}%`,
                              color: '#dfdfdf',
                      },
-                    title: { display: true, text: '% dos filmes do gênero', color: '#828282', font: { size: 10 } }
+                   
                 },
                 y: { grid: { display: false },
                     ticks: {color: '#dfdfdf'} }
@@ -278,7 +368,7 @@
                     grid: { color: COR_LINHA_GRID },
                     ticks: {
                         stepSize: 20,
-                        callback: (val) => val === 0 ? '0' : `${val}M`,
+                        callback: (val) => val === 0 ? '0' : `$ ${val}M`,
                         color: '#dfdfdf'
                     }
                 },
@@ -297,7 +387,7 @@
         data: {
             labels: ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'],
             datasets: [{
-                data: [2600000000, 2200000000, 1900000000, 2000000000, 2700000000, 3300000000, 3100000000, 2500000000, 2100000000, 2300000000, 2900000000, 3500000000],
+                data: [26, 22, 19, 20 , 27, 33, 25, 21, 23, 29, 35],
                 borderColor: COR_ROSA_BARRA,
                 backgroundColor: COR_ROSA_BARRA,
                 pointRadius: 4,
@@ -319,11 +409,11 @@
             scales: {
                 y: {
                     min: 0,
-                    max: 4000000000,
+                    max: 40,
                     grid: { color: COR_LINHA_GRID },
                     ticks: {
-                        stepSize: 1000000000,
-                        callback: (val) => val.toLocaleString('pt-BR'),
+                    
+                        callback: (val) => "$ "+ val + "M",
                         color: '#dfdfdf',
                     }
                 },
