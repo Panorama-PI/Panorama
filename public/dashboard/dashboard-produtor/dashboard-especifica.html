@@ -69,19 +69,19 @@
             <div class="card kpi-card">
                 <p>País Mais Lucrativo</p>
                 <h2>Estados Unidos</h2>
-                <span id="lucro-pais">+ $7.2B</span>
+                <span id="lucro-pais">Representa 54% do lucro total do gênero</span>
             </div>
 
             <div class="card kpi-card">
                 <p>Ator com Mais Aparições em Filmes Lucrativos</p>
                 <h2>Robert Downey Jr</h2>
-                <span id="lucro-pais">20 aparições</span>
+                <span id="lucro-pais">20 aparições <br>+4 aparições que o 2º colocado Leonardo DiCaprio</span>
             </div>
 
             <div class="card kpi-card">
                 <p>Período de Pico de Lucro</p>
                 <h2>Junho a Agosto</h2>
-                <span id="lucro-pais">Média de Lucro do Período - $ 28 M</span>
+                <span id="lucro-pais">+42% superior aos meses de baixa</span>
             </div>
 
         </section>
@@ -236,11 +236,11 @@
 
         data: {
 
-            labels: ['Brasil', 'França', 'China', 'Reino Unido', 'Estados Unidos'],
+            labels: ['Estados Unidos', 'Reino Unido', 'China', 'França', 'Brasil'],
 
             datasets: [{
 
-                data: [2, 3.2, 4.8, 5.2, 7.2],
+                data: [7.2, 5.2, 4.8, 3.2, 2],
 
                 backgroundColor: COR_ROSA_BARRA,
 
@@ -266,7 +266,7 @@
 
                 legend: { display: false },
 
-                title: tituloGrafico('País de origem x Lucro', true),
+                title: tituloGrafico('Lucro Total Acumulado por País', true),
 
                 subtitle: subtituloGrafico(selectGenero.value),
 
@@ -286,7 +286,9 @@
 
                         color: '#dfdfdf',
 
-                        callback: (val) => `$ ${val}B`
+                        callback: (val) => `$ ${val}B`,
+
+                        font: {size: 18}
 
                     }
 
@@ -296,7 +298,7 @@
 
                     grid: { display: false },
 
-                    ticks: { color: '#dfdfdf' }
+                    ticks: { color: '#dfdfdf', font: {size: 18} }
 
                 }
 
@@ -360,7 +362,7 @@
 
                 legend: { display: false },
 
-                title: tituloGrafico('Atores x Aparições em Produções mais lucrativas', true),
+                title: tituloGrafico('Top 5 Atores com Maior Frequência em Filmes Lucrativos', true),
 
                 subtitle: subtituloGrafico(selectGenero.value),
 
@@ -386,7 +388,7 @@
 
                     display: true,
 
-                    ticks: { color: '#dfdfdf' },
+                    ticks: { color: '#dfdfdf', font: {size: 18} },
 
                     max: 25
 
@@ -396,7 +398,7 @@
 
                     grid: { display: false },
 
-                    ticks: { color: '#dfdfdf' }
+                    ticks: { color: '#dfdfdf', font: {size: 18} }
 
                 }
 
@@ -456,7 +458,7 @@
 
                 legend: { display: false },
 
-                title: tituloGrafico('Período x Lucro x Gênero (Média Anual)', true),
+                title: tituloGrafico('Janelas Mais Lucrativas de Lançamento do Gênero', true),
 
                 subtitle: subtituloGrafico(selectGenero.value),
 
@@ -478,7 +480,7 @@
 
                         callback: (val) => "$ " + val + "M",
 
-                        color: '#dfdfdf'
+                        color: '#dfdfdf', font: {size: 18}
 
                     }
 
@@ -488,7 +490,7 @@
 
                     grid: { display: false },
 
-                    ticks: { color: '#dfdfdf' }
+                    ticks: { color: '#dfdfdf', font: {size: 18} }
 
                 }
 
@@ -544,7 +546,7 @@
 
                 legend: { display: false },
 
-                title: tituloGrafico('Atores x Gênero x Lucro', true),
+                title: tituloGrafico('Top 5 Atores Mais Rentáveis em Bilheteria', true),
 
                 subtitle: subtituloGrafico(selectGenero.value),
 
@@ -576,7 +578,9 @@
 
                         callback: (val) => val === 0 ? '0' : `${val}M`,
 
-                        color: '#dfdfdf'
+                        color: '#dfdfdf', 
+                        
+                        font: {size: 18}
 
                     }
 
@@ -586,7 +590,7 @@
 
                     grid: { display: false },
 
-                    ticks: { color: '#dfdfdf' }
+                    ticks: { color: '#dfdfdf', font: {size: 18} }
 
                 }
 
