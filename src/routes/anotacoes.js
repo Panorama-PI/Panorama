@@ -3,33 +3,26 @@ var router = express.Router();
 
 var anotacaoController = require("../controllers/anotacaoController");
 
-// proejtos
+// projetos
+router.get("/projetos/listar/:idUsuario", anotacaoController.listarProjetos);
 
-router.get("/projetos/listar/:idUsuario", function (req, res) {
-    anotacaoController.listarProjetos(req, res);
-});
-router.post("/projetos/criar", function (req, res) {
-    anotacaoController.criarProjeto(req, res);
-});
+router.post("/projetos/criar", anotacaoController.criarProjeto);
+
+router.put("/projetos/editar", anotacaoController.editarProjeto);
+
+router.delete("/projetos/excluir", anotacaoController.excluirProjeto);
+
 
 // anotacoes mesmo
-
 // lista todas as anotacoes do usuario pq a pagina filtra por projeto
-router.get("/listar/:idUsuario", function (req, res) {
-    anotacaoController.listarAnotacoes(req, res);
-});
+router.get("/listar/:idUsuario", anotacaoController.listarAnotacoes);
 
-router.post("/criar", function (req, res) {
-    anotacaoController.criarAnotacao(req, res);
-});
+router.post("/criar", anotacaoController.criarAnotacao);
 
-router.put("/editar", function (req, res) {
-    anotacaoController.editarAnotacao(req, res);
-});
+router.put("/editar", anotacaoController.editarAnotacao);
 
 // exclui uma anotação
-router.delete("/excluir", function (req, res) {
-    anotacaoController.excluirAnotacao(req, res);
-});
+router.delete("/excluir", anotacaoController.excluirAnotacao);
+
 
 module.exports = router;

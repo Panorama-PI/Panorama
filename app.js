@@ -1,7 +1,7 @@
 // Define o ambiente em que a aplicação será executada.
 // O ambiente escolhido determina qual arquivo .env será utilizado.
-// var ambiente_processo = 'producao';
-var ambiente_processo = 'desenvolvimento';
+var ambiente_processo = 'producao';
+// var ambiente_processo = 'desenvolvimento';
 
 // Seleciona o arquivo de configurações de acordo com o ambiente.
 var caminho_env = ambiente_processo === 'producao' ? '.env' : '.env.dev';
@@ -23,6 +23,16 @@ var empresasRouter = require("./src/routes/empresas");
 var anotacoesRouter = require("./src/routes/anotacoes");
 var tokensRouter = require("./src/routes/tokens");
 var filmesRouter = require("./src/routes/filmes");
+var publicacaoRRouter = require("./src/routes/publicacaoR");
+var publicacaoPRouter = require("./src/routes/publicacoes");
+var relatoriosRouter = require("./src/routes/relatorios");
+var feedbackProdutorRouter = require("./src/routes/feedbackProdutor");
+var feedbacksRoteiristaRouter = require("./src/routes/feedbackRoteirista");
+
+// Importa o interceptor global de erros no server
+const errorHandler = require("./src/middleware/ErrorHandler");
+const NotFoundError = require("./src/errors/NotFoundError");
+const AppError = require("./src/errors/AppError");
 // Permite que a aplicação receba dados enviados no formato JSON
 // e também dados enviados por formulários.
 app.use(express.json());
@@ -43,6 +53,18 @@ app.use("/empresas", empresasRouter);
 app.use("/anotacoes", anotacoesRouter);
 app.use("/tokens", tokensRouter);  
 app.use("/filmes", filmesRouter);  
+app.use("/publicacoes", publicacaoRRouter);
+app.use("/publicacoes/produtor", publicacaoPRouter);
+app.use("/relatorios", relatoriosRouter);
+app.use("/feedbacks/produtor", feedbackProdutorRouter);
+app.use("/feedbacks", feedbacksRoteiristaRouter);
+app.all("*", (req, res, next) => {
+  next(new NotFoundError(`Rota ${req.originalUrl} não encontrada.`));
+})
+
+// ATENÇÃO O ERRORHANDLER DEVE SER O ÚLTIMO app.use()
+// Adiciona o errorHandler no server.js
+app.use(errorHandler);
 
 // Inicia o servidor utilizando a porta definida nas configurações
 // do ambiente.

@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap');
 
 /* Variaveis de cor */
 :root{
@@ -19,6 +18,7 @@ body {
   display: flex;
   flex-direction: row;
   background-color: var(--cor-fundo--card);
+  font-family: 'Barlow', sans-serif;
 }
 
 .aside-left a {
@@ -38,6 +38,7 @@ body {
   align-items: center;
   border-right: 2px solid var(--cor-cinza-canto);
   background-color: var(--cor-fundo-side);
+  overflow-y: auto;
 }
 
 .usuario-side{
@@ -70,25 +71,27 @@ body {
 
 .btns-side a {
   box-sizing: border-box; 
-  font-size: 23px;
+  font-size: clamp(15px, 2.6vh, 23px);
   display: flex;
   align-items: center;
   color: var(--cor-cinza-claro);
   background-color: var(--cor-fundo-side);
   border: 1px solid transparent;
   border-radius: 20px;
-  padding: 0.8rem;
+  padding: clamp(0.4rem, 1.2vh, 0.8rem);
   text-align: left;
   width: 15rem;
-  margin: 0.5rem;
+  margin: clamp(0.15rem, 0.7vh, 0.5rem) 0.5rem;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
   cursor: pointer;
 
   img {
-    height: 1.5rem;
+    height: clamp(1.1rem, 2.6vh, 1.5rem);
     padding-right: 0.5rem;
+    filter: grayscale(100%) brightness(0.7);
   }
 }
+
 
 .btns-side a.active {
   background-color: #FF383C;
@@ -195,7 +198,7 @@ body {
   height: 0.3rem; 
   margin-bottom: 3rem; 
 }
-#pesquisa-bar{
+#pesquisa_bar{
   width: 40rem;
   height: 0.1rem;
   color: white;
@@ -204,7 +207,7 @@ body {
   width: 4.5rem;
   height: 0.1rem;
 }
-#pesquisa-bar p{
+#pesquisa_bar p{
   color:white;
 }
 #filtro-bar p{

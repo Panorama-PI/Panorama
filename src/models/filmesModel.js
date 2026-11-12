@@ -1,79 +1,130 @@
 
 var database = require("../database/config");
-var bcrypt = require("bcryptjs");
 
-// async function cadastrar(nome, email, senha, perfil_id, id_empresa) {
-//     var senhaHash = await bcrypt.hash(senha, 10);
-
-//     var instrucaoSql = `
-//         INSERT INTO usuario
-//             (nome, email, senha_hash, perfil_id, criado_em, id_empresa)
-//         VALUES (?, ?, ?, ?, NOW(), ?)
-//     `;
-
-//     return database.executar(instrucaoSql, [
-//         nome,
-//         email,
-//         senhaHash,
-//         perfil_id,
-//         id_empresa
-//     ]);
-// }
-
-async function pesquisar(filme) {
+function pesquisar(filtros) {
     var instrucaoSql = `
-       SELECT
-    f.nome AS titulo,
-    (SELECT fe.ator
-     FROM filme_elenco fe
-     WHERE fe.filme_id = f.id
-     LIMIT 1) AS atorPrincipal,
+        SELECT
+            f.id,
+            f.nome AS titulo,
+            f.pais,
+            f.score AS avaliacao,
+            (f.receita - f.orcamento) AS lucro,
+            (
+        SELECT fg.genero
+        FROM filme_genero fg
+         WHERE fg.filme_id = f.id
+        LIMIT 1
+        ) AS genero,
+            (
+      SELECT fe.ator
+      FROM filme_elenco fe
+      WHERE fe.filme_id = f.id
+      LIMIT 1
+      ) AS atorPrincipal
+        FROM filme f
+        WHERE f.nome LIKE ?
+    `;
 
-    (SELECT fg.genero
-     FROM filme_genero fg
-     WHERE fg.filme_id = f.id
-     LIMIT 1) AS genero,
+    var parametros = ["%" + (filtros.filme || "") + "%"];
 
-    f.pais AS pais,
-    (f.receita - f.orcamento) AS lucro
+    if (filtros.genero) {
+        instrucaoSql += `
+            AND EXISTS (
+                SELECT 1
+                FROM filme_genero fg
+                WHERE fg.filme_id = f.id
+                AND fg.genero = ?
+            )
+        `;
 
-FROM filme f
-WHERE f.nome LIKE '%${filme}%';
-    `
-    
-    return database.executar(instrucaoSql, [filme])
+        parametros.push(filtros.genero);
+    }
 
-    // var usuarios = await database.executar(instrucaoSql, [email]);
+    if (filtros.pais) {
+        instrucaoSql += " AND f.pais = ?";
+        parametros.push(filtros.pais);
+    }
 
-    // if (usuarios.length !== 1) {
-    //     return [];
-    // }
+    if (
+        filtros.tipoVisao == "produtor" &&
+        filtros.operadorLucro &&
+        filtros.valorLucro !== "" &&
+        filtros.valorLucro !== undefined
+    ) {
+        if (filtros.operadorLucro == "maior") {
+            instrucaoSql += " AND (f.receita - f.orcamento) >= ?";
+            parametros.push(Number(filtros.valorLucro));
+        } else if (filtros.operadorLucro == "menor") {
+            instrucaoSql += " AND (f.receita - f.orcamento) <= ?";
+            parametros.push(Number(filtros.valorLucro));
+        }
+    }
 
-    // var usuario = usuarios[0];
-    // var senhaValida = await bcrypt.compare(senha, usuario.senha_hash);
+    if (
+        filtros.tipoVisao == "roteirista" &&
+        filtros.operadorAvaliacao &&
+        filtros.valorAvaliacao !== "" &&
+        filtros.valorAvaliacao !== undefined
+    ) {
+        if (filtros.operadorAvaliacao == "maior") {
+            instrucaoSql += " AND f.score >= ?";
+            parametros.push(Number(filtros.valorAvaliacao));
+        } else if (filtros.operadorAvaliacao == "menor") {
+            instrucaoSql += " AND f.score <= ?";
+            parametros.push(Number(filtros.valorAvaliacao));
+        }
+    }
 
-    // if (!senhaValida) {
-    //     return [];
-    // }
+    instrucaoSql += " ORDER BY f.nome";
 
-    // // Não devolve o hash para o controller
-    // delete usuario.senha_hash;
-
-    // return [usuario];
+    return database.executar(instrucaoSql, parametros);
 }
 
-// function buscarUsuariosPorEmpresa(id) {
-//     var instrucaoSql = `
-//         SELECT id, nome, email, perfil_id, criado_em, id_empresa
-//         FROM usuario
-//         WHERE id_empresa = ?
-//     `;
 
-//     return database.executar(instrucaoSql, [id]);
-// }
+function top10(tipoVisao) {
+    var instrucaoSql = `
+        SELECT
+            f.id,
+            f.nome AS titulo,
+            f.pais,
+            f.score AS avaliacao,
+            (f.receita - f.orcamento) AS lucro,
+            (
+                SELECT fg.genero
+                FROM filme_genero fg
+                WHERE fg.filme_id = f.id
+                LIMIT 1
+            ) AS genero,
+            (
+                SELECT fe.ator
+                FROM filme_elenco fe
+                WHERE fe.filme_id = f.id
+                LIMIT 1
+            ) AS atorPrincipal
+        FROM filme f
+        WHERE
+    `;
+
+    if (tipoVisao == "produtor") {
+        instrucaoSql += `
+            f.receita IS NOT NULL
+            AND f.orcamento IS NOT NULL
+            ORDER BY (f.receita - f.orcamento) DESC
+        `;
+    } else {
+        instrucaoSql += `
+            f.score IS NOT NULL
+            ORDER BY f.score DESC
+        `;
+    }
+
+    instrucaoSql += ", f.nome ASC LIMIT 10";
+
+    return database.executar(instrucaoSql);
+}
+
 
 module.exports = {
-    // cadastrar,
-    pesquisar
-    // buscarUsuariosPorEmpresa
+    pesquisar,
+    top10
 };

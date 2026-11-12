@@ -6,7 +6,6 @@ import com.panorama.mail.model.*;
 import com.panorama.mail.service.EmailService;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,15 +32,10 @@ public class Main {
             try {
                 List<PendenciaEmailEnvio> pendentes = emailDao.verificarEmailPendente();
                 for (PendenciaEmailEnvio pendente : pendentes) {
-                    EmailMessage message = new EmailMessage(
-                            "Envio do Token da Panorama",
-                            "Olá! use o token no site para conseguir o acesso!"
-                    );
-                    emailService.enviarEmail(message,pendente);
+                    emailService.enviarEmail(pendente);
                     System.out.println("E-mail enviado com sucesso!");
-                    emailDao.marcarComoEnviado(pendente.getToken().getToken());
                 }
-            } catch (Exception e) {
+            }catch (Exception e) {
                 System.err.println("Erro ao enviar e-mail: " + e.getMessage());
                 e.printStackTrace();
             }

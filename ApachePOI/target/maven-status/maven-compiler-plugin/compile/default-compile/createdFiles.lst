@@ -1,0 +1,9 @@
+school/sptech/dao/LogDao.class
+school/sptech/model/Log.class
+school/sptech/util/LeitorExcel.class
+school/sptech/dao/FilmeDAO.class
+school/sptech/util/TratamentoUtils.class
+school/sptech/model/Filme.class
+school/sptech/Main.class
+school/sptech/config/Conexao.class
+school/sptech/model/AtorPersonagem.class
