@@ -68,7 +68,8 @@ public class LeitorExcel {
                     filme.setIdiomaOriginal(lerTexto(linha.getCell(8), formatador));
                     filme.setOrcamento(converterParaDouble(lerTexto(linha.getCell(9), formatador)));
                     filme.setReceita(converterParaDouble(lerTexto(linha.getCell(10), formatador)));
-                    filme.setPais(lerTexto(linha.getCell(11), formatador));
+                    String filmeRaw = lerTexto(linha.getCell(11), formatador);
+                    filme.setPais(TratamentoUtils.extrairPais(filmeRaw));
 
                     if (linhasLidas % 500 == 0) {
                         Log logProgresso = new Log("INFO", "LeitorExcel",
