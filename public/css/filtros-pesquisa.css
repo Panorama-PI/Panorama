@@ -249,3 +249,31 @@
         padding: 1rem 0;
     }
 }
+
+.paginacao {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.paginacao button {
+    background: none;
+    border: none;
+    color: #fa3232;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 6px 10px;
+}
+
+.paginacao button:hover {
+    text-decoration: underline;
+}
+
+.paginacao .pagina-ativa {
+    color: #f87171;
+    font-weight: bold;
+    cursor: default;
+    text-decoration: none;
+}
