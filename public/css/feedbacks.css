@@ -76,22 +76,17 @@
 .sino-painel {
     box-sizing: border-box;
     display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    flex: 0 1 30rem;
+    align-items: center;
+    gap: 0.9rem;
+    flex: 0 1 24rem;
     min-width: 0;
-    padding: 1rem 1.2rem;
-    background: #161616;
-    border: 1px solid #3C3C41;
-    border-radius: 14px;
-    transition: border-color 0.2s ease;
-}
-
-.sino-painel.sino-ativo {
-    border-color: #FF383C;
+    padding: 0;
+    background: none;
+    border: 0;
 }
 
 .sino-botao {
+    position: relative;
     display: flex;
     flex-shrink: 0;
     align-items: center;
@@ -99,33 +94,51 @@
     width: 3rem;
     height: 3rem;
     padding: 0;
-    color: #828282;
-    background: #27272A;
+    color: #A1A1AA;
+    background: #1B1B1E;
     border: 1px solid #3C3C41;
     border-radius: 50%;
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    transition: transform 0.2s ease, background-color 0.25s ease,
+        color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .sino-botao svg {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1.35rem;
+    height: 1.35rem;
+    transform-origin: 50% 10%;
 }
 
-.sino-botao:hover {
+.sino-botao:hover:not(:disabled) {
     color: #F4F4F5;
     border-color: #828282;
+    transform: translateY(-1px);
 }
 
+.sino-botao:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.sino-botao:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* Ligado: preenchido + brilho suave */
 .sino-botao[aria-checked="true"] {
     color: #FFFFFF;
-    background: #FF383C;
-    border-color: #FF383C;
+    background: linear-gradient(145deg, #FF5A5E, #FF383C);
+    border-color: transparent;
+    box-shadow: 0 0 0 4px rgb(255 56 60 / 16%),
+        0 6px 18px rgb(255 56 60 / 35%);
 }
 
-.sino-botao[aria-checked="true"]:hover {
-    background: #f81e21;
-    border-color: #f81e21;
+.sino-botao[aria-checked="true"]:hover:not(:disabled) {
+    background: linear-gradient(145deg, #FF6A6E, #f81e21);
+}
+
+.sino-botao[aria-checked="true"] svg {
+    animation: sino-balanco 0.7s ease-in-out 1;
 }
 
 .sino-botao[aria-checked="true"] .sino-icone-desativado,
@@ -133,6 +146,16 @@
     display: none;
 }
 
+@keyframes sino-balanco {
+    0%   { transform: rotate(0); }
+    20%  { transform: rotate(14deg); }
+    40%  { transform: rotate(-12deg); }
+    60%  { transform: rotate(8deg); }
+    80%  { transform: rotate(-4deg); }
+    100% { transform: rotate(0); }
+}
+
+/* Textos */
 .sino-textos {
     min-width: 0;
 }
@@ -141,60 +164,80 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 0.35rem;
+    gap: 0.2rem 0.6rem;
+    margin-bottom: 0.15rem;
 }
 
 .sino-titulo {
     margin: 0;
     color: #F4F4F5;
-    font-size: 1.05rem;
+    font-size: 0.95rem;
+    font-weight: 600;
 }
 
+/* Estado vira uma bolinha + texto, sem "etiqueta" */
 .sino-estado {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 6px;
-    color: #A1A1AA;
-    background: #27272A;
-    border: 1px solid #3C3C41;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0;
+    color: #828282;
+    background: none;
+    border: 0;
     font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
+    font-weight: 600;
+    text-transform: none;
+}
+
+.sino-estado::before {
+    content: "";
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: #52525B;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .sino-ativo .sino-estado {
-    color: #FFFFFF;
-    background: #FF383C;
-    border-color: #FF383C;
+    color: #FF6B6B;
+    background: none;
+    border: 0;
 }
 
-.sino-descricao,
-.sino-status {
-    margin: 0;
-    font-size: 0.85rem;
-    line-height: 1.5;
+.sino-ativo .sino-estado::before {
+    background: #FF383C;
+    box-shadow: 0 0 6px #FF383C;
 }
 
 .sino-descricao {
-    color: #A1A1AA;
+    margin: 0;
+    color: #828282;
+    font-size: 0.78rem;
+    line-height: 1.45;
 }
 
+/* Continua lido por leitores de tela (aria-describedby), mas sai da vista */
 .sino-status {
-    margin-top: 0.35rem;
-    color: #F4F4F5;
-    font-weight: 600;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 /* Mensagens informativas (sininho e página) */
 .feedbacks-aviso,
 .sino-mensagem {
     margin: 0 0 1.5rem;
-    padding: 0.9rem 1.1rem;
+    padding: 0.7rem 1rem;
     color: #B4B4B8;
-    background: #27272A;
-    border: 1px solid #3C3C41;
-    border-radius: 8px;
+    background: transparent;
+    border-left: 3px solid #FF383C;
+    border-radius: 0 8px 8px 0;
     font-size: 0.85rem;
     line-height: 1.5;
 }
