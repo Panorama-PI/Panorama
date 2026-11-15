@@ -562,3 +562,18 @@ body {
     line-height: 1;
     flex-shrink: 0;
 }
+
+.dash .kpi-card .comparacao-kpi {
+    white-space: nowrap;
+    font-size: 14px !important;
+}
+
+.dash .kpi-card .valor-kpi {
+    white-space: nowrap;
+}
+
+.dash .kpi-card .valor-kpi small {
+    font-size: 16px;
+    font-weight: 500;
+    color: #BDBDBD;
+}
