@@ -198,9 +198,9 @@ COLLATE = utf8mb4_unicode_ci;
 
 
 -- -----------------------------------------------------
--- Table `filmes_db`.`relatorio`
+-- Table `filmes_db`.`filtro`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `filmes_db`.`relatorio` (
+CREATE TABLE IF NOT EXISTS `filmes_db`.`filtro` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `usuario_id` INT NOT NULL,
   `titulo` VARCHAR(150) NOT NULL,
@@ -216,8 +216,8 @@ CREATE TABLE IF NOT EXISTS `filmes_db`.`relatorio` (
   `valor_avaliacao` DECIMAL(5,2) NULL DEFAULT NULL,
   `atualizado_em` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_relatorios_usuario` (`usuario_id` ASC) VISIBLE,
-  CONSTRAINT `fk_relatorios_usuario`
+  INDEX `fk_filtros_usuario` (`usuario_id` ASC) VISIBLE,
+  CONSTRAINT `fk_filtros_usuario`
     FOREIGN KEY (`usuario_id`)
     REFERENCES `filmes_db`.`usuario` (`id`))
 ENGINE = InnoDB
@@ -376,12 +376,12 @@ FOREIGN KEY (id_observacao) REFERENCES observacao(id)
 ON DELETE CASCADE;
 
 
--- RELATORIO → USUARIO
-ALTER TABLE relatorio
-DROP FOREIGN KEY fk_relatorios_usuario;
+-- filtro → USUARIO
+ALTER TABLE filtro
+DROP FOREIGN KEY fk_filtros_usuario;
 
-ALTER TABLE relatorio
-ADD CONSTRAINT fk_relatorios_usuario
+ALTER TABLE filtro
+ADD CONSTRAINT fk_filtros_usuario
 FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 ON DELETE CASCADE;
 
