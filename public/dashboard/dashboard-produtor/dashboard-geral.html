@@ -55,23 +55,23 @@
         <section class="kpi-cards">
             <div class="card kpi-card">
                 <p>Gênero Mais Lucrativo Geral</p>
-                <h2>Romance</h2>
-                <span id="roi-genero">Soma dos lucros - $ 4,8B</span>
+                <h2>Romance - $ 4,8B</h2>
+                <span id="roi-genero">+28% acima do 2º colocado (Ficção)</span>
             </div>
             <div class="card kpi-card">
                 <p>Gênero com Maior Retorno (ROI)</p>
                 <h2>Terror</h2>
-                <span id="roi-genero">4,2x o orçamento</span>
+                <span id="roi-genero">+1,8x acima da média geral da indústria (2,4x)</span>
             </div>
             <div class="card kpi-card">
                 <p>Gênero de Maior Risco &nbsp;(ROI &nbsp;<&nbsp; 2,5 x)</p>
                 <h2>Ação</h2>
-                <span id="risco-genero">45% dos filmes</span>
+                <span id="risco-genero">+15% de risco acima da média global</span>
             </div>
             <div class="card kpi-card">
                 <p>Melhor Mês para Lançar filmes</p> 
                 <h2 id="melhor-mes">Dezembro</h2> 
-                <span id="melhor-mes-lucro">Maior lucro médio</span> 
+                <span id="melhor-mes-lucro">+18% de receita vs. Junho</span> 
             </div>
         </section>
 
@@ -215,12 +215,12 @@ Chart.register(pluginMedia);
             layout: { padding: { top: 20, left: 24, right: 24, bottom: 16 } },
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Lucro x Gênero'),
+                title: tituloGrafico('Lucro Total Acumulado por Gênero'),
                 datalabels: {
                     anchor: 'end',
                     align: 'top',
                     color: '#FFFFFF',
-                    font: { weight: 'bold', size: 11 },
+                    font: { weight: 'bold', size: 20 },
                     formatter: (value) => `R$ ${value.toFixed(1)}B`
                 }
             },
@@ -230,12 +230,13 @@ Chart.register(pluginMedia);
                     grid: { color: COR_LINHA_GRID },
                     ticks: {
                         color: '#dfdfdf',
-                        callback: (value) => value === 0 ? '0' : `$ ${value}B`
+                        callback: (value) => value === 0 ? '0' : `$ ${value}B`,
+                        font: {size: 18} 
                     }
                 },
                 x: { 
                     grid: { display: false },
-                    ticks: { color: '#dfdfdf' }
+                    ticks: { color: '#dfdfdf',font: {size: 18}  }
                 }
             }
         }
@@ -266,7 +267,7 @@ Chart.register(pluginMedia);
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Gênero x Retorno sobre o Orçamento (ROI)'),
+                title: tituloGrafico('Retorno por Real Investido (ROI) por Gênero'),
                 datalabels: { display: false },
                 tooltip: {
                     callbacks: {
@@ -280,11 +281,12 @@ Chart.register(pluginMedia);
                     grid: { color: COR_LINHA_GRID },
                     ticks: { stepSize: 1, callback: (val) => `${val}x`,
                         color: '#dfdfdf',
+                        font: {size: 18} 
                      },
                     title: { display: true, text: 'ROI: quantas vezes a receita cobre o orçamento (receita ÷ orçamento)', color: '#828282', font: { size: 10 } }
                 },
                 y: { grid: { display: false },
-                    ticks: {color: '#dfdfdf'}}
+                    ticks: {color: '#dfdfdf',font: {size: 18} }}
             }
         }
     });
@@ -313,7 +315,7 @@ Chart.register(pluginMedia);
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Gênero x % Filmes com Lucro'),
+                title: tituloGrafico('Taxa de Assertividade: % de Produções Lucrativas'),
                 datalabels: { display: false }
             },
             scales: {
@@ -322,11 +324,12 @@ Chart.register(pluginMedia);
                     grid: { color: COR_LINHA_GRID },
                     ticks: { stepSize: 20, callback: (val) => `${val}%`,
                              color: '#dfdfdf',
+                             font: {size: 18} 
                      },
                    
                 },
                 y: { grid: { display: false },
-                    ticks: {color: '#dfdfdf'} }
+                    ticks: {color: '#dfdfdf',font: {size: 18} } }
             }
         }
     });
@@ -354,7 +357,7 @@ Chart.register(pluginMedia);
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Orçamento Médio x Gênero'),
+                title: tituloGrafico('Custo Médio de Produção por Gênero'),
                 datalabels: {
                     anchor: 'center',
                     align: 'center',
@@ -369,11 +372,12 @@ Chart.register(pluginMedia);
                     ticks: {
                         stepSize: 20,
                         callback: (val) => val === 0 ? '0' : `$ ${val}M`,
-                        color: '#dfdfdf'
+                        color: '#dfdfdf',
+                        font: {size: 18} 
                     }
                 },
                 x: { grid: { display: false } ,
-                     ticks: {color: '#dfdfdf'}}
+                     ticks: {color: '#dfdfdf', font: {size: 18} }}
             }
         }
     });
@@ -402,7 +406,7 @@ Chart.register(pluginMedia);
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: tituloGrafico('Período de Lançamento x Lucro (Todos os Gêneros)', true),
+                title: tituloGrafico('Janelas Mais Lucrativas de Lançamento', true),
                 subtitle: subtituloGrafico('Média Anual'),
                 datalabels: { display: false }
             },
@@ -415,10 +419,11 @@ Chart.register(pluginMedia);
                     
                         callback: (val) => "$ "+ val + "M",
                         color: '#dfdfdf',
+                        font: {size: 18} 
                     }
                 },
                 x: { grid: { display: false },
-                ticks:{color: '#dfdfdf'} }
+                ticks:{color: '#dfdfdf', font: {size: 18} } }
             }
         }
     });
