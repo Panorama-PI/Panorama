@@ -405,9 +405,9 @@ ADD CONSTRAINT fk_feedback_usuario
 FOREIGN KEY (autor_id) REFERENCES usuario(id)
 ON DELETE CASCADE;
 
-
-
-
+ALTER TABLE feedback
+ADD COLUMN avaliacao TINYINT UNSIGNED NOT NULL DEFAULT 0,
+ADD CONSTRAINT chk_avaliacao CHECK (avaliacao >= 0 AND avaliacao <= 5);
 
 
 CREATE VIEW vw_emails_pendentes AS
