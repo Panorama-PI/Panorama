@@ -267,6 +267,20 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 ;
 
+CREATE TABLE IF NOT EXISTS `filmes_db`.`genero` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(100) NOT NULL
+  );
+
+
+INSERT INTO genero (nome)
+SELECT DISTINCT TRIM(genero)
+FROM filme_genero
+WHERE genero IS NOT NULL AND TRIM(genero) <> '';
+
+ALTER TABLE projeto ADD COLUMN genero_id INT NULL;
+ALTER TABLE projeto ADD CONSTRAINT fk_projeto_genero FOREIGN KEY (genero_id) REFERENCES genero(id) ON DELETE SET NULL;
+
 ALTER TABLE usuario ADD COLUMN notificacao TINYINT;
 ALTER TABLE token ADD COLUMN email_destinatario VARCHAR(255);
 ALTER TABLE feedback ADD COLUMN autor_id INT NOT NULL;
@@ -276,7 +290,7 @@ ALTER TABLE feedback ADD COLUMN status TINYINT NOT NULL;
 ALTER TABLE feedback ADD COLUMN criado_em  DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL;
 
 
-CREATE VIEW vw_emails_pendentes AS
+CREATE OR REPLACE VIEW vw_emails_pendentes AS
 SELECT 
     t.id AS id_token,
     NULL AS id_feedback,
