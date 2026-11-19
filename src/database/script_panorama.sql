@@ -287,6 +287,14 @@ CREATE TABLE IF NOT EXISTS `filmes_db`.`genero_palavra` (
   CONSTRAINT fk_genero FOREIGN KEY (id_genero) REFERENCES genero(id)
   );
 
+  CREATE TABLE avaliacao(
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  texto TEXT ,
+  status_enviado TINYINT,
+  publicacao_id INT NOT NULL,
+  CONSTRAINT fk_publicacao_avaliacao FOREIGN KEY (publicacao_id) REFERENCES publicacao(id)
+  );
+
 INSERT INTO genero (nome)
 SELECT DISTINCT TRIM(genero)
 FROM filme_genero
@@ -306,6 +314,8 @@ ALTER TABLE feedback ADD COLUMN criado_em  DATETIME DEFAULT CURRENT_TIMESTAMP NO
 ALTER TABLE usuario ADD COLUMN horario_inicio TIME NULL,
 ADD COLUMN horario_fim TIME NULL,
 ADD COLUMN dia_resumo_semanal TINYINT NULL;
+
+ALTER TABLE feedback DROP COLUMN avaliacao;
 
 desc feedback;
 CREATE OR REPLACE VIEW vw_emails_pendentes AS
