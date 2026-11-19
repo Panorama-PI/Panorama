@@ -289,7 +289,7 @@ ALTER TABLE feedback DROP COLUMN status_enviado;
 ALTER TABLE feedback ADD COLUMN status TINYINT NOT NULL;
 ALTER TABLE feedback ADD COLUMN criado_em  DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL;
 
-
+desc feedback;
 CREATE OR REPLACE VIEW vw_emails_pendentes AS
 SELECT 
     t.id AS id_token,
@@ -423,13 +423,8 @@ ALTER TABLE feedback
 ADD COLUMN avaliacao TINYINT UNSIGNED NOT NULL DEFAULT 0,
 ADD CONSTRAINT chk_avaliacao CHECK (avaliacao >= 0 AND avaliacao <= 5);
 
-ALTER TABLE usuario
-ADD COLUMN horario_inicio TIME NULL,
-ADD COLUMN horario_fim TIME NULL,
-ADD COLUMN dia_resumo_semanal TINYINT NULL;
 
-
-CREATE VIEW vw_emails_pendentes AS
+CREATE OR REPLACE VIEW vw_emails_pendentes AS
 SELECT 
     t.id AS id_token,
     NULL AS id_feedback,
@@ -455,7 +450,7 @@ SELECT
     produtor.nome AS nome_produtor,
     roteirista.nome AS nome_roteirista,
     'FEEDBACK' AS tipo,
-    f.status_enviado,
+    f.status,
     roteirista.email AS email_destinatario, 
     NULL AS codigo,
     NULL AS expiracao,     
@@ -466,7 +461,6 @@ INNER JOIN publicacao p ON f.publicacao_id = p.id
 INNER JOIN usuario roteirista ON p.usuario_id = roteirista.id
 INNER JOIN usuario produtor ON f.autor_id = produtor.id
 INNER JOIN empresa e ON produtor.id_empresa = e.id;
-
 
 -- VIEWS DAS DASHBOARDS - Para facilitar essas daqui são utilizadas por geral
     
@@ -484,6 +478,7 @@ FROM (
     f.score,
     f.orcamento,
     f.receita,
+    f.pais AS pais,
     CASE WHEN f.orcamento > 0 AND f.receita > 0
          THEN f.receita - f.orcamento END AS lucro,
     CASE WHEN f.orcamento > 0 AND f.receita > 0
@@ -578,6 +573,36 @@ FROM (
   GROUP BY genero
 ) t
 WHERE ranking = 1;
+
+-- DASHBOARD ESPECIFICA ROTEIRISTA
+	-- Avaliação média x Pais origem (barras + linha media_genero)
+CREATE OR REPLACE VIEW vw_rot_esp_grafico_nota_pais AS
+SELECT
+  genero,
+  pais,
+  nota_media,
+  qtd_filmes,
+  ROUND(AVG(nota_media) OVER (PARTITION BY genero), 1) AS media_genero,
+  ROW_NUMBER() OVER (PARTITION BY genero ORDER BY nota_media DESC) AS ranking
+FROM (
+  SELECT genero, pais, ROUND(AVG(score), 1) AS nota_media, COUNT(*) AS qtd_filmes
+  FROM vw_base_filme_genero
+  WHERE score IS NOT NULL AND pais IS NOT NULL
+  GROUP BY genero, pais
+  HAVING COUNT(*) >= 3          -- amostra mínima por país
+) t;    
+
+	-- Proporção de Gêneros Associados (%)
+CREATE OR REPLACE VIEW vw_rot_esp_grafico_generos_associados AS
+SELECT
+  genero,
+  genero_associado,
+  qtd_filmes,
+  percentual,
+  ROW_NUMBER() OVER (PARTITION BY genero ORDER BY percentual DESC, genero_associado) AS ranking
+FROM vw_base_genero_associacao;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
