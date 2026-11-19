@@ -315,7 +315,7 @@ ALTER TABLE usuario ADD COLUMN horario_inicio TIME NULL,
 ADD COLUMN horario_fim TIME NULL,
 ADD COLUMN dia_resumo_semanal TINYINT NULL;
 
-ALTER TABLE feedback DROP COLUMN avaliacao;
+
 
 desc feedback;
 CREATE OR REPLACE VIEW vw_emails_pendentes AS
@@ -448,10 +448,9 @@ FOREIGN KEY (autor_id) REFERENCES usuario(id)
 ON DELETE CASCADE;
 
 ALTER TABLE feedback
-ADD COLUMN avaliacao TINYINT UNSIGNED NOT NULL DEFAULT 0,
-ADD CONSTRAINT chk_avaliacao CHECK (avaliacao >= 0 AND avaliacao <= 5);
+ADD COLUMN avaliacao TINYINT UNSIGNED NOT NULL DEFAULT 0;
 
-
+ALTER TABLE feedback DROP COLUMN avaliacao;
 
 CREATE OR REPLACE VIEW vw_emails_pendentes AS
 SELECT 
