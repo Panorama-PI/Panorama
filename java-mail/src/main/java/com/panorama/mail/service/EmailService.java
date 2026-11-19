@@ -40,7 +40,7 @@ public class EmailService {
         if (tipo.equals("TOKEN")){
             TokenDao tokenDao = new TokenDao();
 
-            Usuario roteirista = pendenciaEmailEnvio.getRoteirista();
+            Roteirista roteirista = pendenciaEmailEnvio.getRoteirista();
             Empresa empresa = pendenciaEmailEnvio.getEmpresa();
             Token token = pendenciaEmailEnvio.getToken();
 
@@ -68,8 +68,8 @@ public class EmailService {
             if(status.equals(2)){
                 FeedbackDao feedbackDao = new FeedbackDao();
 
-                Usuario produtor = pendenciaEmailEnvio.getProdutor();
-                Usuario roteirista = pendenciaEmailEnvio.getRoteirista();
+                Produtor produtor = pendenciaEmailEnvio.getProdutor();
+                Roteirista roteirista = pendenciaEmailEnvio.getRoteirista();
                 Feedback feedback = pendenciaEmailEnvio.getFeedback();
                 Empresa empresa = pendenciaEmailEnvio.getEmpresa();
 
@@ -95,8 +95,8 @@ public class EmailService {
             } else if(status.equals(3)){
                 FeedbackDao feedbackDao = new FeedbackDao();
 
-                Usuario produtor = pendenciaEmailEnvio.getProdutor();
-                Usuario roteirista = pendenciaEmailEnvio.getRoteirista();
+                Produtor produtor = pendenciaEmailEnvio.getProdutor();
+                Roteirista roteirista = pendenciaEmailEnvio.getRoteirista();
                 Feedback feedback = pendenciaEmailEnvio.getFeedback();
                 Empresa empresa = pendenciaEmailEnvio.getEmpresa();
 
@@ -124,7 +124,7 @@ public class EmailService {
 
     }
 
-    public String htmlFeedback(Usuario roteirista, Usuario produtor, Empresa empresa){
+    public String htmlFeedback(Roteirista roteirista, Produtor produtor, Empresa empresa){
         return "<div style=\"background-color: #0b0b0b; padding: 30px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e0e0e0;\">" +
                 "<table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"background-color: #141414; border: 1px solid #222222; border-radius: 8px; overflow: hidden;\">" +
 
@@ -169,7 +169,7 @@ public class EmailService {
     }
 
 
-    public String htmlFeedbackEditado(Usuario roteirista, Usuario produtor, Empresa empresa){
+    public String htmlFeedbackEditado(Roteirista roteirista, Produtor produtor, Empresa empresa){
         return "<div style=\"background-color: #0b0b0b; padding: 30px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e0e0e0;\">" +
                 "<table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"background-color: #141414; border: 1px solid #222222; border-radius: 8px; overflow: hidden;\">" +
 
