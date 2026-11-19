@@ -289,6 +289,10 @@ ALTER TABLE feedback DROP COLUMN status_enviado;
 ALTER TABLE feedback ADD COLUMN status TINYINT NOT NULL;
 ALTER TABLE feedback ADD COLUMN criado_em  DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL;
 
+ALTER TABLE usuario ADD COLUMN horario_inicio TIME NULL,
+ADD COLUMN horario_fim TIME NULL,
+ADD COLUMN dia_resumo_semanal TINYINT NULL;
+
 desc feedback;
 CREATE OR REPLACE VIEW vw_emails_pendentes AS
 SELECT 
@@ -422,6 +426,7 @@ ON DELETE CASCADE;
 ALTER TABLE feedback
 ADD COLUMN avaliacao TINYINT UNSIGNED NOT NULL DEFAULT 0,
 ADD CONSTRAINT chk_avaliacao CHECK (avaliacao >= 0 AND avaliacao <= 5);
+
 
 
 CREATE OR REPLACE VIEW vw_emails_pendentes AS
