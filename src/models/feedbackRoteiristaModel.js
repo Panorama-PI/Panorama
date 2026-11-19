@@ -1,8 +1,6 @@
+
 var database = require("../database/config");
 
-// Os ids chegam validados pelo controller; Number() garante que só número entra no SQL.
-
-// Feedbacks das publicações do roteirista
 function listarFeedbacks(idRoteirista) {
     var instrucao = `
         SELECT
@@ -21,7 +19,6 @@ function listarFeedbacks(idRoteirista) {
     return database.executar(instrucao);
 }
 
-// Só devolve se o feedback for de uma publicação do roteirista
 function buscarFeedback(idFeedback, idRoteirista) {
     var instrucao = `
         SELECT
@@ -42,7 +39,12 @@ function buscarFeedback(idFeedback, idRoteirista) {
 
 function buscarNotificacao(idRoteirista) {
     var instrucao = `
-        SELECT id, notificacao
+        SELECT
+            id,
+            notificacao,
+            horario_inicio,
+            horario_fim,
+            dia_resumo_semanal
         FROM usuario
         WHERE id = ${idRoteirista}
           AND perfil_id <> 1;
@@ -60,9 +62,28 @@ function atualizarNotificacao(idRoteirista, ativo) {
     return database.executar(instrucao);
 }
 
+function atualizarPreferencias(
+    idRoteirista,
+    horarioInicio,
+    horarioFim,
+    diaResumoSemanal
+) {
+    var instrucao = `
+        UPDATE usuario
+        SET
+            horario_inicio = '${horarioInicio}',
+            horario_fim = '${horarioFim}',
+            dia_resumo_semanal = ${diaResumoSemanal}
+        WHERE id = ${idRoteirista}
+          AND perfil_id <> 1;
+    `;
+    return database.executar(instrucao);
+}
+
 module.exports = {
     listarFeedbacks,
     buscarFeedback,
     buscarNotificacao,
-    atualizarNotificacao
+    atualizarNotificacao,
+    atualizarPreferencias
 };
