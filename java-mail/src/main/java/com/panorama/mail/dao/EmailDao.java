@@ -28,11 +28,11 @@ public class EmailDao {
             Empresa empresa = (nomeEmpresa != null) ? new Empresa(nomeEmpresa) : null;
 
             String nomeProdutor = rs.getString("nome_produtor");
-            Usuario produtor = (nomeProdutor != null) ? new Usuario(nomeProdutor) : null;
+            Produtor produtor = (nomeProdutor != null) ? new Produtor(nomeProdutor) : null;
 
             String nomeRoteirista = rs.getString("nome_roteirista");
             String emailDestinatario = rs.getString("email_destinatario");
-            Usuario roteirista = new Usuario(nomeRoteirista, emailDestinatario);
+            Roteirista roteirista = new Roteirista(nomeRoteirista, emailDestinatario);
 
             Feedback feedback = null;
             Object idFeedbackObj = rs.getObject("id_feedback");
