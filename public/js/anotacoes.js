@@ -69,6 +69,21 @@ if (typeof preencherUsuario === "function") {
         return total;
     }
 
+
+function obterGenerosSelecionados() {
+    var select = document.getElementById("projeto_generos");
+    var generos = [];
+
+    for (var i = 0; i < select.options.length; i++) {
+        if (select.options[i].selected) {
+            generos.push(select.options[i].value);
+        }
+    }
+
+    return generos;
+}
+
+
     function nomeDoProjeto(idProjeto) {
         for (var i = 0; i < dashboardAtual.projetos.length; i++) {
             if (dashboardAtual.projetos[i].id == idProjeto) {
@@ -292,7 +307,7 @@ if (typeof preencherUsuario === "function") {
         if (dashboardAtual.projetos.length === 0) {
             container.innerHTML = `
                 <tr>
-                    <td colspan="4">Nenhum projeto cadastrado.</td>
+                    <td colspan="5">Nenhum projeto cadastrado.</td>
                 </tr>
             `;
             return;
@@ -303,9 +318,10 @@ if (typeof preencherUsuario === "function") {
             var linha = document.createElement("tr");
 
             linha.innerHTML = `
-                <td>${escapar(projeto.nome)}</td>
-                <td>—</td>
-                <td>${contarAnotacoes(projeto.id)} anotações</td>
+    <td>${escapar(projeto.nome)}</td>
+    <td>${escapar(formatarGeneros(projeto.generos || []))}</td>
+    <td>—</td>
+    <td>${contarAnotacoes(projeto.id)} anotações</td>
 
                 <td>
                     <div class="projeto-acoes">
@@ -388,6 +404,14 @@ if (typeof preencherUsuario === "function") {
         campoId.value = projetoEncontrado.id;
         campoNome.value = projetoEncontrado.nome;
 
+        var selectGeneros = document.getElementById("projeto_generos");
+
+for (var i = 0; i < selectGeneros.options.length; i++) {
+    selectGeneros.options[i].selected =
+        projetoEncontrado.generos &&
+        projetoEncontrado.generos.includes(selectGeneros.options[i].value);
+}
+
         if (tituloModal) {
             tituloModal.textContent = "Editar projeto";
         }
@@ -463,6 +487,7 @@ if (typeof preencherUsuario === "function") {
         var idProjeto = campoId ? campoId.value : "";
         var nome = campoNome ? campoNome.value.trim() : "";
         var idUsuario = sessionStorage.ID_USUARIO;
+        var generos = obterGenerosSelecionados();
 
         if (!idUsuario) {
             alert("Não foi possível identificar o usuário. Entre novamente.");
@@ -490,7 +515,8 @@ if (typeof preencherUsuario === "function") {
             body: JSON.stringify({
                 id: idProjeto,
                 idUsuario: idUsuario,
-                nome: nome
+                nome: nome,
+                genero:generos
             })
         })
             .then(function (resposta) {
@@ -884,6 +910,23 @@ if (typeof preencherUsuario === "function") {
     if (nome) document.getElementById('a_usuario').innerHTML = nome;
     if (email) document.getElementById('c_email').innerHTML = email;
 }
+
+function formatarGeneros(generos) {
+    var select = document.getElementById("projeto_generos");
+    var nomes = [];
+
+    for (var i = 0; i < generos.length; i++) {
+        for (var j = 0; j < select.options.length; j++) {
+            if (select.options[j].value == generos[i]) {
+                nomes.push(select.options[j].textContent);
+                break;
+            }
+        }
+    }
+
+    return nomes.join(", ");
+}
+
 
     // =========================
     // INICIALIZAÇÃO

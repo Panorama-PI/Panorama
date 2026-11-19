@@ -72,11 +72,12 @@
             <div class="anotacoes-tabela-wrap">
                 <table class="anotacoes-tabela">
                     <thead>
-                        <tr>
-                            <th>Projeto</th>
-                            <th>Criado em</th>
-                            <th>Anotações</th>
-                            <th>Ações</th>
+                       <tr>
+                     <th>Projeto</th>
+                     <th>Gêneros</th>
+                     <th>Criado em</th>
+                     <th>Anotações</th>
+                     <th>Ações</th>
                         </tr>
                     </thead>
 
@@ -137,6 +138,35 @@
                     <input type="text" id="projeto_nome" name="nome" maxlength="150"
                         placeholder="Ex.: Meu roteiro de suspense" required>
                 </div>
+                
+<div class="anotacoes-campo">
+    <label for="projeto_generos">Gêneros do projeto</label>
+
+    <select id="projeto_generos" name="generos" multiple required>
+        <option value="Drama">Drama</option>
+        <option value="Action">Ação</option>
+        <option value="Science Fiction">Ficção científica</option>
+        <option value="Adventure">Aventura</option>
+        <option value="Animation">Animação</option>
+        <option value="Family">Família</option>
+        <option value="Fantasy">Fantasia</option>
+        <option value="Comedy">Comédia</option>
+        <option value="Thriller">Suspense</option>
+        <option value="Crime">Crime</option>
+        <option value="Horror">Terror</option>
+        <option value="Mystery">Mistério</option>
+        <option value="History">História</option>
+        <option value="War">Guerra</option>
+        <option value="Documentary">Documentário</option>
+        <option value="Romance">Romance</option>
+        <option value="Music">Música</option>
+        <option value="Western">Faroeste</option>
+        <option value="TV Movie">Filme para TV</option>
+    </select>
+
+    <small>Segure Ctrl para selecionar mais de um gênero.</small>
+</div>
+
 
                 <footer class="anotacoes-modal-acoes">
                     <button type="button" class="anotacoes-btn-secundario" id="cancelar-projeto">
