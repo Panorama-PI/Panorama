@@ -10,7 +10,9 @@ var dadosPublicacoes = [];
 function buscarPublicacoes() {
     var idEmpresa = sessionStorage.ID_EMPRESA;
 
-    fetch("/publicacoes/produtor/empresa/" + idEmpresa)
+    var idProdutor = sessionStorage.ID_USUARIO;
+
+    fetch("/publicacoes/produtor/empresa/" + idEmpresa + "?idProdutor=" + encodeURIComponent(idProdutor))
         .then(function (resposta) {
             if (resposta.ok) {
                 resposta.json().then(function (dados) {
@@ -79,6 +81,11 @@ function renderizarCards(lista) {
     for (var i = 0; i < lista.length; i++) {
         var pub = lista[i];
         var dataFormatada = formatarData(pub.data || pub.criado_em);
+        var nota = obterNotaProdutor(pub);
+        var estrelas = "";
+        for (var estrela = 1; estrela <= 5; estrela++) {
+            estrelas += `<button type="button" class="estrela-nota${estrela <= nota ? " selecionada" : ""}" onclick="definirNota(${pub.id}, ${estrela})" aria-label="Dar nota ${estrela} de 5" aria-pressed="${estrela === nota}">★</button>`;
+        }
 
         html += `
             <div class="card-publicacao" data-id="${pub.id}">
@@ -95,6 +102,11 @@ function renderizarCards(lista) {
                 </div>
 
                 <div class="card-coluna acao">
+                    <div class="avaliacao-publicacao">
+                        <span class="avaliacao-legenda">Nota do produtor</span>
+                        <div class="avaliacao-estrelas" role="group" aria-label="Nota da publicação: ${nota ? nota + ' de 5' : 'não avaliada'}">${estrelas}</div>
+                        <span class="avaliacao-valor">${nota ? `${nota}/5` : "Avalie"}</span>
+                    </div>
                     <button type="button" class="btn-outline" onclick="abrirModal(${pub.id})">Abrir projeto</button>
                 </div>
             </div>
@@ -102,6 +114,34 @@ function renderizarCards(lista) {
     }
 
     container.innerHTML = html;
+}
+
+function obterNotaProdutor(pub) {
+    var nota = Number(pub.nota_produtor || 0);
+    return Number.isInteger(nota) && nota >= 1 && nota <= 5 ? nota : 0;
+}
+
+function definirNota(idPublicacao, nota) {
+    nota = Number(nota);
+    if (!Number.isInteger(nota) || nota < 1 || nota > 5) return;
+
+    var idProdutor = sessionStorage.ID_USUARIO;
+    if (!idProdutor) return;
+
+    fetch("/publicacoes/produtor/" + idPublicacao + "/avaliacao", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idProdutor: Number(idProdutor), nota: nota })
+    })
+        .then(function (resposta) {
+            if (!resposta.ok) throw new Error("Não foi possível salvar a avaliação.");
+            var publicacao = dadosPublicacoes.find(function (item) { return Number(item.id) === Number(idPublicacao); });
+            if (publicacao) publicacao.nota_produtor = nota;
+            aplicarFiltros();
+        })
+        .catch(function () {
+            window.alert("Não foi possível salvar sua nota. Tente novamente.");
+        });
 }
 
 // Remove acentos para facilitar comparação de filtros
@@ -355,6 +395,7 @@ window.buscarPublicacoes = buscarPublicacoes;
 window.aplicarFiltros = aplicarFiltros;
 window.limparFiltros = limparFiltros;
 window.abrirModal = abrirModal;
+window.definirNota = definirNota;
 window.fecharModal = fecharModal;
 window.fecharModalExterno = fecharModalExterno;
 
