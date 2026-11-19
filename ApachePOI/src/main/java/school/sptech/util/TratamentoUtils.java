@@ -3,12 +3,14 @@ package school.sptech.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import school.sptech.model.AtorPersonagem;
 
 public class TratamentoUtils {
 
-
+    private static final Pattern PALAVRA = Pattern.compile("\\p{L}+(?:['\u2019]\\p{L}+)*");
     public static String repararEncoding(String texto) {
         if (texto == null || texto.isEmpty()) return texto;
 
@@ -94,7 +96,34 @@ public class TratamentoUtils {
         }
     }
 
+    public static String removerStopWords(String sinopse) {
+        if (sinopse == null) return null;
 
+        StringBuilder resultado = new StringBuilder();
+        Matcher m = PALAVRA.matcher(sinopse);
+
+        while (m.find()) {
+            String palavra = m.group().toLowerCase(Locale.ROOT).replace('\u2019', '\'');
+
+            int apostrofo = palavra.indexOf('\'');
+            if (apostrofo >= 0) {
+                String base = palavra.substring(0, apostrofo);
+                String sufixo = palavra.substring(apostrofo + 1);
+                if (sufixo.equals("s")) {
+                    palavra = base;                       // posse: "Adonis's" -> "adonis"
+                } else if (sufixo.equals("t") || sufixo.equals("re") || sufixo.equals("ve")
+                        || sufixo.equals("ll") || sufixo.equals("d") || sufixo.equals("m")) {
+                    continue;                             // contrações: isn't, they're, I'm...
+                }
+            }
+
+            if (palavra.length() < 2 || StopWords.ehStopWord(palavra)) continue;
+
+            if (resultado.length() > 0) resultado.append(' ');
+            resultado.append(palavra);
+        }
+        return resultado.toString();
+    }
 
 
     public static List<String> extrairGeneros(String textoBruto) {
@@ -136,10 +165,10 @@ public class TratamentoUtils {
         }
     }
 
-    public static Integer extrairScore(String scoreRaw) {
+    public static Double extrairScore(String scoreRaw) {
         if (scoreRaw == null) return null;
         try {
-            int score = (int) Double.parseDouble(scoreRaw);
+            Double score =  Double.parseDouble(scoreRaw) / 10 ;
             return score <= 0 ? null : score;
         } catch (NumberFormatException e) {
             return null;
