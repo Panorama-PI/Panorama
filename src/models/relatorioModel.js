@@ -3,7 +3,7 @@ var database = require("../database/config");
 
 function cadastrar(usuarioId, titulo, criterios) {
     var instrucaoSql = `
-        INSERT INTO relatorio (
+        INSERT INTO filtro (
             usuario_id,
             titulo,
             tipo_visao,
@@ -37,7 +37,7 @@ function cadastrar(usuarioId, titulo, criterios) {
 function listar(usuarioId) {
     var instrucaoSql = `
         SELECT *
-        FROM relatorio
+        FROM filtro
         WHERE usuario_id = ?
         ORDER BY criado_em DESC
     `;
@@ -48,7 +48,7 @@ function listar(usuarioId) {
 function buscarPorId(id, usuarioId) {
     var instrucaoSql = `
         SELECT *
-        FROM relatorio
+        FROM filtro
         WHERE id = ? AND usuario_id = ?
     `;
 
@@ -57,7 +57,7 @@ function buscarPorId(id, usuarioId) {
 
 function atualizar(id, usuarioId, titulo, criterios) {
     var instrucaoSql = `
-        UPDATE relatorio
+        UPDATE filtro
         SET titulo = ?,
             tipo_visao = ?,
             criterios_pesquisa = ?,
@@ -88,7 +88,7 @@ function atualizar(id, usuarioId, titulo, criterios) {
 
 function excluir(id, usuarioId) {
     var instrucaoSql = `
-        DELETE FROM relatorio
+        DELETE FROM filtro
         WHERE id = ? AND usuario_id = ?
     `;
 

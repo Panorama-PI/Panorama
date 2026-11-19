@@ -292,7 +292,12 @@ CREATE TABLE IF NOT EXISTS `filmes_db`.`genero_palavra` (
   texto TEXT ,
   status_enviado TINYINT,
   publicacao_id INT NOT NULL,
-  CONSTRAINT fk_publicacao_avaliacao FOREIGN KEY (publicacao_id) REFERENCES publicacao(id)
+  autor_id INT NOT NULL,
+  nota TINYINT UNSIGNED NOT NULL,
+  UNIQUE KEY uq_avaliacao_publicacao_autor (publicacao_id, autor_id),
+  CONSTRAINT chk_avaliacao_nota CHECK (nota BETWEEN 1 AND 5),
+  CONSTRAINT fk_publicacao_avaliacao FOREIGN KEY (publicacao_id) REFERENCES publicacao(id),
+  CONSTRAINT fk_autor_avaliacao FOREIGN KEY (autor_id) REFERENCES usuario(id)
   );
 
 INSERT INTO genero (nome)
