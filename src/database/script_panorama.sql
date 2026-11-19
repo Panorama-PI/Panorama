@@ -273,6 +273,20 @@ CREATE TABLE IF NOT EXISTS `filmes_db`.`genero` (
   );
 
 
+CREATE TABLE IF NOT EXISTS `filmes_db`.`filme_ator` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(100) NOT NULL,
+  `id_filme` INT,
+  CONSTRAINT fk_filme FOREIGN KEY (id_filme) REFERENCES filme(id)
+  );
+
+CREATE TABLE IF NOT EXISTS `filmes_db`.`genero_palavra` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(100) NOT NULL,
+  `id_genero` INT,
+  CONSTRAINT fk_genero FOREIGN KEY (id_genero) REFERENCES genero(id)
+  );
+
 INSERT INTO genero (nome)
 SELECT DISTINCT TRIM(genero)
 FROM filme_genero
