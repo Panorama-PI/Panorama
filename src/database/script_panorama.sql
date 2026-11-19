@@ -423,6 +423,11 @@ ALTER TABLE feedback
 ADD COLUMN avaliacao TINYINT UNSIGNED NOT NULL DEFAULT 0,
 ADD CONSTRAINT chk_avaliacao CHECK (avaliacao >= 0 AND avaliacao <= 5);
 
+ALTER TABLE usuario
+ADD COLUMN horario_inicio TIME NULL,
+ADD COLUMN horario_fim TIME NULL,
+ADD COLUMN dia_resumo_semanal TINYINT NULL;
+
 
 CREATE VIEW vw_emails_pendentes AS
 SELECT 
