@@ -35,8 +35,8 @@ public class FilmeDAO {
                 stmtFilme.setString(1, nome);
                 stmtFilme.setString(2, f.getDataLancamento());
 
-                if (f.getScore() != null) stmtFilme.setInt(3, f.getScore());
-                else stmtFilme.setNull(3, Types.INTEGER);
+                if (f.getScore() != null) stmtFilme.setDouble(3, f.getScore());
+                else stmtFilme.setNull(3, Types.DOUBLE);
 
                 stmtFilme.setString(4, f.getSinopse());
                 stmtFilme.setString(5, titulo);

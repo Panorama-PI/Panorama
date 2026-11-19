@@ -7,7 +7,7 @@ public class Filme {
     
     private String nome;
     private String dataLancamento;
-    private Integer score;
+    private Double score;
     private String sinopse;
     private String tituloOriginal;
     private String status;
@@ -37,11 +37,11 @@ public class Filme {
         this.dataLancamento = dataLancamento;
     }
 
-    public Integer getScore() {
+    public Double getScore() {
         return score;
     }
 
-    public void setScore(Integer score) {
+    public void setScore(Double score) {
         this.score = score;
     }
 
