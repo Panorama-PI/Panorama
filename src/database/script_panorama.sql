@@ -467,6 +467,118 @@ INNER JOIN usuario roteirista ON p.usuario_id = roteirista.id
 INNER JOIN usuario produtor ON f.autor_id = produtor.id
 INNER JOIN empresa e ON produtor.id_empresa = e.id;
 
+
+-- VIEWS DAS DASHBOARDS - Para facilitar essas daqui são utilizadas por geral
+    
+-- Data convertida, lucro/ROI calculados
+CREATE OR REPLACE VIEW vw_base_filme AS
+SELECT
+  t.*,
+  YEAR(t.data_lancamento)  AS ano,
+  MONTH(t.data_lancamento) AS mes
+FROM (
+  SELECT
+    f.id AS filme_id,
+    f.nome,
+    STR_TO_DATE(TRIM(f.data_lancamento), '%m/%d/%Y') AS data_lancamento,
+    f.score,
+    f.orcamento,
+    f.receita,
+    CASE WHEN f.orcamento > 0 AND f.receita > 0
+         THEN f.receita - f.orcamento END AS lucro,
+    CASE WHEN f.orcamento > 0 AND f.receita > 0
+         THEN f.receita / f.orcamento END AS roi
+  FROM filme f
+) t;
+
+-- Um registro por filme x gênero (sem duplicidades)
+CREATE OR REPLACE VIEW vw_base_filme_genero_unico AS
+SELECT DISTINCT
+  fg.filme_id,
+  TRIM(fg.genero) AS genero
+FROM filme_genero fg
+WHERE fg.genero IS NOT NULL AND TRIM(fg.genero) <> '';
+
+-- Filme + gênero - base da maioria dos especificos
+CREATE OR REPLACE VIEW vw_base_filme_genero AS
+SELECT b.*, g.genero
+FROM vw_base_filme b
+INNER JOIN vw_base_filme_genero_unico g ON g.filme_id = b.filme_id;
+
+-- Pares de gêneros que aparecem juntos no mesmo filme
+CREATE OR REPLACE VIEW vw_base_genero_associacao AS
+SELECT
+  a.genero,
+  b.genero AS genero_associado,
+  COUNT(*) AS qtd_filmes,
+  ROUND(100 * COUNT(*) / tot.total_filmes, 0) AS percentual
+FROM vw_base_filme_genero_unico a
+INNER JOIN vw_base_filme_genero_unico b
+        ON b.filme_id = a.filme_id AND b.genero <> a.genero
+INNER JOIN (
+  SELECT genero, COUNT(*) AS total_filmes
+  FROM vw_base_filme_genero_unico
+  GROUP BY genero
+) tot ON tot.genero = a.genero
+GROUP BY a.genero, b.genero, tot.total_filmes;
+
+-- DASHBOARD GERAL ROTEIRISTA
+	-- Avaliação média x genero
+CREATE OR REPLACE VIEW vw_rot_geral_grafico_nota_genero AS
+SELECT
+  genero,
+  nota_media,
+  qtd_filmes,
+  ROUND(AVG(nota_media) OVER (), 1) AS media_geral,
+  ROW_NUMBER() OVER (ORDER BY nota_media DESC) AS ranking
+FROM (
+  SELECT genero, ROUND(AVG(score), 1) AS nota_media, COUNT(*) AS qtd_filmes
+  FROM vw_base_filme_genero
+  WHERE score IS NOT NULL
+  GROUP BY genero
+) t;
+
+	-- Avaliação média x País de origem (use ranking <= 5)
+CREATE OR REPLACE VIEW vw_rot_geral_grafico_nota_pais AS
+SELECT
+  pais,
+  nota_media,
+  qtd_filmes,
+  ROUND(AVG(nota_media) OVER (), 1) AS media_geral,
+  ROW_NUMBER() OVER (ORDER BY nota_media DESC) AS ranking
+FROM (
+  SELECT pais, ROUND(AVG(score), 1) AS nota_media, COUNT(*) AS qtd_filmes
+  FROM filme
+  WHERE score IS NOT NULL AND pais IS NOT NULL
+  GROUP BY pais
+  HAVING COUNT(*) >= 5  -- amostra mínima por país
+) t;
+
+	-- Genero com melhro média de avaliações
+CREATE OR REPLACE VIEW vw_rot_geral_kpi_genero_melhor_nota AS
+SELECT genero, nota_media
+FROM vw_rot_geral_grafico_nota_genero
+WHERE ranking = 1;
+
+	-- País com melhor média de avaliações
+CREATE OR REPLACE VIEW vw_rot_geral_kpi_pais_melhor_nota AS
+SELECT pais, nota_media
+FROM vw_rot_geral_grafico_nota_pais
+WHERE ranking = 1;
+
+	-- Gênero mais associado a outros gêneros
+CREATE OR REPLACE VIEW vw_rot_geral_kpi_genero_associado AS
+SELECT genero, total_associacoes
+FROM (
+  SELECT
+    genero,
+    SUM(qtd_filmes) AS total_associacoes,
+    ROW_NUMBER() OVER (ORDER BY SUM(qtd_filmes) DESC) AS ranking
+  FROM vw_base_genero_associacao
+  GROUP BY genero
+) t
+WHERE ranking = 1;
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
