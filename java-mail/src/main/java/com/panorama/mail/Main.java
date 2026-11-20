@@ -6,6 +6,7 @@ import com.panorama.mail.model.*;
 import com.panorama.mail.service.EmailService;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,11 +36,72 @@ public class Main {
                     emailService.enviarEmail(pendente);
                     System.out.println("E-mail enviado com sucesso!");
                 }
-            }catch (Exception e) {
-                System.err.println("Erro ao enviar e-mail: " + e.getMessage());
+            }
+                // LEMBRETES SEMANAIS DOS PRODUTORES
+
+
+                List<ResumoProdutorEmail> produtores =
+                        emailDao.buscarProdutoresPendentes();
+
+                LocalDate periodoInicio =
+                        LocalDate.now().minusDays(7);
+
+                LocalDate periodoFim =
+                        LocalDate.now();
+
+                for (ResumoProdutorEmail produtor : produtores) {
+
+                    emailService.enviarLembreteProdutor(produtor);
+
+                    emailDao.marcarEnvioSemanal(
+                            produtor.getId(),
+                            "LEMBRETE_PRODUTOR",
+                            periodoInicio,
+                            periodoFim
+                    );
+
+                    System.out.println(
+                            "Lembrete enviado para o produtor: "
+                            + produtor.getNome()
+                    );
+                }
+
+                // RESUMOS SEMANAIS DOS ROTEIRISTAS
+
+                List<ResumoRoteiristaEmail> roteiristas =
+                        emailDao.buscarResumosRoteiristas();
+
+                for (ResumoRoteiristaEmail roteirista : roteiristas) {
+
+                    emailService.enviarResumoRoteirista(
+                            roteirista,
+                            periodoInicio,
+                            periodoFim
+                    );
+
+                    emailDao.marcarEnvioSemanal(
+                            roteirista.getId(),
+                            "RESUMO_ROTEIRISTA",
+                            periodoInicio,
+                            periodoFim
+                    );
+
+                    System.out.println(
+                            "Resumo semanal enviado para o roteirista: "
+                            + roteirista.getNome()
+                    );
+                }
+
+            } catch (Exception e) {
+
+                System.err.println(
+                        "Erro ao executar os envios de e-mail: "
+                        + e.getMessage()
+                );
+
                 e.printStackTrace();
             }
+
         }, 0, 30, TimeUnit.SECONDS);
 
-    }
 }
