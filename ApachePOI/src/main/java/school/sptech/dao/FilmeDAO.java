@@ -27,7 +27,7 @@ public class FilmeDAO {
              PreparedStatement stmtFilmeAtor = conn.prepareStatement(sqlFilmeAtor)) {
 
             System.out.println("Iniciando a gravação no banco. Isso pode levar alguns minutos...");
-
+            conn.setAutoCommit(false);
             for (Filme f : filmes) {
 
                 String titulo = f.getTituloOriginal();
@@ -102,7 +102,7 @@ public class FilmeDAO {
                     }
                 }
             }
-
+            conn.commit();
             System.out.println("✅ Todos os filmes foram salvos com sucesso!");
 
         } catch (SQLException e) {
