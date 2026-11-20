@@ -73,15 +73,15 @@ public class LeitorExcel {
                     String filmeRaw = lerTexto(linha.getCell(11), formatador);
                     filme.setPais(TratamentoUtils.extrairPais(filmeRaw));
 
-//                    List<String> nulos = camposNulos(filme);
-//                    if (!nulos.isEmpty()) {
-//                        linhasComNulos++;
-//                        Log logNulos = new Log("WARN", "LeitorExcel",
-//                                String.format("Linha %d ignorada, campos nulos: %s", (i + 1), String.join(", ", nulos)));
-//                        logDao.inserirLog(logNulos);
-//                        System.out.println(logNulos);
-//                        continue;
-//                    }
+                    List<String> nulos = camposNulos(filme);
+                    if (!nulos.isEmpty()) {
+                        linhasComNulos++;
+                        Log logNulos = new Log("WARN", "LeitorExcel",
+                                String.format("Linha %d ignorada, campos nulos: %s", (i + 1), String.join(", ", nulos)));
+                        logDao.inserirLog(logNulos);
+                        System.out.println(logNulos);
+                        continue;
+                    }
 
                     if (linhasLidas % 500 == 0) {
                         Log logProgresso = new Log("INFO", "LeitorExcel",

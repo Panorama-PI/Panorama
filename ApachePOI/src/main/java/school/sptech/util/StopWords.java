@@ -1,13 +1,11 @@
 package school.sptech.util;
 
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
 
-public final class StopWords {
+public class StopWords {
 
-    private StopWords() {
-    }
-
-    private static final Set<String> GRAMATICAIS = Set.of(
+    private static final List<String> LISTA = Arrays.asList(
             "a", "about", "above", "after", "again", "against", "all", "almost",
             "also", "am", "an", "and", "any", "are", "aren", "as",
             "at", "be", "because", "been", "before", "being", "below", "between",
@@ -28,24 +26,16 @@ public final class StopWords {
             "very", "via", "was", "wasn", "we", "were", "weren", "what",
             "when", "whenever", "where", "whether", "which", "while", "who", "whom",
             "whose", "why", "will", "with", "within", "without", "won", "would",
-            "wouldn", "yet", "you", "your", "yours", "yourself", "yourselves"
+            "wouldn", "yet", "you", "your", "yours", "yourself", "yourselves", "one",
+            "two", "three", "four", "five", "first", "second", "still", "soon",
+            "back", "find", "finds", "found", "finding", "become", "becomes", "became",
+            "becoming", "take", "takes", "took", "taking", "begin", "begins", "began",
+            "make", "makes", "made", "making", "get", "gets", "got", "getting",
+            "must", "may", "might", "shall", "help", "helps", "tries", "try",
+            "trying", "way"
     );
 
-
-    private static final Set<String> GENERICAS = Set.of(
-            "one", "two", "three", "four", "five", "first", "second",
-            "still", "soon", "back",
-            "find", "finds", "found", "finding",
-            "become", "becomes", "became", "becoming",
-            "take", "takes", "took", "taking",
-            "begin", "begins", "began",
-            "make", "makes", "made", "making",
-            "get", "gets", "got", "getting",
-            "must", "may", "might", "shall",
-            "help", "helps", "tries", "try", "trying", "way"
-    );
-
-    public static boolean ehStopWord(String palavraMinuscula) {
-        return GRAMATICAIS.contains(palavraMinuscula) || GENERICAS.contains(palavraMinuscula);
+    public static boolean ehStopWord(String palavra) {
+        return LISTA.contains(palavra);
     }
 }
