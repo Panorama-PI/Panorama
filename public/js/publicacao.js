@@ -81,6 +81,8 @@ function renderizarCards(lista) {
     for (var i = 0; i < lista.length; i++) {
         var pub = lista[i];
         var dataFormatada = formatarData(pub.data || pub.criado_em);
+        var nomeRoteirista = pub.roteirista || "Roteirista";
+        var inicialRoteirista = nomeRoteirista.trim().charAt(0).toUpperCase() || "R";
         var nota = obterNotaProdutor(pub);
         var estrelas = "";
         for (var estrela = 1; estrela <= 5; estrela++) {
@@ -90,6 +92,7 @@ function renderizarCards(lista) {
         html += `
             <div class="card-publicacao" data-id="${pub.id}">
                 <div class="card-coluna info-projeto">
+                    <span class="projeto-eyebrow"><span class="projeto-ponto"></span> Publicação</span>
                     <h2>${pub.titulo}</h2>
                     <div class="tags">
                         <span class="tag-data"><i class="fa-regular fa-calendar"></i> ${dataFormatada}</span>
@@ -97,7 +100,11 @@ function renderizarCards(lista) {
                 </div>
 
                 <div class="card-coluna autor-premissa">
-                    <span class="autor">Por: ${pub.roteirista || "Roteirista"}</span>
+                    <span class="autor-legenda">ROTEIRO DE</span>
+                    <div class="autor-identidade">
+                        <span class="autor-avatar" aria-hidden="true">${inicialRoteirista}</span>
+                        <span class="autor">${nomeRoteirista}</span>
+                    </div>
                     ${pub.premissa ? `<p class="premissa">${pub.premissa}</p>` : ""}
                 </div>
 
