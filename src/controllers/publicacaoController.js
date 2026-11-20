@@ -6,13 +6,18 @@ const { BadRequestError, NotFoundError } = require("../errors");
 
 function buscarPublicacoes(req, res, next) { // <-- Adicionado 'next'
     let idEmpresa = req.params.idEmpresa;
+    let idProdutor = Number(req.query.idProdutor);
 
-    if (!idEmpresa) {
+    if (!Number.isSafeInteger(Number(idEmpresa)) || Number(idEmpresa) <= 0) {
         // Erro 400 substituído
         return next(new BadRequestError("O parametro 'idEmpresa' é obrigatorio e não pode estar vazio"));
     } 
     
-    publicacaoModel.buscarPublicacoes(idEmpresa)
+    if (!Number.isSafeInteger(idProdutor) || idProdutor <= 0) {
+        return next(new BadRequestError("O ID do produtor é obrigatório e deve ser válido."));
+    }
+
+    publicacaoModel.buscarPublicacoes(idEmpresa, idProdutor)
         .then((resultado) => {
             if (resultado) {
                 console.log("[" + hora.obterDataHoraFormatada() + "] SUCESSO 200: publicações foram encontradas!");
@@ -27,6 +32,35 @@ function buscarPublicacoes(req, res, next) { // <-- Adicionado 'next'
             // Erro 500 repassado
             next(erro);
         });
+}
+
+function salvarAvaliacao(req, res, next) {
+    const idPublicacao = Number(req.params.id);
+    const idProdutor = Number(req.body.idProdutor);
+    const nota = Number(req.body.nota);
+
+    if (!Number.isSafeInteger(idPublicacao) || idPublicacao <= 0 ||
+        !Number.isSafeInteger(idProdutor) || idProdutor <= 0) {
+        return next(new BadRequestError("Informe IDs válidos para publicação e produtor."));
+    }
+
+    if (!Number.isInteger(nota) || nota < 1 || nota > 5) {
+        return next(new BadRequestError("A nota deve ser um número inteiro entre 1 e 5."));
+    }
+
+    publicacaoModel.salvarAvaliacao(idPublicacao, idProdutor, nota)
+        .then((publicacaoElegivel) => {
+            if (!publicacaoElegivel) {
+                return next(new NotFoundError("Publicação não encontrada para este produtor."));
+            }
+
+            return res.status(200).json({
+                sucesso: true,
+                mensagem: "Avaliação salva com sucesso.",
+                nota
+            });
+        })
+        .catch(next);
 }
 
 function buscarPublicacoesAnotacoes(req, res, next) { // <-- Adicionado 'next'
@@ -106,6 +140,7 @@ function buscarRoteiristas(req, res, next) { // <-- Adicionado 'next'
 
 module.exports = {
     buscarPublicacoes,
+    salvarAvaliacao,
     buscarPublicacoesAnotacoes,
     buscarRoteiristas
 };
