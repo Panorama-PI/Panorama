@@ -23,14 +23,16 @@ async function cadastrar(dados) {
         // 2. Cadastra o administrador vinculado à empresa
         var resultadoUsuario = await query(
             `INSERT INTO usuario
-                (nome, email, senha_hash, perfil_id, criado_em, id_empresa)
-             VALUES (?, ?, ?, ?, NOW(), ?)`,
+                (nome, email, senha_hash, perfil_id, criado_em, id_empresa, notificacao)
+            VALUES (?, ?, ?, ?, NOW(), ?, ?)`,
+
             [
                 dados.nomeAdmin,
                 dados.email,
                 senhaHash,
                 3,
-                idEmpresa
+                idEmpresa,
+                0
             ]
         );
 

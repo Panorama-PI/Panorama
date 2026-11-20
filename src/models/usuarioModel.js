@@ -24,9 +24,9 @@ async function cadastrar(nome, email, senha, perfilId, idEmpresa) {
     var senhaHash = await bcrypt.hash(senha, 10);
 
     return consultar(
-        `INSERT INTO usuario (nome, email, senha_hash, perfil_id, criado_em, id_empresa)
-         VALUES (?, ?, ?, ?, NOW(), ?)`,
-        [nome, email, senhaHash, perfilId, idEmpresa]
+        `INSERT INTO usuario (nome, email, senha_hash, perfil_id, criado_em, id_empresa, notificacao)
+        VALUES (?, ?, ?, ?, NOW(), ?, ?)`,
+        [nome, email, senhaHash, perfilId, idEmpresa, 0]
     );
 }
 
