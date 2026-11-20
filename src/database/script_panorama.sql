@@ -6,13 +6,12 @@
 -- -----------------------------------------------------
 -- Schema filmes_db
 -- -----------------------------------------------------
-
+drop database filmes_db;
 -- -----------------------------------------------------
 -- Schema filmes_db
 -- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `filmes_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ;
 USE `filmes_db` ;
-
 -- -----------------------------------------------------
 -- Table `filmes_db`.`empresa`
 -- -----------------------------------------------------
@@ -109,7 +108,6 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 5
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
-
 
 -- -----------------------------------------------------
 -- Table `filmes_db`.`projeto`
@@ -282,7 +280,7 @@ CREATE TABLE IF NOT EXISTS `filmes_db`.`filme_ator` (
 
 CREATE TABLE IF NOT EXISTS `filmes_db`.`genero_palavra` (
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `nome` VARCHAR(100) NOT NULL,
+  `nome` VARCHAR(100) UNIQUE NOT NULL,
   `id_genero` INT,
   CONSTRAINT fk_genero FOREIGN KEY (id_genero) REFERENCES genero(id)
   );
@@ -292,18 +290,70 @@ CREATE TABLE IF NOT EXISTS `filmes_db`.`genero_palavra` (
   texto TEXT ,
   status_enviado TINYINT,
   publicacao_id INT NOT NULL,
-  autor_id INT NOT NULL,
-  nota TINYINT UNSIGNED NOT NULL,
-  UNIQUE KEY uq_avaliacao_publicacao_autor (publicacao_id, autor_id),
-  CONSTRAINT chk_avaliacao_nota CHECK (nota BETWEEN 1 AND 5),
-  CONSTRAINT fk_publicacao_avaliacao FOREIGN KEY (publicacao_id) REFERENCES publicacao(id),
-  CONSTRAINT fk_autor_avaliacao FOREIGN KEY (autor_id) REFERENCES usuario(id)
+  CONSTRAINT fk_publicacao_avaliacao FOREIGN KEY (publicacao_id) REFERENCES publicacao(id)
   );
 
+-- A tabela genero é preenchida AQUI, lendo a coluna de texto da filme_genero ANTIGA.
+-- Por isso o DROP da filme_genero só pode vir depois deste INSERT.
 INSERT INTO genero (nome)
 SELECT DISTINCT TRIM(genero)
 FROM filme_genero
 WHERE genero IS NOT NULL AND TRIM(genero) <> '';
+
+
+-- =====================================================================
+-- RECRIAÇÃO DE filme_genero, ator E filme_ator (modelo associativo)
+-- ORDEM: 1) DROP  ->  2) CREATE  ->  3) ALTERs (mais abaixo)
+-- ATENÇÃO: o DROP apaga os dados das 3 tabelas.
+-- =====================================================================
+
+-- 1) DROP
+-- Nenhuma dessas 3 tabelas é referenciada por outra (todas apontam para filme),
+-- então a ordem entre elas é livre.
+DROP TABLE IF EXISTS `filmes_db`.`filme_elenco`;
+DROP TABLE IF EXISTS `filmes_db`.`filme_genero`;
+DROP TABLE IF EXISTS `filmes_db`.`filme_ator`;
+
+-- 2) CREATE
+-- (a tabela genero já foi criada acima)
+
+-- Associativa FILME x GENERO
+CREATE TABLE IF NOT EXISTS `filmes_db`.`filme_genero` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_filme` INT NOT NULL,
+  `id_genero` INT NOT NULL,
+  CONSTRAINT `fk_filme_genero_filme`
+    FOREIGN KEY (`id_filme`) REFERENCES `filmes_db`.`filme` (`id`),
+  CONSTRAINT `fk_filme_genero_genero`
+    FOREIGN KEY (`id_genero`) REFERENCES `filmes_db`.`genero` (`id`)
+);
+
+-- ATOR
+CREATE TABLE IF NOT EXISTS `filmes_db`.`ator` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(150) NOT NULL
+);
+-- Associativa FILME x ATOR (com o personagem interpretado)
+CREATE TABLE IF NOT EXISTS `filmes_db`.`filme_ator` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_filme` INT NOT NULL,
+  `id_ator` INT NOT NULL,
+  `personagem` VARCHAR(255) NULL,
+  CONSTRAINT `fk_filme_ator_filme`
+    FOREIGN KEY (`id_filme`) REFERENCES `filmes_db`.`filme` (`id`),
+  CONSTRAINT `fk_filme_ator_ator`
+    FOREIGN KEY (`id_ator`) REFERENCES `filmes_db`.`ator` (`id`)
+);
+
+-- =====================================================================
+-- 3) ALTERs
+-- =====================================================================
+
+-- Nome do gênero único.
+-- Se der erro 1062 (Duplicate entry), há gêneros repetidos em genero: remova os duplicados antes.
+ALTER TABLE genero ADD CONSTRAINT uq_genero_nome UNIQUE (nome);
+-- Se a intenção era a palavra da tabela genero_palavra, use esta linha no lugar da de cima:
+-- ALTER TABLE genero_palavra ADD CONSTRAINT uq_genero_palavra_nome UNIQUE (nome);
 
 ALTER TABLE projeto ADD COLUMN genero_id INT NULL;
 ALTER TABLE projeto ADD CONSTRAINT fk_projeto_genero FOREIGN KEY (genero_id) REFERENCES genero(id) ON DELETE SET NULL;
@@ -324,6 +374,8 @@ ADD COLUMN dia_resumo_semanal TINYINT NULL;
 
 desc feedback;
 CREATE OR REPLACE VIEW vw_emails_pendentes AS
+ 
+-- 1) TOKEN
 SELECT 
     t.id AS id_token,
     NULL AS id_feedback,
@@ -336,12 +388,17 @@ SELECT
     t.codigo AS codigo,
     t.expiracao AS expiracao,
     NULL AS texto_feedback,
-    NULL AS notificacao
+    NULL AS notificacao,
+    u.horario_inicio AS horario_inicio,   -- NULL se o e-mail do token ainda não for de um usuário
+    u.horario_fim AS horario_fim,
+    NULL AS id_avaliacao
 FROM token t
 INNER JOIN empresa e ON t.id_empresa = e.id
-
+LEFT JOIN usuario u ON u.email = t.email_destinatario   
+ 
 UNION ALL
-
+ 
+-- 2) FEEDBACK (produtor -> roteirista)
 SELECT 
     NULL AS id_token,
     f.id AS id_feedback,
@@ -354,12 +411,38 @@ SELECT
     NULL AS codigo,
     NULL AS expiracao,     
     f.texto AS texto_feedback,
-    roteirista.notificacao AS notificacao
+    roteirista.notificacao AS notificacao,
+    roteirista.horario_inicio AS horario_inicio,
+    roteirista.horario_fim AS horario_fim,
+    NULL AS id_avaliacao
 FROM feedback f
 INNER JOIN publicacao p ON f.publicacao_id = p.id
 INNER JOIN usuario roteirista ON p.usuario_id = roteirista.id
 INNER JOIN usuario produtor ON f.autor_id = produtor.id
-INNER JOIN empresa e ON produtor.id_empresa = e.id;
+INNER JOIN empresa e ON produtor.id_empresa = e.id
+ 
+UNION ALL
+ 
+SELECT 
+    NULL AS id_token,
+    NULL AS id_feedback,
+    e.nome AS nome_empresa,          -- empresa do roteirista (não há autor para buscar a do produtor)
+    NULL AS nome_produtor,
+    roteirista.nome AS nome_roteirista,
+    'AVALIACAO' AS tipo,
+    a.status_enviado AS status_enviado,
+    roteirista.email AS email_destinatario,
+    NULL AS codigo,
+    NULL AS expiracao,
+    a.texto AS texto_feedback,      
+    roteirista.notificacao AS notificacao,
+    roteirista.horario_inicio AS horario_inicio,
+    roteirista.horario_fim AS horario_fim,
+    a.id AS id_avaliacao
+FROM avaliacao a
+INNER JOIN publicacao p ON a.publicacao_id = p.id
+INNER JOIN usuario roteirista ON p.usuario_id = roteirista.id
+INNER JOIN empresa e ON roteirista.id_empresa = e.id;
 
 
 
@@ -457,6 +540,7 @@ ADD COLUMN avaliacao TINYINT UNSIGNED NOT NULL DEFAULT 0;
 
 ALTER TABLE feedback DROP COLUMN avaliacao;
 
+
 CREATE OR REPLACE VIEW vw_emails_pendentes AS
 SELECT 
     t.id AS id_token,
@@ -520,12 +604,15 @@ FROM (
 ) t;
 
 -- Um registro por filme x gênero (sem duplicidades)
+-- ATUALIZADA: filme_genero agora é associativa (id_filme, id_genero),
+-- então o nome do gênero vem da tabela genero.
 CREATE OR REPLACE VIEW vw_base_filme_genero_unico AS
 SELECT DISTINCT
-  fg.filme_id,
-  TRIM(fg.genero) AS genero
+  fg.id_filme AS filme_id,
+  TRIM(g.nome) AS genero
 FROM filme_genero fg
-WHERE fg.genero IS NOT NULL AND TRIM(fg.genero) <> '';
+INNER JOIN genero g ON g.id = fg.id_genero
+WHERE g.nome IS NOT NULL AND TRIM(g.nome) <> '';
 
 -- Filme + gênero - base da maioria dos especificos
 CREATE OR REPLACE VIEW vw_base_filme_genero AS
