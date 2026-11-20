@@ -53,20 +53,6 @@ COLLATE = utf8mb4_unicode_ci;
 -- -----------------------------------------------------
 -- Table `filmes_db`.`filme_elenco`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `filmes_db`.`filme_elenco` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `filme_id` INT NULL DEFAULT NULL,
-  `ator` TEXT NULL DEFAULT NULL,
-  `personagem` TEXT NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `filme_id` (`filme_id` ASC) VISIBLE,
-  CONSTRAINT `filme_elenco_ibfk_1`
-    FOREIGN KEY (`filme_id`)
-    REFERENCES `filmes_db`.`filme` (`id`))
-ENGINE = InnoDB
-AUTO_INCREMENT = 82593
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_unicode_ci;
 
 
 -- -----------------------------------------------------
@@ -345,6 +331,49 @@ CREATE TABLE IF NOT EXISTS `filmes_db`.`filme_ator` (
     FOREIGN KEY (`id_ator`) REFERENCES `filmes_db`.`ator` (`id`)
 );
 
+DROP TABLE IF EXISTS avaliacao;
+
+CREATE TABLE IF NOT EXISTS avaliacao (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    texto DECIMAL(2,1) NOT NULL,
+    status_enviado TINYINT NOT NULL DEFAULT 0,
+    publicacao_id INT NOT NULL,
+    autor_id INT NOT NULL,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_publicacao_avaliacao
+        FOREIGN KEY (publicacao_id)
+        REFERENCES publicacao(id),
+
+    CONSTRAINT fk_avaliacao_autor
+        FOREIGN KEY (autor_id)
+        REFERENCES usuario(id),
+
+    CONSTRAINT uq_avaliacao_publicacao_autor
+        UNIQUE (publicacao_id, autor_id),
+
+    CONSTRAINT chk_avaliacao_nota
+        CHECK (texto >= 0 AND texto <= 5)
+);
+
+CREATE TABLE IF NOT EXISTS email_envio_semanal (
+
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    usuario_id INT NOT NULL,
+    tipo VARCHAR(30) NOT NULL,
+    periodo_inicio DATE NOT NULL,
+    periodo_fim DATE NOT NULL,
+    enviado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_email_semanal_usuario
+        FOREIGN KEY (usuario_id)
+        REFERENCES usuario(id),
+
+    CONSTRAINT uq_email_semanal
+        UNIQUE (usuario_id, tipo, periodo_inicio)
+
+);
+
 -- =====================================================================
 -- 3) ALTERs
 -- =====================================================================
@@ -371,6 +400,17 @@ ADD COLUMN horario_fim TIME NULL,
 ADD COLUMN dia_resumo_semanal TINYINT NULL;
 
 
+DROP TABLE IF EXISTS genero_palavra;
+
+CREATE TABLE genero_palavra (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  id_genero INT NOT NULL,
+  INDEX idx_genero_palavra (id_genero, nome),
+  CONSTRAINT fk_genero FOREIGN KEY (id_genero) REFERENCES genero(id)
+);
+
+ALTER TABLE ator ADD CONSTRAINT uq_ator_nome UNIQUE (nome);
 
 desc feedback;
 CREATE OR REPLACE VIEW vw_emails_pendentes AS
