@@ -74,6 +74,7 @@
                     <thead>
                         <tr>
                             <th>Projeto</th>
+                            <th>Gêneros</th>
                             <th>Criado em</th>
                             <th>Anotações</th>
                             <th>Ações</th>
@@ -94,9 +95,13 @@
                     ← Voltar aos projetos
                 </button>
 
-                <h2 id="nome-projeto-ativo">
-                    Nome do projeto
-                </h2>
+                <div class="anotacoes-detalhes-titulo">
+                    <h2 id="nome-projeto-ativo">
+                        Nome do projeto
+                    </h2>
+
+                    <div class="genero-tags" id="tagsProjetoAtivo"></div>
+                </div>
 
                 <button type="button" class="anotacoes-btn-principal" id="nova-anotacao-projeto">
                     + Nova anotação
@@ -134,32 +139,27 @@
 
                 <div class="anotacoes-campo">
                     <label for="projeto_nome">Nome do projeto</label>
-                    <input type="text" id="projeto_nome" name="nome" maxlength="150"
+                    <input type="text" id="projeto_nome" name="nome" maxlength="50"
                         placeholder="Ex.: Meu roteiro de suspense" required>
                 </div>
                 <div class="anotacoes-campo">
-                     <label for="projeto_genero">Gênero</label>
-                         <select id="projeto_genero" name="generos" multiple size="6" required>
-                            <option value="acao">Ação</option>
-                            <option value="aventura">Aventura</option>
-                            <option value="comedia">Comédia</option>
-                            <option value="drama">Drama</option>
-                            <option value="terror">Terror</option>
-                            <option value="suspense">Suspense</option>
-                            <option value="romance">Romance</option>
-                            <option value="ficcao-cientifica">Ficção Científica</option>
-                            <option value="fantasia">Fantasia</option>
-                            <option value="animacao">Animação</option>
-                            <option value="documentario">Documentário</option>
-                            <option value="musical">Musical</option>
-                        </select>
-                            <small>Segure Ctrl (ou Cmd no Mac) para selecionar mais de um.</small>
+                    <label for="selectGenero">Gêneros</label>
+
+                    <div class="genero-tags genero-tags-form" id="tagsGeneroForm"></div>
+
+                    <select id="selectGenero" onchange="adicionarGenero()">
+                        <option value=""> Adicionar gênero</option>
+                    </select>
+
+                    <small class="anotacoes-dica" id="dicaGenero">
+                        Escolha um ou mais gêneros. Clique no × da tag para remover.
+                    </small>
                 </div>
 
-                                <footer class="anotacoes-modal-acoes">
-                                    <button type="button" class="anotacoes-btn-secundario" id="cancelar-projeto">
-                                        Cancelar
-                                    </button>
+                <footer class="anotacoes-modal-acoes">
+                    <button type="button" class="anotacoes-btn-secundario" id="cancelar-projeto">
+                        Cancelar
+                    </button>
 
                     <button type="submit" class="anotacoes-btn-principal" id="salvar-projeto">
                         Criar projeto

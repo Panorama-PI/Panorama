@@ -229,6 +229,13 @@ body.body-anotacoes {
 }
 
 .anotacoes-lista-topo h2,
+.anotacoes-detalhes-titulo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .anotacoes-detalhes-topo h2 {
     margin: 0;
     color: var(--cor-texto);
@@ -268,22 +275,22 @@ body.body-anotacoes {
 
 .anotacoes-tabela th:nth-child(1),
 .anotacoes-tabela td:nth-child(1) {
-    width: 18%;
+    width: 20%;
 }
 
 .anotacoes-tabela th:nth-child(2),
 .anotacoes-tabela td:nth-child(2) {
-    width: 22%;
+    width: 26%;
 }
 
 .anotacoes-tabela th:nth-child(3),
 .anotacoes-tabela td:nth-child(3) {
-    width: 15%;
+    width: 12%;
 }
 
 .anotacoes-tabela th:nth-child(4),
 .anotacoes-tabela td:nth-child(4) {
-    width: 15%;
+    width: 12%;
 }
 
 .anotacoes-tabela th:nth-child(5),
@@ -962,4 +969,98 @@ body.body-anotacoes {
 .anotacoes-campo small {
     color: var(--cor-cinza-claro);
     font-size: 0.8rem;
+}
+
+/* =========================================================
+   TAGS DE GÊNERO (estilo Trello / Jira)
+   Cada gênero recebe um --h (matiz) calculado no JS pelo nome,
+   então a mesma tag tem sempre a mesma cor.
+   ========================================================= */
+
+.genero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.genero-tags:empty {
+    display: none;
+}
+
+.anotacoes-tabela tbody td:nth-child(2) .genero-tags {
+    justify-content: center;
+}
+
+.genero-tag {
+    --h: 0;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    padding: 0.2rem 0.65rem;
+    border: 1px solid hsla(var(--h), 70%, 60%, 0.55);
+    border-radius: 999px;
+
+    color: hsl(var(--h), 90%, 82%);
+    background: hsla(var(--h), 70%, 55%, 0.18);
+
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.genero-tag-remover {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 1.1rem;
+    height: 1.1rem;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+
+    color: inherit;
+    background: transparent;
+
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.genero-tag-remover:hover,
+.genero-tag-remover:focus-visible {
+    background: hsla(var(--h), 70%, 55%, 0.35);
+    outline: none;
+}
+
+.genero-tags-form {
+    min-height: 2rem;
+    padding: 0.5rem;
+    border: 1px dashed var(--cor-borda-card);
+    border-radius: 8px;
+    background: var(--cor-fundo-escuro);
+}
+
+/* no formulário a caixa fica visível mesmo vazia */
+.genero-tags-form:empty {
+    display: flex;
+}
+
+.genero-tags-form:empty::before {
+    content: "Nenhum gênero selecionado";
+    color: var(--cor-cinza-claro);
+    font-size: 0.85rem;
+}
+
+.anotacoes-dica {
+    color: var(--cor-cinza-claro);
+    font-size: 0.8rem;
+}
+
+.anotacoes-dica.erro {
+    color: var(--cor-vermelho);
 }
