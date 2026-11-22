@@ -1,4 +1,8 @@
 
+// gêneros do banco e gêneros marcados no formulário de projeto
+var listaGeneros = [];
+var generosEscolhidos = [];
+
 document.addEventListener("DOMContentLoaded", function () {
 
     // =========================
@@ -51,12 +55,6 @@ if (typeof preencherUsuario === "function") {
     // FUNÇÕES AUXILIARES
     // =========================
 
-    function escapar(texto) {
-        var div = document.createElement("div");
-        div.textContent = texto == null ? "" : String(texto);
-        return div.innerHTML;
-    }
-
     function contarAnotacoes(idProjeto) {
         var total = 0;
 
@@ -68,20 +66,6 @@ if (typeof preencherUsuario === "function") {
 
         return total;
     }
-
-
-function obterGenerosSelecionados() {
-    var select = document.getElementById("projeto_generos");
-    var generos = [];
-
-    for (var i = 0; i < select.options.length; i++) {
-        if (select.options[i].selected) {
-            generos.push(select.options[i].value);
-        }
-    }
-
-    return generos;
-}
 
 
     function nomeDoProjeto(idProjeto) {
@@ -157,6 +141,9 @@ function obterGenerosSelecionados() {
         var campoId = document.getElementById("projeto_id");
         var tituloModal = document.getElementById("titulo-modal-projeto");
         var botaoSalvar = document.getElementById("salvar-projeto");
+
+        generosEscolhidos = [];
+        exibirGenerosEscolhidos();
 
         if (campoId) {
             campoId.value = "";
@@ -318,10 +305,10 @@ function obterGenerosSelecionados() {
             var linha = document.createElement("tr");
 
             linha.innerHTML = `
-    <td>${escapar(projeto.nome)}</td>
-    <td>${escapar(formatarGeneros(projeto.generos || []))}</td>
-    <td>—</td>
-    <td>${contarAnotacoes(projeto.id)} anotações</td>
+                <td>${escapar(projeto.nome)}</td>
+                <td>${montarTagsProjeto(projeto.generos) || "—"}</td>
+                <td>—</td>
+                <td>${contarAnotacoes(projeto.id)} anotações</td>
 
                 <td>
                     <div class="projeto-acoes">
@@ -404,13 +391,15 @@ function obterGenerosSelecionados() {
         campoId.value = projetoEncontrado.id;
         campoNome.value = projetoEncontrado.nome;
 
-        var selectGeneros = document.getElementById("projeto_generos");
+        generosEscolhidos = [];
 
-for (var i = 0; i < selectGeneros.options.length; i++) {
-    selectGeneros.options[i].selected =
-        projetoEncontrado.generos &&
-        projetoEncontrado.generos.includes(selectGeneros.options[i].value);
-}
+        if (projetoEncontrado.generos) {
+            for (var g = 0; g < projetoEncontrado.generos.length; g++) {
+                generosEscolhidos.push(Number(projetoEncontrado.generos[g].id));
+            }
+        }
+
+        exibirGenerosEscolhidos();
 
         if (tituloModal) {
             tituloModal.textContent = "Editar projeto";
@@ -487,7 +476,7 @@ for (var i = 0; i < selectGeneros.options.length; i++) {
         var idProjeto = campoId ? campoId.value : "";
         var nome = campoNome ? campoNome.value.trim() : "";
         var idUsuario = sessionStorage.ID_USUARIO;
-        var generos = obterGenerosSelecionados();
+        var generos = generosEscolhidos;
 
         if (!idUsuario) {
             alert("Não foi possível identificar o usuário. Entre novamente.");
@@ -496,6 +485,17 @@ for (var i = 0; i < selectGeneros.options.length; i++) {
 
         if (nome === "") {
             alert("Digite o nome do projeto.");
+            return;
+        }
+
+        if (generos.length === 0) {
+            var dica = document.getElementById("dicaGenero");
+
+            if (dica) {
+                dica.classList.add("erro");
+            }
+
+            alert("Escolha pelo menos um gênero para o projeto.");
             return;
         }
 
@@ -516,7 +516,7 @@ for (var i = 0; i < selectGeneros.options.length; i++) {
                 id: idProjeto,
                 idUsuario: idUsuario,
                 nome: nome,
-                genero:generos
+                generos: generos
             })
         })
             .then(function (resposta) {
@@ -543,6 +543,30 @@ for (var i = 0; i < selectGeneros.options.length; i++) {
             })
             .catch(function (erro) {
                 mostrarErro("Erro ao salvar projeto.", erro);
+            });
+    }
+
+    // =========================
+    // CARREGAR GÊNEROS
+    // =========================
+
+    function obterGeneros() {
+        fetch("/anotacoes/generos/listar", {
+            cache: "no-store"
+        })
+            .then(function (resposta) {
+                if (!resposta.ok) {
+                    throw new Error("Não foi possível carregar os gêneros.");
+                }
+
+                return resposta.json();
+            })
+            .then(function (generos) {
+                listaGeneros = generos;
+                exibirGenerosEscolhidos();
+            })
+            .catch(function (erro) {
+                mostrarErro("Erro ao carregar os gêneros.", erro);
             });
     }
 
@@ -653,6 +677,22 @@ for (var i = 0; i < selectGeneros.options.length; i++) {
 
         if (tituloProjeto) {
             tituloProjeto.textContent = nomeAtivo;
+        }
+
+        var tagsAtivo = document.getElementById("tagsProjetoAtivo");
+
+        if (tagsAtivo) {
+            tagsAtivo.innerHTML = "";
+
+            for (var k = 0; k < dashboardAtual.projetos.length; k++) {
+                if (dashboardAtual.projetos[k].id == dashboardAtual.projetoSelecionado) {
+                    var generosDoProjeto = dashboardAtual.projetos[k].generos || [];
+
+                    for (var m = 0; m < generosDoProjeto.length; m++) {
+                        tagsAtivo.innerHTML += montarTagGenero(generosDoProjeto[m], false);
+                    }
+                }
+            }
         }
 
         var exibidas = 0;
@@ -911,28 +951,182 @@ for (var i = 0; i < selectGeneros.options.length; i++) {
     if (email) document.getElementById('c_email').innerHTML = email;
 }
 
-function formatarGeneros(generos) {
-    var select = document.getElementById("projeto_generos");
-    var nomes = [];
-
-    for (var i = 0; i < generos.length; i++) {
-        for (var j = 0; j < select.options.length; j++) {
-            if (select.options[j].value == generos[i]) {
-                nomes.push(select.options[j].textContent);
-                break;
-            }
-        }
-    }
-
-    return nomes.join(", ");
-}
-
 
     // =========================
     // INICIALIZAÇÃO
     // =========================
 
+    obterGeneros();
     obterProjetos();
     obterAnotacoes();
 
 });
+
+
+// =========================
+// FUNÇÕES GLOBAIS (chamadas pelo onclick / onchange do HTML)
+// =========================
+
+function escapar(texto) {
+    var div = document.createElement("div");
+    div.textContent = texto == null ? "" : String(texto);
+    return div.innerHTML;
+}
+
+// o banco guarda o nome em inglês (mesmo padrão do filtro de pesquisa)
+var traducaoGeneros = {
+    "Drama": "Drama",
+    "Action": "Ação",
+    "Science Fiction": "Ficção científica",
+    "Adventure": "Aventura",
+    "Animation": "Animação",
+    "Family": "Família",
+    "Fantasy": "Fantasia",
+    "Comedy": "Comédia",
+    "Thriller": "Suspense",
+    "Crime": "Crime",
+    "Horror": "Terror",
+    "Mystery": "Mistério",
+    "History": "História",
+    "War": "Guerra",
+    "Documentary": "Documentário",
+    "Romance": "Romance",
+    "Music": "Música",
+    "Western": "Faroeste",
+    "TV Movie": "Filme para TV"
+};
+
+function nomeDoGenero(nome) {
+    if (traducaoGeneros[nome]) {
+        return traducaoGeneros[nome];
+    }
+
+    return nome;
+}
+
+// transforma o nome em um número de 0 a 359 (cor da tag), sempre o mesmo para o mesmo gênero
+function corDoGenero(nome) {
+    var cor = 0;
+
+    for (var i = 0; i < nome.length; i++) {
+        cor = (cor * 31 + nome.charCodeAt(i)) % 360;
+    }
+
+    return cor;
+}
+
+function montarTagGenero(genero, comBotao) {
+    var botao = "";
+
+    if (comBotao) {
+        botao = `<button type="button" class="genero-tag-remover" onclick="removerGenero(${genero.id})" aria-label="Remover gênero">×</button>`;
+    }
+
+    return `
+        <span class="genero-tag" style="--h: ${corDoGenero(genero.nome)}">
+            ${escapar(nomeDoGenero(genero.nome))}${botao}
+        </span>
+    `;
+}
+
+function montarTagsProjeto(generos) {
+    var tags = "";
+
+    if (!generos) {
+        return "";
+    }
+
+    for (var i = 0; i < generos.length; i++) {
+        tags += montarTagGenero(generos[i], false);
+    }
+
+    if (tags === "") {
+        return "";
+    }
+
+    return `<div class="genero-tags">${tags}</div>`;
+}
+
+function buscarGenero(idGenero) {
+    for (var i = 0; i < listaGeneros.length; i++) {
+        if (listaGeneros[i].id == idGenero) {
+            return listaGeneros[i];
+        }
+    }
+
+    return null;
+}
+
+function generoJaEscolhido(idGenero) {
+    for (var i = 0; i < generosEscolhidos.length; i++) {
+        if (generosEscolhidos[i] == idGenero) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// desenha as tags escolhidas e deixa no select só os gêneros que ainda faltam
+function exibirGenerosEscolhidos() {
+    var caixa = document.getElementById("tagsGeneroForm");
+    var select = document.getElementById("selectGenero");
+
+    if (!caixa || !select) {
+        return;
+    }
+
+    var tags = "";
+
+    for (var i = 0; i < generosEscolhidos.length; i++) {
+        var genero = buscarGenero(generosEscolhidos[i]);
+
+        if (genero) {
+            tags += montarTagGenero(genero, true);
+        }
+    }
+
+    caixa.innerHTML = tags;
+
+    var opcoes = `<option value="">+ Adicionar gênero</option>`;
+
+    for (var j = 0; j < listaGeneros.length; j++) {
+        if (!generoJaEscolhido(listaGeneros[j].id)) {
+            opcoes += `<option value="${listaGeneros[j].id}">${escapar(nomeDoGenero(listaGeneros[j].nome))}</option>`;
+        }
+    }
+
+    select.innerHTML = opcoes;
+    select.value = "";
+    select.disabled = select.options.length === 1;
+
+    var dica = document.getElementById("dicaGenero");
+
+    if (dica) {
+        dica.classList.remove("erro");
+    }
+}
+
+// onchange do select
+function adicionarGenero() {
+    var select = document.getElementById("selectGenero");
+
+    if (select.value !== "") {
+        generosEscolhidos.push(Number(select.value));
+        exibirGenerosEscolhidos();
+    }
+}
+
+// onclick do × da tag
+function removerGenero(idGenero) {
+    var restantes = [];
+
+    for (var i = 0; i < generosEscolhidos.length; i++) {
+        if (generosEscolhidos[i] != idGenero) {
+            restantes.push(generosEscolhidos[i]);
+        }
+    }
+
+    generosEscolhidos = restantes;
+    exibirGenerosEscolhidos();
+}
