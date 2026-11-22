@@ -8,8 +8,9 @@ public class PendenciaEmailEnvio {
     private Roteirista roteirista;
     private Feedback feedback;
     private Token token;
+    private Avaliacao avaliacao;
 
-    public PendenciaEmailEnvio(String tipo, Integer status, Empresa empresa, Produtor produtor, Roteirista roteirista, Feedback feedback, Token token) {
+    public PendenciaEmailEnvio(String tipo, Integer status, Empresa empresa, Produtor produtor, Roteirista roteirista, Feedback feedback, Token token, Avaliacao avaliacao) {
         this.tipo = tipo;
         this.status = status;
         this.empresa = empresa;
@@ -17,6 +18,7 @@ public class PendenciaEmailEnvio {
         this.roteirista = roteirista;
         this.feedback = feedback;
         this.token = token;
+        this.avaliacao = avaliacao;
     }
 
     public String getTipo() {
@@ -73,5 +75,13 @@ public class PendenciaEmailEnvio {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Avaliacao getAvaliacao() {
+        return avaliacao;
+    }
+
+    public void setAvaliacao(Avaliacao avaliacao) {
+        this.avaliacao = avaliacao;
     }
 }
