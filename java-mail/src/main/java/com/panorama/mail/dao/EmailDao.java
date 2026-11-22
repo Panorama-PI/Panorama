@@ -4,7 +4,9 @@ import com.panorama.mail.config.ConnectionProvider;
 import com.panorama.mail.model.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,7 +19,7 @@ public class EmailDao {
         String sql = """
                 SELECT *
                 FROM vw_emails_pendentes
-                WHERE (status_enviado = 0 OR status_enviado > 1) AND (notificacao = 1 OR notificacao IS NULL);
+                WHERE (status_enviado = 0 OR status_enviado > 1) AND (notificacao = 1 OR notificacao IS NULL';
                 """;
 
 
@@ -32,7 +34,9 @@ public class EmailDao {
 
             String nomeRoteirista = rs.getString("nome_roteirista");
             String emailDestinatario = rs.getString("email_destinatario");
-            Roteirista roteirista = new Roteirista(nomeRoteirista, emailDestinatario);
+            Time horarioInicio = rs.getTime("horario_inicio");
+            Time horarioFim = rs.getTime("horario_fim");
+            Roteirista roteirista = new Roteirista(nomeRoteirista, emailDestinatario,horarioInicio,horarioFim);
 
             Feedback feedback = null;
             Object idFeedbackObj = rs.getObject("id_feedback");
@@ -40,6 +44,15 @@ public class EmailDao {
                 feedback = new Feedback(
                         ((Number) idFeedbackObj).intValue(),
                         rs.getString("texto_feedback")
+                );
+            }
+
+            Avaliacao avaliacao = null;
+            Object idAvaliacaoObj = rs.getObject("id_avaliacao");
+            if (idAvaliacaoObj != null) {
+                avaliacao = new Avaliacao(
+                        ((Number) idFeedbackObj).intValue(),
+                        rs.getDouble("texto_feedback")
                 );
             }
 
@@ -53,7 +66,7 @@ public class EmailDao {
                 LocalDateTime expiracao = (expiracaoTs != null) ? expiracaoTs.toLocalDateTime() : null;
                 token = new Token(codigoToken, expiracao);
             }
-            return new PendenciaEmailEnvio(tipo,status,empresa,produtor,roteirista,feedback,token);
+            return new PendenciaEmailEnvio(tipo,status,empresa,produtor,roteirista,feedback,token,avaliacao);
 
         });
     }
