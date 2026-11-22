@@ -1,3 +1,4 @@
+
 // Configuração e funções usadas pelas duas telas de dashboard (geral e específica).
 
 Chart.defaults.color = '#828282';
@@ -13,7 +14,7 @@ function tituloGrafico(texto, comSubtitulo) {
         display: true,
         text: texto,
         color: '#FFFFFF',
-        font: { size: 16, weight: 'bold' },
+        font: { size: 18, weight: 'bold' },
         align: 'start',
         padding: { top: 0, bottom: comSubtitulo ? 4 : 24 }
     };
@@ -26,7 +27,7 @@ function subtituloGrafico(texto) {
         text: texto,
         color: '#34C759',
         align: 'start',
-        font: { size: 12 },
+        font: { size: 13 },
         padding: { bottom: 24 }
     };
 }
@@ -41,7 +42,7 @@ function pluginRotuloFimBarra(formatar) {
             const valores = chart.data.datasets[0].data;
             ctx.save();
             ctx.fillStyle = '#FFFFFF';
-            ctx.font = "bold 11px 'Barlow', sans-serif";
+            ctx.font = "bold 13px 'Barlow', sans-serif";
             ctx.textBaseline = 'middle';
             barras.forEach((barra, i) => ctx.fillText(formatar(valores[i]), barra.x + 8, barra.y));
             ctx.restore();

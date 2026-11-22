@@ -21,6 +21,7 @@ public class LeitorExcel {
         Integer totalLinhas = sheet.getLastRowNum();
         Integer linhasLidas = 0;
         Integer linhasNulas = 0;
+        Integer linhasComNulos = 0;
         Integer falhasConversao = 0;
 
         LogDao logDao = new LogDao();
@@ -45,7 +46,7 @@ public class LeitorExcel {
                     filme.setDataLancamento(lerTexto(linha.getCell(1), formatador));
 
 
-                    filme.setScore(converterParaInteiro(lerTexto(linha.getCell(2), formatador)));
+                    filme.setScore(TratamentoUtils.extrairScore(lerTexto(linha.getCell(2), formatador)));
 
 
                     String textoGeneros = lerTexto(linha.getCell(3), formatador);
@@ -53,7 +54,8 @@ public class LeitorExcel {
 
 
                     String sinopseBruta = lerTexto(linha.getCell(4), formatador);
-                    filme.setSinopse(TratamentoUtils.repararEncoding(sinopseBruta));
+                    String sinopse = TratamentoUtils.repararEncoding(sinopseBruta);
+                    filme.setSinopse(TratamentoUtils.removerStopWords(sinopse));
 
 
                     String textoElenco = lerTexto(linha.getCell(5), formatador);
@@ -68,7 +70,18 @@ public class LeitorExcel {
                     filme.setIdiomaOriginal(lerTexto(linha.getCell(8), formatador));
                     filme.setOrcamento(converterParaDouble(lerTexto(linha.getCell(9), formatador)));
                     filme.setReceita(converterParaDouble(lerTexto(linha.getCell(10), formatador)));
-                    filme.setPais(lerTexto(linha.getCell(11), formatador));
+                    String filmeRaw = lerTexto(linha.getCell(11), formatador);
+                    filme.setPais(TratamentoUtils.extrairPais(filmeRaw));
+
+                    List<String> nulos = camposNulos(filme);
+                    if (!nulos.isEmpty()) {
+                        linhasComNulos++;
+                        Log logNulos = new Log("WARN", "LeitorExcel",
+                                String.format("Linha %d ignorada, campos nulos: %s", (i + 1), String.join(", ", nulos)));
+                        logDao.inserirLog(logNulos);
+                        System.out.println(logNulos);
+                        continue;
+                    }
 
                     if (linhasLidas % 500 == 0) {
                         Log logProgresso = new Log("INFO", "LeitorExcel",
@@ -107,8 +120,8 @@ public class LeitorExcel {
         }
 
         Log logFim = new Log("INFO", "LeitorExcel", String.format(
-                "Importação concluída. Lidos com sucesso: %d | Duplicados: %d | Falhas: %d | Linhas nulas: %d | Total final: %d",
-                linhasLidas, duplicadosRemovidos, falhasConversao, linhasNulas, listaFiltrada.size()
+                "Importação concluída. Lidos com sucesso: %d | Duplicados: %d | Falhas: %d | Linhas nulas: %d | Ignorados por campos nulos: %d | Total final: %d",
+                linhasLidas, duplicadosRemovidos, falhasConversao, linhasNulas, linhasComNulos, listaFiltrada.size()
         ));
         logDao.inserirLog(logFim);
         System.out.println(logFim);
@@ -124,14 +137,28 @@ public class LeitorExcel {
         return texto.isEmpty() ? null : texto;
     }
 
-    private Integer converterParaInteiro(String texto) {
-        if (texto == null) return null;
-        try {
-            return (int) Double.parseDouble(texto);
-        } catch (Exception e) {
-            return null;
-        }
+    private boolean vazio(String texto) {
+        return texto == null || texto.isBlank();
     }
+
+
+    private List<String> camposNulos(Filme f) {
+        List<String> nulos = new ArrayList<>();
+        if (vazio(f.getNome())) nulos.add("nome");
+        if (vazio(f.getDataLancamento())) nulos.add("dataLancamento");
+        if (f.getScore() == null) nulos.add("score");
+        if (f.getGeneros() == null || f.getGeneros().isEmpty()) nulos.add("generos");
+        if (vazio(f.getSinopse())) nulos.add("sinopse");
+        if (f.getElenco() == null || f.getElenco().isEmpty()) nulos.add("elenco");
+        if (vazio(f.getTituloOriginal())) nulos.add("tituloOriginal");
+        if (vazio(f.getStatus())) nulos.add("status");
+        if (vazio(f.getIdiomaOriginal())) nulos.add("idiomaOriginal");
+        if (f.getOrcamento() == null) nulos.add("orcamento");
+        if (f.getReceita() == null) nulos.add("receita");
+        if (vazio(f.getPais())) nulos.add("pais");
+        return nulos;
+    }
+
 
     private Double converterParaDouble(String texto) {
         if (texto == null) return null;

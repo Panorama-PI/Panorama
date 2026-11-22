@@ -1,18 +1,18 @@
--- MySQL Workbench Forward Engineering
 
+-- MySQL Workbench Forward Engineering
+ 
 -- -----------------------------------------------------
 -- Schema mydb
 -- -----------------------------------------------------
 -- -----------------------------------------------------
 -- Schema filmes_db
 -- -----------------------------------------------------
-
+drop database filmes_db;
 -- -----------------------------------------------------
 -- Schema filmes_db
 -- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `filmes_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ;
 USE `filmes_db` ;
-
 -- -----------------------------------------------------
 -- Table `filmes_db`.`empresa`
 -- -----------------------------------------------------
@@ -27,8 +27,8 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 3
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
-
-
+ 
+ 
 -- -----------------------------------------------------
 -- Table `filmes_db`.`filme`
 -- -----------------------------------------------------
@@ -49,27 +49,13 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 9731
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
-
-
+ 
+ 
 -- -----------------------------------------------------
 -- Table `filmes_db`.`filme_elenco`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `filmes_db`.`filme_elenco` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `filme_id` INT NULL DEFAULT NULL,
-  `ator` TEXT NULL DEFAULT NULL,
-  `personagem` TEXT NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `filme_id` (`filme_id` ASC) VISIBLE,
-  CONSTRAINT `filme_elenco_ibfk_1`
-    FOREIGN KEY (`filme_id`)
-    REFERENCES `filmes_db`.`filme` (`id`))
-ENGINE = InnoDB
-AUTO_INCREMENT = 82593
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_unicode_ci;
-
-
+ 
+ 
 -- -----------------------------------------------------
 -- Table `filmes_db`.`filme_genero`
 -- -----------------------------------------------------
@@ -86,8 +72,8 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 25140
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
-
-
+ 
+ 
 -- -----------------------------------------------------
 -- Table `filmes_db`.`usuario`
 -- -----------------------------------------------------
@@ -109,8 +95,7 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 5
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
-
-
+ 
 -- -----------------------------------------------------
 -- Table `filmes_db`.`projeto`
 -- -----------------------------------------------------
@@ -127,8 +112,8 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
-
-
+ 
+ 
 -- -----------------------------------------------------
 -- Table `filmes_db`.`observacao`
 -- -----------------------------------------------------
@@ -147,8 +132,8 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
-
-
+ 
+ 
 -- -----------------------------------------------------
 -- Table `filmes_db`.`publicacao`
 -- -----------------------------------------------------
@@ -173,8 +158,8 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
-
-
+ 
+ 
 -- -----------------------------------------------------
 -- Table `filmes_db`.`publicacao_observacao`
 -- -----------------------------------------------------
@@ -195,12 +180,12 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 2
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
-
-
+ 
+ 
 -- -----------------------------------------------------
--- Table `filmes_db`.`relatorio`
+-- Table `filmes_db`.`filtro`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `filmes_db`.`relatorio` (
+CREATE TABLE IF NOT EXISTS `filmes_db`.`filtro` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `usuario_id` INT NOT NULL,
   `titulo` VARCHAR(150) NOT NULL,
@@ -216,16 +201,16 @@ CREATE TABLE IF NOT EXISTS `filmes_db`.`relatorio` (
   `valor_avaliacao` DECIMAL(5,2) NULL DEFAULT NULL,
   `atualizado_em` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_relatorios_usuario` (`usuario_id` ASC) VISIBLE,
-  CONSTRAINT `fk_relatorios_usuario`
+  INDEX `fk_filtros_usuario` (`usuario_id` ASC) VISIBLE,
+  CONSTRAINT `fk_filtros_usuario`
     FOREIGN KEY (`usuario_id`)
     REFERENCES `filmes_db`.`usuario` (`id`))
 ENGINE = InnoDB
 AUTO_INCREMENT = 8
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
-
-
+ 
+ 
 -- -----------------------------------------------------
 -- Table `filmes_db`.`token`
 -- -----------------------------------------------------
@@ -244,8 +229,8 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 4
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
-
-
+ 
+ 
 CREATE TABLE feedback(
 id INT PRIMARY KEY AUTO_INCREMENT,
 texto TEXT ,
@@ -253,7 +238,7 @@ status_enviado TINYINT,
 publicacao_id INT NOT NULL,
 CONSTRAINT fk_publicacao_feedback FOREIGN KEY (publicacao_id) REFERENCES publicacao(id)
 );
-
+ 
 CREATE TABLE IF NOT EXISTS `filmes_db`.`log_execucao` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `nivel` VARCHAR(10) NOT NULL,              
@@ -266,17 +251,196 @@ AUTO_INCREMENT = 4
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 ;
-
-ALTER TABLE usuario ADD COLUMN notificacao TINYINT;
+ 
+CREATE TABLE IF NOT EXISTS `filmes_db`.`genero` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(100) NOT NULL
+  );
+ 
+ 
+CREATE TABLE IF NOT EXISTS `filmes_db`.`filme_ator` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(100) NOT NULL,
+  `id_filme` INT,
+  CONSTRAINT fk_filme FOREIGN KEY (id_filme) REFERENCES filme(id)
+  );
+ 
+CREATE TABLE IF NOT EXISTS `filmes_db`.`genero_palavra` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(100) UNIQUE NOT NULL,
+  `id_genero` INT,
+  CONSTRAINT fk_genero FOREIGN KEY (id_genero) REFERENCES genero(id)
+  );
+ 
+  CREATE TABLE avaliacao(
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  texto TEXT ,
+  status_enviado TINYINT,
+  publicacao_id INT NOT NULL,
+  CONSTRAINT fk_publicacao_avaliacao FOREIGN KEY (publicacao_id) REFERENCES publicacao(id)
+  );
+ 
+-- A tabela genero é preenchida AQUI, lendo a coluna de texto da filme_genero ANTIGA.
+-- Por isso o DROP da filme_genero só pode vir depois deste INSERT.
+INSERT INTO genero (nome)
+SELECT DISTINCT TRIM(genero)
+FROM filme_genero
+WHERE genero IS NOT NULL AND TRIM(genero) <> '';
+ 
+ 
+-- =====================================================================
+-- RECRIAÇÃO DE filme_genero, ator E filme_ator (modelo associativo)
+-- ORDEM: 1) DROP  ->  2) CREATE  ->  3) ALTERs (mais abaixo)
+-- ATENÇÃO: o DROP apaga os dados das 3 tabelas.
+-- =====================================================================
+ 
+-- 1) DROP
+-- Nenhuma dessas 3 tabelas é referenciada por outra (todas apontam para filme),
+-- então a ordem entre elas é livre.
+DROP TABLE IF EXISTS `filmes_db`.`filme_elenco`;
+DROP TABLE IF EXISTS `filmes_db`.`filme_genero`;
+DROP TABLE IF EXISTS `filmes_db`.`filme_ator`;
+ 
+-- 2) CREATE
+-- (a tabela genero já foi criada acima)
+ 
+-- Associativa FILME x GENERO
+CREATE TABLE IF NOT EXISTS `filmes_db`.`filme_genero` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_filme` INT NOT NULL,
+  `id_genero` INT NOT NULL,
+  CONSTRAINT `fk_filme_genero_filme`
+    FOREIGN KEY (`id_filme`) REFERENCES `filmes_db`.`filme` (`id`),
+  CONSTRAINT `fk_filme_genero_genero`
+    FOREIGN KEY (`id_genero`) REFERENCES `filmes_db`.`genero` (`id`)
+);
+ 
+-- ATOR
+CREATE TABLE IF NOT EXISTS `filmes_db`.`ator` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(150) NOT NULL
+);
+-- Associativa FILME x ATOR (com o personagem interpretado)
+CREATE TABLE IF NOT EXISTS `filmes_db`.`filme_ator` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `id_filme` INT NOT NULL,
+  `id_ator` INT NOT NULL,
+  `personagem` VARCHAR(255) NULL,
+  CONSTRAINT `fk_filme_ator_filme`
+    FOREIGN KEY (`id_filme`) REFERENCES `filmes_db`.`filme` (`id`),
+  CONSTRAINT `fk_filme_ator_ator`
+    FOREIGN KEY (`id_ator`) REFERENCES `filmes_db`.`ator` (`id`)
+);
+ 
+DROP TABLE IF EXISTS avaliacao;
+ 
+CREATE TABLE IF NOT EXISTS avaliacao (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    texto DECIMAL(2,1) NOT NULL,
+    status_enviado TINYINT NOT NULL DEFAULT 0,
+    publicacao_id INT NOT NULL,
+    autor_id INT NOT NULL,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ 
+    CONSTRAINT fk_publicacao_avaliacao
+        FOREIGN KEY (publicacao_id)
+        REFERENCES publicacao(id),
+ 
+    CONSTRAINT fk_avaliacao_autor
+        FOREIGN KEY (autor_id)
+        REFERENCES usuario(id),
+ 
+    CONSTRAINT uq_avaliacao_publicacao_autor
+        UNIQUE (publicacao_id, autor_id),
+ 
+    CONSTRAINT chk_avaliacao_nota
+        CHECK (texto >= 0 AND texto <= 5)
+);
+ 
+CREATE TABLE IF NOT EXISTS email_envio_semanal (
+ 
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    usuario_id INT NOT NULL,
+    tipo VARCHAR(30) NOT NULL,
+    periodo_inicio DATE NOT NULL,
+    periodo_fim DATE NOT NULL,
+    enviado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ 
+    CONSTRAINT fk_email_semanal_usuario
+        FOREIGN KEY (usuario_id)
+        REFERENCES usuario(id),
+ 
+    CONSTRAINT uq_email_semanal
+        UNIQUE (usuario_id, tipo, periodo_inicio)
+ 
+);
+ 
+-- =====================================================================
+-- 3) ALTERs
+-- =====================================================================
+ 
+-- Nome do gênero único.
+-- Se der erro 1062 (Duplicate entry), há gêneros repetidos em genero: remova os duplicados antes.
+ALTER TABLE genero ADD CONSTRAINT uq_genero_nome UNIQUE (nome);
+-- Se a intenção era a palavra da tabela genero_palavra, use esta linha no lugar da de cima:
+-- ALTER TABLE genero_palavra ADD CONSTRAINT uq_genero_palavra_nome UNIQUE (nome);
+ 
+ALTER TABLE projeto ADD COLUMN genero_id INT NULL;
+ALTER TABLE projeto ADD CONSTRAINT fk_projeto_genero FOREIGN KEY (genero_id) REFERENCES genero(id) ON DELETE SET NULL;
+ 
 ALTER TABLE token ADD COLUMN email_destinatario VARCHAR(255);
 ALTER TABLE feedback ADD COLUMN autor_id INT NOT NULL;
 ALTER TABLE feedback ADD CONSTRAINT fk_feedback_usuario FOREIGN KEY (autor_id) REFERENCES usuario(id);
 ALTER TABLE feedback DROP COLUMN status_enviado;
 ALTER TABLE feedback ADD COLUMN status TINYINT NOT NULL;
 ALTER TABLE feedback ADD COLUMN criado_em  DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL;
-
-
-CREATE VIEW vw_emails_pendentes AS
+ 
+ALTER TABLE usuario ADD COLUMN horario_inicio TIME NULL,
+ADD COLUMN horario_fim TIME NULL,
+ADD COLUMN dia_resumo_semanal TINYINT NULL;
+ 
+-- CORRIGIDO (1): a coluna notificacao precisa existir ANTES de criar vw_emails_pendentes,
+-- pois a view lê roteirista.notificacao. Estes 3 comandos estavam depois da view.
+ALTER TABLE usuario
+ADD COLUMN notificacao TINYINT NOT NULL DEFAULT 1;
+ 
+-- Corrige os usuários que já estão com notificacao NULL
+-- (CORRIGIDO: esta linha tinha só um "-", o que causava erro de sintaxe)
+UPDATE usuario
+SET notificacao = 0
+WHERE notificacao IS NULL;
+ 
+-- Define 0 como valor padrão e impede NULL
+ALTER TABLE usuario
+MODIFY COLUMN notificacao TINYINT NOT NULL DEFAULT 0;
+ 
+-- CORRIGIDO (2): horario_inicio, horario_fim e dia_resumo_semanal já foram adicionadas
+-- acima. O ADD COLUMN repetido dava erro 1060 (Duplicate column name);
+-- aqui só definimos os valores padrão com MODIFY.
+ALTER TABLE usuario
+MODIFY COLUMN dia_resumo_semanal TINYINT DEFAULT 1,
+MODIFY COLUMN horario_inicio TIME DEFAULT '09:00:00',
+MODIFY COLUMN horario_fim TIME DEFAULT '10:00:00';
+ 
+ 
+DROP TABLE IF EXISTS genero_palavra;
+ 
+CREATE TABLE genero_palavra (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  id_genero INT NOT NULL,
+  INDEX idx_genero_palavra (id_genero, nome),
+  CONSTRAINT fk_genero FOREIGN KEY (id_genero) REFERENCES genero(id)
+);
+ 
+ALTER TABLE ator ADD CONSTRAINT uq_ator_nome UNIQUE (nome);
+ 
+desc feedback;
+ 
+-- vw_emails_pendentes (versão final, com horarios e avaliacao)
+CREATE OR REPLACE VIEW vw_emails_pendentes AS
+ 
+-- 1) TOKEN
 SELECT 
     t.id AS id_token,
     NULL AS id_feedback,
@@ -289,12 +453,17 @@ SELECT
     t.codigo AS codigo,
     t.expiracao AS expiracao,
     NULL AS texto_feedback,
-    NULL AS notificacao
+    NULL AS notificacao,
+    u.horario_inicio AS horario_inicio,   -- NULL se o e-mail do token ainda não for de um usuário
+    u.horario_fim AS horario_fim,
+    NULL AS id_avaliacao
 FROM token t
 INNER JOIN empresa e ON t.id_empresa = e.id
-
+LEFT JOIN usuario u ON u.email = t.email_destinatario   
+ 
 UNION ALL
-
+ 
+-- 2) FEEDBACK (produtor -> roteirista)
 SELECT 
     NULL AS id_token,
     f.id AS id_feedback,
@@ -307,147 +476,287 @@ SELECT
     NULL AS codigo,
     NULL AS expiracao,     
     f.texto AS texto_feedback,
-    roteirista.notificacao AS notificacao
+    roteirista.notificacao AS notificacao,
+    roteirista.horario_inicio AS horario_inicio,
+    roteirista.horario_fim AS horario_fim,
+    NULL AS id_avaliacao
 FROM feedback f
 INNER JOIN publicacao p ON f.publicacao_id = p.id
 INNER JOIN usuario roteirista ON p.usuario_id = roteirista.id
 INNER JOIN usuario produtor ON f.autor_id = produtor.id
+INNER JOIN empresa e ON produtor.id_empresa = e.id
+ 
+UNION ALL
+ 
+-- 3) AVALIAÇÃO (produtor -> roteirista; agora a tabela avaliacao tem autor_id)
+SELECT 
+    NULL AS id_token,
+    NULL AS id_feedback,
+    e.nome AS nome_empresa,          -- empresa do produtor (autor), igual ao feedback
+    produtor.nome AS nome_produtor,
+    roteirista.nome AS nome_roteirista,
+    'AVALIACAO' AS tipo,
+    a.status_enviado AS status_enviado,
+    roteirista.email AS email_destinatario,
+    NULL AS codigo,
+    NULL AS expiracao,
+    a.texto AS texto_feedback,       -- aqui vai a nota (0 a 5)
+    roteirista.notificacao AS notificacao,
+    roteirista.horario_inicio AS horario_inicio,
+    roteirista.horario_fim AS horario_fim,
+    a.id AS id_avaliacao
+FROM avaliacao a
+INNER JOIN publicacao p ON a.publicacao_id = p.id
+INNER JOIN usuario roteirista ON p.usuario_id = roteirista.id
+INNER JOIN usuario produtor ON a.autor_id = produtor.id
 INNER JOIN empresa e ON produtor.id_empresa = e.id;
-
-
-
-
+ 
+ 
+ 
+ 
 -- PROJETO → USUARIO
 ALTER TABLE projeto
 DROP FOREIGN KEY fk_projeto_usuario;
-
+ 
 ALTER TABLE projeto
 ADD CONSTRAINT fk_projeto_usuario
 FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 ON DELETE CASCADE;
-
-
+ 
+ 
 -- OBSERVACAO → PROJETO
 ALTER TABLE observacao
 DROP FOREIGN KEY fk_observacoes_projeto;
-
+ 
 ALTER TABLE observacao
 ADD CONSTRAINT fk_observacoes_projeto
 FOREIGN KEY (projeto_id) REFERENCES projeto(id)
 ON DELETE CASCADE;
-
-
+ 
+ 
 -- PUBLICACAO → PROJETO
 ALTER TABLE publicacao
 DROP FOREIGN KEY fk_publicacao_projeto;
-
+ 
 ALTER TABLE publicacao
 ADD CONSTRAINT fk_publicacao_projeto
 FOREIGN KEY (projeto_id) REFERENCES projeto(id)
 ON DELETE CASCADE;
-
-
+ 
+ 
 -- PUBLICACAO → USUARIO
 ALTER TABLE publicacao
 DROP FOREIGN KEY fk_publicacao_usuario;
-
+ 
 ALTER TABLE publicacao
 ADD CONSTRAINT fk_publicacao_usuario
 FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 ON DELETE CASCADE;
-
-
+ 
+ 
 -- PUBLICACAO_OBSERVACAO → PUBLICACAO
 ALTER TABLE publicacao_observacao
 DROP FOREIGN KEY fk_publicacao_obs;
-
+ 
 ALTER TABLE publicacao_observacao
 ADD CONSTRAINT fk_publicacao_obs
 FOREIGN KEY (id_publicacao) REFERENCES publicacao(id)
 ON DELETE CASCADE;
-
+ 
 -- PUBLICACAO_OBSERVACAO → OBSERVACAO
 ALTER TABLE publicacao_observacao
 DROP FOREIGN KEY fk_obs_publicacao;
-
+ 
 ALTER TABLE publicacao_observacao
 ADD CONSTRAINT fk_obs_publicacao
 FOREIGN KEY (id_observacao) REFERENCES observacao(id)
 ON DELETE CASCADE;
-
-
--- RELATORIO → USUARIO
-ALTER TABLE relatorio
-DROP FOREIGN KEY fk_relatorios_usuario;
-
-ALTER TABLE relatorio
-ADD CONSTRAINT fk_relatorios_usuario
+ 
+ 
+-- filtro → USUARIO
+ALTER TABLE filtro
+DROP FOREIGN KEY fk_filtros_usuario;
+ 
+ALTER TABLE filtro
+ADD CONSTRAINT fk_filtros_usuario
 FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 ON DELETE CASCADE;
-
-
+ 
+ 
 -- FEEDBACK → PUBLICACAO
 ALTER TABLE feedback
 DROP FOREIGN KEY fk_publicacao_feedback;
-
+ 
 ALTER TABLE feedback
 ADD CONSTRAINT fk_publicacao_feedback
 FOREIGN KEY (publicacao_id) REFERENCES publicacao(id)
 ON DELETE CASCADE;
-
-
+ 
+ 
 -- FEEDBACK → USUARIO (AUTOR)
 ALTER TABLE feedback
 DROP FOREIGN KEY fk_feedback_usuario;
-
+ 
 ALTER TABLE feedback
 ADD CONSTRAINT fk_feedback_usuario
 FOREIGN KEY (autor_id) REFERENCES usuario(id)
 ON DELETE CASCADE;
-
-
-
-
-
-
-CREATE VIEW vw_emails_pendentes AS
-SELECT 
-    t.id AS id_token,
-    NULL AS id_feedback,
-    e.nome AS nome_empresa,
-    NULL AS nome_produtor,
-    NULL AS nome_roteirista,
-    'TOKEN' AS tipo,
-    t.status_enviado,
-    t.email_destinatario,
-    t.codigo AS codigo,
-    t.expiracao AS expiracao,
-    NULL AS texto_feedback,
-    NULL AS notificacao
-FROM token t
-INNER JOIN empresa e ON t.id_empresa = e.id
-
-UNION ALL
-
-SELECT 
-    NULL AS id_token,
-    f.id AS id_feedback,
-    e.nome AS nome_empresa,
-    produtor.nome AS nome_produtor,
-    roteirista.nome AS nome_roteirista,
-    'FEEDBACK' AS tipo,
-    f.status_enviado,
-    roteirista.email AS email_destinatario, 
-    NULL AS codigo,
-    NULL AS expiracao,     
-    f.texto AS texto_feedback,
-    roteirista.notificacao AS notificacao
-FROM feedback f
-INNER JOIN publicacao p ON f.publicacao_id = p.id
-INNER JOIN usuario roteirista ON p.usuario_id = roteirista.id
-INNER JOIN usuario produtor ON f.autor_id = produtor.id
-INNER JOIN empresa e ON produtor.id_empresa = e.id;
-
+ 
+ALTER TABLE feedback
+ADD COLUMN avaliacao TINYINT UNSIGNED NOT NULL DEFAULT 0;
+ 
+ALTER TABLE feedback DROP COLUMN avaliacao;
+ 
+-- CORRIGIDO (3): aqui havia um SEGUNDO "CREATE OR REPLACE VIEW vw_emails_pendentes"
+-- (a versão ANTIGA, sem horarios e sem avaliacao). Ele sobrescrevia a view nova.
+-- Foi removido: a versão final é a que está logo depois do "desc feedback;".
+ 
+-- VIEWS DAS DASHBOARDS - Para facilitar essas daqui são utilizadas por geral
+    
+-- Data convertida, lucro/ROI calculados
+CREATE OR REPLACE VIEW vw_base_filme AS
+SELECT
+  t.*,
+  YEAR(t.data_lancamento)  AS ano,
+  MONTH(t.data_lancamento) AS mes
+FROM (
+  SELECT
+    f.id AS filme_id,
+    f.nome,
+    STR_TO_DATE(TRIM(f.data_lancamento), '%m/%d/%Y') AS data_lancamento,
+    f.score,
+    f.orcamento,
+    f.receita,
+    f.pais AS pais,
+    CASE WHEN f.orcamento > 0 AND f.receita > 0
+         THEN f.receita - f.orcamento END AS lucro,
+    CASE WHEN f.orcamento > 0 AND f.receita > 0
+         THEN f.receita / f.orcamento END AS roi
+  FROM filme f
+) t;
+ 
+-- Um registro por filme x gênero (sem duplicidades)
+-- ATUALIZADA: filme_genero agora é associativa (id_filme, id_genero),
+-- então o nome do gênero vem da tabela genero.
+CREATE OR REPLACE VIEW vw_base_filme_genero_unico AS
+SELECT DISTINCT
+  fg.id_filme AS filme_id,
+  TRIM(g.nome) AS genero
+FROM filme_genero fg
+INNER JOIN genero g ON g.id = fg.id_genero
+WHERE g.nome IS NOT NULL AND TRIM(g.nome) <> '';
+ 
+-- Filme + gênero - base da maioria dos especificos
+CREATE OR REPLACE VIEW vw_base_filme_genero AS
+SELECT b.*, g.genero
+FROM vw_base_filme b
+INNER JOIN vw_base_filme_genero_unico g ON g.filme_id = b.filme_id;
+ 
+-- Pares de gêneros que aparecem juntos no mesmo filme
+CREATE OR REPLACE VIEW vw_base_genero_associacao AS
+SELECT
+  a.genero,
+  b.genero AS genero_associado,
+  COUNT(*) AS qtd_filmes,
+  ROUND(100 * COUNT(*) / tot.total_filmes, 0) AS percentual
+FROM vw_base_filme_genero_unico a
+INNER JOIN vw_base_filme_genero_unico b
+        ON b.filme_id = a.filme_id AND b.genero <> a.genero
+INNER JOIN (
+  SELECT genero, COUNT(*) AS total_filmes
+  FROM vw_base_filme_genero_unico
+  GROUP BY genero
+) tot ON tot.genero = a.genero
+GROUP BY a.genero, b.genero, tot.total_filmes;
+ 
+-- DASHBOARD GERAL ROTEIRISTA
+	-- Avaliação média x genero
+CREATE OR REPLACE VIEW vw_rot_geral_grafico_nota_genero AS
+SELECT
+  genero,
+  nota_media,
+  qtd_filmes,
+  ROUND(AVG(nota_media) OVER (), 1) AS media_geral,
+  ROW_NUMBER() OVER (ORDER BY nota_media DESC) AS ranking
+FROM (
+  SELECT genero, ROUND(AVG(score), 1) AS nota_media, COUNT(*) AS qtd_filmes
+  FROM vw_base_filme_genero
+  WHERE score IS NOT NULL
+  GROUP BY genero
+) t;
+ 
+	-- Avaliação média x País de origem (use ranking <= 5)
+CREATE OR REPLACE VIEW vw_rot_geral_grafico_nota_pais AS
+SELECT
+  pais,
+  nota_media,
+  qtd_filmes,
+  ROUND(AVG(nota_media) OVER (), 1) AS media_geral,
+  ROW_NUMBER() OVER (ORDER BY nota_media DESC) AS ranking
+FROM (
+  SELECT pais, ROUND(AVG(score), 1) AS nota_media, COUNT(*) AS qtd_filmes
+  FROM filme
+  WHERE score IS NOT NULL AND pais IS NOT NULL
+  GROUP BY pais
+  HAVING COUNT(*) >= 5  -- amostra mínima por país
+) t;
+ 
+	-- Genero com melhro média de avaliações
+CREATE OR REPLACE VIEW vw_rot_geral_kpi_genero_melhor_nota AS
+SELECT genero, nota_media
+FROM vw_rot_geral_grafico_nota_genero
+WHERE ranking = 1;
+ 
+	-- País com melhor média de avaliações
+CREATE OR REPLACE VIEW vw_rot_geral_kpi_pais_melhor_nota AS
+SELECT pais, nota_media
+FROM vw_rot_geral_grafico_nota_pais
+WHERE ranking = 1;
+ 
+	-- Gênero mais associado a outros gêneros
+CREATE OR REPLACE VIEW vw_rot_geral_kpi_genero_associado AS
+SELECT genero, total_associacoes
+FROM (
+  SELECT
+    genero,
+    SUM(qtd_filmes) AS total_associacoes,
+    ROW_NUMBER() OVER (ORDER BY SUM(qtd_filmes) DESC) AS ranking
+  FROM vw_base_genero_associacao
+  GROUP BY genero
+) t
+WHERE ranking = 1;
+ 
+-- DASHBOARD ESPECIFICA ROTEIRISTA
+	-- Avaliação média x Pais origem (barras + linha media_genero)
+CREATE OR REPLACE VIEW vw_rot_esp_grafico_nota_pais AS
+SELECT
+  genero,
+  pais,
+  nota_media,
+  qtd_filmes,
+  ROUND(AVG(nota_media) OVER (PARTITION BY genero), 1) AS media_genero,
+  ROW_NUMBER() OVER (PARTITION BY genero ORDER BY nota_media DESC) AS ranking
+FROM (
+  SELECT genero, pais, ROUND(AVG(score), 1) AS nota_media, COUNT(*) AS qtd_filmes
+  FROM vw_base_filme_genero
+  WHERE score IS NOT NULL AND pais IS NOT NULL
+  GROUP BY genero, pais
+  HAVING COUNT(*) >= 3          -- amostra mínima por país
+) t;    
+ 
+	-- Proporção de Gêneros Associados (%)
+CREATE OR REPLACE VIEW vw_rot_esp_grafico_generos_associados AS
+SELECT
+  genero,
+  genero_associado,
+  qtd_filmes,
+  percentual,
+  ROW_NUMBER() OVER (PARTITION BY genero ORDER BY percentual DESC, genero_associado) AS ranking
+FROM vw_base_genero_associacao;
+ 
+ 
+ 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+ 

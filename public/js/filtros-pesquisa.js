@@ -16,6 +16,8 @@ var tituloTabela = document.getElementById("titulo");
 
 var usuarioId = sessionStorage.ID_USUARIO;
 
+var criteriosAtuais = null;
+
 // Chama a função que preenche a side bar
 if (typeof preencherUsuario === "function") {
         preencherUsuario();
@@ -114,6 +116,7 @@ function formatarLucro(lucro) {
 
 
 function carregarTop10() {
+    document.getElementById("paginacao").innerHTML = "";
     tituloTabela.style.display = "";
     corpoTabela.innerHTML = `
         <tr>
@@ -187,10 +190,14 @@ function carregarTop10() {
 
 
 function buscar() {
-    var criterios = obterCriterios();
+    criteriosAtuais = obterCriterios();
+    criteriosAtuais.filme = campoPesquisa.value.trim();
 
-    criterios.filme = campoPesquisa.value.trim();
+    buscarPagina(1);
+}
 
+
+function buscarPagina(pagina) {
     tituloTabela.style.display = "none";
     corpoTabela.innerHTML = "";
 
@@ -200,14 +207,15 @@ function buscar() {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            filmeServer: criterios.filme,
-            tipoVisao: criterios.tipoVisao,
-            genero: criterios.genero,
-            pais: criterios.pais,
-            operadorLucro: criterios.operadorLucro,
-            valorLucro: criterios.valorLucro,
-            operadorAvaliacao: criterios.operadorAvaliacao,
-            valorAvaliacao: criterios.valorAvaliacao
+            filmeServer: criteriosAtuais.filme,
+            tipoVisao: criteriosAtuais.tipoVisao,
+            genero: criteriosAtuais.genero,
+            pais: criteriosAtuais.pais,
+            operadorLucro: criteriosAtuais.operadorLucro,
+            valorLucro: criteriosAtuais.valorLucro,
+            operadorAvaliacao: criteriosAtuais.operadorAvaliacao,
+            valorAvaliacao: criteriosAtuais.valorAvaliacao,
+            pagina: pagina
         })
     })
     .then(function (resposta) {
@@ -217,38 +225,104 @@ function buscar() {
 
         return resposta.json();
     })
-    .then(function (filmes) {
+    .then(function (dados) {
+        var filmes = dados.filmes;
+
         if (filmes.length == 0) {
             corpoTabela.innerHTML = `
                 <tr>
                     <td colspan="5">Nenhum filme encontrado.</td>
                 </tr>
             `;
+            document.getElementById("paginacao").innerHTML = "";
             return;
         }
 
         for (var i = 0; i < filmes.length; i++) {
-    var valorFinal = tipoVisao == "produtor"
-        ? (filmes[i].lucro == null ? "N/A" :
-            (Math.round((Number(filmes[i].lucro) / 1000000) * 10) / 10) + "M")
-        : (filmes[i].avaliacao == null ? "N/A" :
-            filmes[i].avaliacao);
+            var valorFinal;
 
-    corpoTabela.innerHTML += `
-        <tr>
-            <td>${filmes[i].titulo || ""}</td>
-            <td>${filmes[i].atorPrincipal || "N/A"}</td>
-            <td>${filmes[i].genero || "N/A"}</td>
-            <td>${filmes[i].pais || "N/A"}</td>
-            <td>${valorFinal}</td>
-        </tr>
-    `;
-}
+            if (tipoVisao == "produtor") {
+                valorFinal = filmes[i].lucro == null
+                    ? "N/A"
+                    : formatarLucro(filmes[i].lucro);
+            } else {
+                valorFinal = filmes[i].avaliacao == null
+                    ? "N/A"
+                    : filmes[i].avaliacao;
+            }
+
+            corpoTabela.innerHTML += `
+                <tr>
+                    <td>${filmes[i].titulo || ""}</td>
+                    <td>${filmes[i].atorPrincipal || "N/A"}</td>
+                    <td>${filmes[i].genero || "N/A"}</td>
+                    <td>${filmes[i].pais || "N/A"}</td>
+                    <td>${valorFinal}</td>
+                </tr>
+            `;
+        }
+
+        montarPaginacao(dados.pagina, dados.totalPaginas);
     })
     .catch(function (erro) {
         console.log(erro);
         alert("Erro ao pesquisar os filmes.");
     });
+}
+
+
+function montarPaginacao(paginaAtual, totalPaginas) {
+    var divPaginacao = document.getElementById("paginacao");
+    divPaginacao.innerHTML = "";
+
+    if (totalPaginas <= 1) {
+        return;
+    }
+
+    var inicio = Math.max(1, paginaAtual - 4);
+    var fim = Math.min(totalPaginas, inicio + 9);
+    inicio = Math.max(1, fim - 9);
+
+    if (paginaAtual > 1) {
+        var botaoAnterior = document.createElement("button");
+        botaoAnterior.textContent = "Anterior";
+        botaoAnterior.onclick = function (pagina) {
+            return function () {
+                buscarPagina(pagina);
+            };
+        }(paginaAtual - 1);
+
+        divPaginacao.appendChild(botaoAnterior);
+    }
+
+    for (var i = inicio; i <= fim; i++) {
+        var botaoPagina = document.createElement("button");
+        botaoPagina.textContent = i;
+
+        if (i == paginaAtual) {
+            botaoPagina.className = "pagina-ativa";
+        }
+
+        botaoPagina.onclick = function (pagina) {
+            return function () {
+                buscarPagina(pagina);
+            };
+        }(i);
+
+        divPaginacao.appendChild(botaoPagina);
+    }
+
+    if (paginaAtual < totalPaginas) {
+        var botaoProxima = document.createElement("button");
+        botaoProxima.textContent = "Mais";
+        botaoProxima.onclick = function (pagina) {
+            return function () {
+                buscarPagina(pagina);
+            };
+        }(paginaAtual + 1);
+
+        divPaginacao.appendChild(botaoProxima);
+    }
 }
 
 function salvarFiltro() {

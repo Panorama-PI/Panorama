@@ -2,25 +2,28 @@ package school.sptech.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import school.sptech.model.AtorPersonagem;
 
 public class TratamentoUtils {
 
-    
+    private static final Pattern PALAVRA = Pattern.compile("\\p{L}+(?:['\u2019]\\p{L}+)*");
     public static String repararEncoding(String texto) {
         if (texto == null || texto.isEmpty()) return texto;
 
         boolean Mojibake = false;
 
-        
-        for (int i = 0; i < texto.length(); i++) {
-                 char c = texto.charAt(i);
 
-            
-            
+        for (int i = 0; i < texto.length(); i++) {
+            char c = texto.charAt(i);
+
+
+
             if (c > 0x00FF) {
-                
+
                 if (c != '\u20AC' && c != '\u201A' && c != '\u0192' && c != '\u201E' &&
                         c != '\u2026' && c != '\u2020' && c != '\u2021' && c != '\u02C6' &&
                         c != '\u2030' && c != '\u0160' && c != '\u2039' && c != '\u0152' &&
@@ -28,22 +31,22 @@ public class TratamentoUtils {
                         c != '\u201D' && c != '\u2022' && c != '\u2013' && c != '\u2014' &&
                         c != '\u02DC' && c != '\u2122' && c != '\u0161' && c != '\u203A' &&
                         c != '\u0153' && c != '\u017E' && c != '\u0178') {
-                    return texto; 
+                    return texto;
                 }
             }
 
-            
+
             if (c >= 0x0080) {
                 Mojibake = true;
             }
         }
 
-        
+
         if (!Mojibake) {
             return texto;
         }
 
-        
+
         try {
             byte[] bytes = new byte[texto.length()];
             for (int i = 0; i < texto.length(); i++) {
@@ -76,15 +79,15 @@ public class TratamentoUtils {
                     case '\u0153': bytes[i] = (byte) 0x9C; break;
                     case '\u017E': bytes[i] = (byte) 0x9E; break;
                     case '\u0178': bytes[i] = (byte) 0x9F; break;
-                    default: bytes[i] = (byte) (c & 0xFF); break; 
+                    default: bytes[i] = (byte) (c & 0xFF); break;
                 }
             }
 
             String corrigido = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
 
-            
-            
-            
+
+
+
             if (corrigido.contains("\uFFFD")) return texto;
 
             return corrigido;
@@ -93,13 +96,40 @@ public class TratamentoUtils {
         }
     }
 
-    
+    public static String removerStopWords(String sinopse) {
+        if (sinopse == null) return null;
+
+        StringBuilder resultado = new StringBuilder();
+        Matcher m = PALAVRA.matcher(sinopse);
+
+        while (m.find()) {
+            String palavra = m.group().toLowerCase(Locale.ROOT).replace('\u2019', '\'');
+
+            int apostrofo = palavra.indexOf('\'');
+            if (apostrofo >= 0) {
+                String base = palavra.substring(0, apostrofo);
+                String sufixo = palavra.substring(apostrofo + 1);
+                if (sufixo.equals("s")) {
+                    palavra = base;                       // posse: "Adonis's" -> "adonis"
+                } else if (sufixo.equals("t") || sufixo.equals("re") || sufixo.equals("ve")
+                        || sufixo.equals("ll") || sufixo.equals("d") || sufixo.equals("m")) {
+                    continue;                             // contrações: isn't, they're, I'm...
+                }
+            }
+
+            if (palavra.length() < 2 || StopWords.ehStopWord(palavra)) continue;
+
+            if (resultado.length() > 0) resultado.append(' ');
+            resultado.append(palavra);
+        }
+        return resultado.toString();
+    }
 
 
     public static List<String> extrairGeneros(String textoBruto) {
         List<String> lista = new ArrayList<>();
         if (textoBruto != null) {
-            
+
             String textoReparado = repararEncoding(textoBruto).replace("\u00A0", " ");
             String[] pedacos = textoReparado.split(",");
             for (String pedaco : pedacos) {
@@ -112,7 +142,7 @@ public class TratamentoUtils {
     public static List<AtorPersonagem> extrairElenco(String textoBruto) {
         List<AtorPersonagem> lista = new ArrayList<>();
         if (textoBruto != null) {
-            
+
             String textoReparado = repararEncoding(textoBruto);
             String[] pedacos = textoReparado.split(",");
             for (int i = 0; i < pedacos.length - 1; i += 2) {
@@ -122,12 +152,12 @@ public class TratamentoUtils {
         return lista;
     }
 
-    
+
     public static Double extrairMonetario(String valorRaw) {
         if (valorRaw == null) return null;
         try {
             double valor = Double.parseDouble(valorRaw);
-            
+
             if (valor < 1000 || valor == 175269998.8) return null;
             return valor;
         } catch (NumberFormatException e) {
@@ -135,13 +165,25 @@ public class TratamentoUtils {
         }
     }
 
-    public static Integer extrairScore(String scoreRaw) {
+    public static Double extrairScore(String scoreRaw) {
         if (scoreRaw == null) return null;
         try {
-            int score = (int) Double.parseDouble(scoreRaw);
+            Double score =  Double.parseDouble(scoreRaw) / 10 ;
             return score <= 0 ? null : score;
         } catch (NumberFormatException e) {
             return null;
         }
     }
+
+
+    public static String extrairPais(String siglaRaw) {
+        if (siglaRaw == null || siglaRaw.trim().isEmpty()) return null;
+
+        if (siglaRaw.equals("XC")){
+            return siglaRaw = "República Tcheca";
+        } else if (siglaRaw.equals("SU")){
+            return siglaRaw = "União Soviética";
+        } else {
+        return Locale.of("", siglaRaw.trim()).getDisplayCountry(Locale.of("pt", "BR"));
+    }}
 }

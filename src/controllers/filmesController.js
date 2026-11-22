@@ -33,7 +33,16 @@ function pesquisar(req, res, next) { // <-- Adicionado 'next'
         return next(new BadRequestError("Informe uma avaliação válida."));
     }
 
-    filmesModel.pesquisar(filtros)
+    var limite = 10;
+    var pagina = parseInt(req.body.pagina);
+
+    if (isNaN(pagina) || pagina < 1) {
+        pagina = 1;
+    }
+
+    var offset = (pagina - 1) * limite;
+
+    filmesModel.pesquisar(filtros, limite, offset)
         .then(function (resultado) {
             var filmes = [];
 
@@ -49,8 +58,21 @@ function pesquisar(req, res, next) { // <-- Adicionado 'next'
                 });
             }
 
-            console.log("Filmes enviados para o navegador:", filmes);
-            res.json(filmes);
+            filmesModel.contar(filtros)
+                .then(function (resultadoTotal) {
+                    var total = resultadoTotal[0].total;
+
+                    res.json({
+                        filmes: filmes,
+                        total: total,
+                        pagina: pagina,
+                        totalPaginas: Math.ceil(total / limite)
+                    });
+                })
+                .catch(function (erro) {
+                    console.log("Erro ao contar filmes:", erro);
+                    next(erro);
+                });
         })
         .catch(function (erro) {
             console.log("Erro ao pesquisar filmes:", erro);
