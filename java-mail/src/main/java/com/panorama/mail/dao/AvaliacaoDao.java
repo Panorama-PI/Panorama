@@ -1,0 +1,18 @@
+package com.panorama.mail.dao;
+
+import com.panorama.mail.config.ConnectionProvider;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+public class AvaliacaoDao {
+
+    ConnectionProvider connectionProvider = new ConnectionProvider();
+    public JdbcTemplate jdbcTemplate = connectionProvider.getConnection();
+
+    public void marcarComoEnviado(Integer id){
+        String sql = """
+                UPDATE avaliacao SET status_enviado = 1 WHERE id = ?;
+        """;
+
+        jdbcTemplate.update(sql, id);
+    }
+}

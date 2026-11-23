@@ -9,120 +9,119 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+
+import java.time.LocalTime;
 import java.util.Properties;
 
 public class EmailService {
     private final EmailConfig config;
     private EmailDao emailDao;
+    private Session session;
 
     public EmailService(EmailConfig config){
         this.config = config;
-    }
-
-    public void enviarEmail(PendenciaEmailEnvio pendenciaEmailEnvio) throws MessagingException {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", config.getHost());
         props.put("mail.smtp.port", config.getPort());
+        props.put("mail.smtp.connectiontimeout", "5000");
+        props.put("mail.smtp.timeout", "10000");
+        props.put("mail.smtp.writetimeout", "10000");
 
-        Session session = Session.getInstance(props, new Authenticator() {
+        this.session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(config.getUsername(), config.getPassword());
             }
         });
+    }
 
-        String tipo = pendenciaEmailEnvio.getTipo();
-        Integer status = pendenciaEmailEnvio.getStatus();
+    public void enviarEmail(PendenciaEmailEnvio pendencia) throws MessagingException {
+        String tipo = pendencia.getTipo();
+        Integer status = pendencia.getStatus();
+        Roteirista roteirista = pendencia.getRoteirista();
+        Empresa empresa = pendencia.getEmpresa();
 
+        if ("TOKEN".equals(tipo)) {
+            Token token = pendencia.getToken();
+            String assunto = "Envio do Token da Panorama";
+            String html = htmlToken(empresa, token);
 
-        if (tipo.equals("TOKEN")){
-            TokenDao tokenDao = new TokenDao();
-
-            Roteirista roteirista = pendenciaEmailEnvio.getRoteirista();
-            Empresa empresa = pendenciaEmailEnvio.getEmpresa();
-            Token token = pendenciaEmailEnvio.getToken();
-
-            EmailMessage emailMessage = new EmailMessage(
-                    "Envio do Token da Panorama",
-                    "Olá! use o token no site para conseguir o acesso!"
-            );
-
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(config.getUsername()));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(roteirista.getEmail()));
-            message.setSubject(emailMessage.getSubject());
-
-
-            String htmlContent = htmlToken(empresa,token);
-
-
-            message.setContent(htmlContent, "text/html; charset=utf-8");
-
-            Transport.send(message);
-
-            tokenDao.marcarComoEnviado(token.getToken());
-        }else if(tipo.equals("FEEDBACK")){
-
-            if(status.equals(2)){
-                FeedbackDao feedbackDao = new FeedbackDao();
-
-                Produtor produtor = pendenciaEmailEnvio.getProdutor();
-                Roteirista roteirista = pendenciaEmailEnvio.getRoteirista();
-                Feedback feedback = pendenciaEmailEnvio.getFeedback();
-                Empresa empresa = pendenciaEmailEnvio.getEmpresa();
-
-                EmailMessage emailMessage = new EmailMessage(
-                        "Um produtor da sua empresa te mandou um feedback",
-                        "Olá! Acesse o site para ver o feedback"
-                );
-
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(config.getUsername()));
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(roteirista.getEmail()));
-                message.setSubject(emailMessage.getSubject());
-
-
-                String htmlContent = htmlFeedback(roteirista,produtor,empresa);
-
-
-                message.setContent(htmlContent, "text/html; charset=utf-8");
-
-                Transport.send(message);
-
-                feedbackDao.marcarComoEnviado(feedback.getId());
-            } else if(status.equals(3)){
-                FeedbackDao feedbackDao = new FeedbackDao();
-
-                Produtor produtor = pendenciaEmailEnvio.getProdutor();
-                Roteirista roteirista = pendenciaEmailEnvio.getRoteirista();
-                Feedback feedback = pendenciaEmailEnvio.getFeedback();
-                Empresa empresa = pendenciaEmailEnvio.getEmpresa();
-
-                EmailMessage emailMessage = new EmailMessage(
-                        "Um produtor da sua empresa te editou um feedback",
-                        "Olá! Acesse o site para ver o feedback editado"
-                );
-
-                Message message = new MimeMessage(session);
-                message.setFrom(new InternetAddress(config.getUsername()));
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(roteirista.getEmail()));
-                message.setSubject(emailMessage.getSubject());
-
-
-                String htmlContent = htmlFeedbackEditado(roteirista,produtor,empresa);
-
-
-                message.setContent(htmlContent, "text/html; charset=utf-8");
-
-                Transport.send(message);
-
-                feedbackDao.marcarComoEnviado(feedback.getId());
-            }
+            dispararEmail(roteirista.getEmail(), assunto, html);
+            new TokenDao().marcarComoEnviado(token.getToken());
+            return;
         }
 
+        if (!dentroDoHorarioPermitido(roteirista)) {
+            return;
+        }
+
+        Produtor produtor = pendencia.getProdutor();
+
+        if ("FEEDBACK".equals(tipo)) {
+            Feedback feedback = pendencia.getFeedback();
+
+            if (Integer.valueOf(2).equals(status)) {
+                dispararEmail(
+                        roteirista.getEmail(),
+                        "Um produtor da sua empresa te mandou um feedback",
+                        htmlFeedback(roteirista, produtor, empresa)
+                );
+                new FeedbackDao().marcarComoEnviado(feedback.getId());
+
+            } else if (Integer.valueOf(3).equals(status)) {
+                dispararEmail(
+                        roteirista.getEmail(),
+                        "Um produtor da sua empresa te editou um feedback",
+                        htmlFeedbackEditado(roteirista, produtor, empresa)
+                );
+                new FeedbackDao().marcarComoEnviado(feedback.getId());
+            }
+
+        } else if ("AVALIACAO".equals(tipo)) {
+            Avaliacao avaliacao = pendencia.getAvaliacao();
+
+            if (Integer.valueOf(2).equals(status)) {
+                dispararEmail(
+                        roteirista.getEmail(),
+                        "Um produtor da sua empresa te mandou uma avaliação da publicação",
+                        htmlAvaliacao(roteirista, produtor, empresa)
+                );
+                new AvaliacaoDao().marcarComoEnviado(avaliacao.getIdAvaliacao());
+            } else if (Integer.valueOf(3).equals(status)) {
+                dispararEmail(
+                        roteirista.getEmail(),
+                        "Um produtor da sua empresa te editou uma avaliação da publicação",
+                        htmlAvaliacaoEditada(roteirista, produtor, empresa)
+                );
+                new AvaliacaoDao().marcarComoEnviado(avaliacao.getIdAvaliacao());
+            }
+        }
     }
+
+    private boolean dentroDoHorarioPermitido(Roteirista roteirista) {
+        if (roteirista.getHorarioInicio() == null || roteirista.getHorarioFim() == null) {
+            return true; // Ou false, dependendo da regra caso não tenha horário configurado
+        }
+        LocalTime agora = LocalTime.now();
+        LocalTime inicio = roteirista.getHorarioInicio().toLocalTime();
+        LocalTime fim = roteirista.getHorarioFim().toLocalTime();
+
+        return !agora.isBefore(inicio) && !agora.isAfter(fim);
+    }
+
+    private void dispararEmail(String destinatario, String assunto, String htmlContent) throws MessagingException {
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(config.getUsername()));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
+        message.setSubject(assunto);
+        message.setContent(htmlContent, "text/html; charset=utf-8");
+
+        Transport.send(message);
+    }
+
 
     public String htmlFeedback(Roteirista roteirista, Produtor produtor, Empresa empresa){
         return "<div style=\"background-color: #0b0b0b; padding: 30px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e0e0e0;\">" +
