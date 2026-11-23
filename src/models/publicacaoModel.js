@@ -12,7 +12,7 @@ function buscarPublicacoes(idEmpresa, idProdutor) {
             p.criado_em,
             u.nome AS roteirista,
             proj.nome AS nome_projeto,
-            a.nota AS nota_produtor
+            a.texto AS nota_produtor
         FROM
             publicacao AS p
         INNER JOIN usuario AS u ON u.id = p.usuario_id
@@ -53,12 +53,12 @@ function salvarAvaliacao(idPublicacao, idProdutor, nota) {
         if (avaliacaoExistente.length > 0) {
             await query(`
                 UPDATE avaliacao
-                SET nota = ?
+                SET texto = ?
                 WHERE id = ?;
             `, [nota, avaliacaoExistente[0].id]);
         } else {
             await query(`
-                INSERT INTO avaliacao (publicacao_id, autor_id, nota)
+                INSERT INTO avaliacao (publicacao_id, autor_id, texto)
                 VALUES (?, ?, ?);
             `, [idPublicacao, idProdutor, nota]);
         }
