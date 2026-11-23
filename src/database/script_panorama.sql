@@ -435,7 +435,23 @@ CREATE TABLE genero_palavra (
  
 ALTER TABLE ator ADD CONSTRAINT uq_ator_nome UNIQUE (nome);
  
-desc feedback;
+
+ALTER TABLE projeto DROP FOREIGN KEY fk_projeto_genero;
+ALTER TABLE projeto DROP COLUMN genero_id;
+
+
+CREATE TABLE IF NOT EXISTS filmes_db.projeto_genero (
+  projeto_id INT NOT NULL,
+  genero_id  INT NOT NULL,
+  PRIMARY KEY (projeto_id, genero_id),
+  INDEX fk_projeto_genero_genero (genero_id ASC),
+  CONSTRAINT fk_projeto_genero_projeto
+    FOREIGN KEY (projeto_id) REFERENCES filmes_db.projeto (id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_projeto_genero_genero
+    FOREIGN KEY (genero_id) REFERENCES filmes_db.genero (id)
+    ON DELETE CASCADE
+);
  
 -- vw_emails_pendentes (versão final, com horarios e avaliacao)
 CREATE OR REPLACE VIEW vw_emails_pendentes AS
