@@ -57,3 +57,198 @@ function preencherUsuario() {
     if (nome) document.getElementById('a_usuario').innerHTML = nome;
     if (email) document.getElementById('c_email').innerHTML = email;
 }
+
+
+// =====================================================================
+// INTEGRAÇÃO COM A API (compartilhado pelas dashboards)
+// =====================================================================
+
+var BILHAO = 1000000000;
+var MILHAO = 1000000;
+
+// Busca JSON na API. Se o servidor responder com erro, cai no .catch de quem chamou.
+function buscarDados(url) {
+    return fetch(url).then(function (resposta) {
+        if (!resposta.ok) {
+            throw new Error("Erro " + resposta.status + " ao consultar " + url);
+        }
+
+        return resposta.json();
+    });
+}
+
+// O banco guarda os gêneros em inglês; a tela mostra em português.
+var GENEROS_PT = {
+    'Drama': 'Drama',
+    'Action': 'Ação',
+    'Science Fiction': 'Ficção Científica',
+    'Adventure': 'Aventura',
+    'Animation': 'Animação',
+    'Family': 'Família',
+    'Fantasy': 'Fantasia',
+    'Comedy': 'Comédia',
+    'Thriller': 'Suspense',
+    'Crime': 'Crime',
+    'Horror': 'Terror',
+    'Mystery': 'Mistério',
+    'History': 'História',
+    'War': 'Guerra',
+    'Documentary': 'Documentário',
+    'Romance': 'Romance',
+    'Music': 'Música',
+    'Western': 'Faroeste',
+    'TV Movie': 'Filme para TV'
+};
+
+// O banco guarda o país como sigla; a tela mostra o nome em português.
+// Se a sigla não estiver na lista, mostra a própria sigla (é só acrescentar aqui).
+var PAISES_PT = {
+    'US': 'Estados Unidos',
+    'GB': 'Reino Unido',
+    'FR': 'França',
+    'DE': 'Alemanha',
+    'IT': 'Itália',
+    'ES': 'Espanha',
+    'CA': 'Canadá',
+    'AU': 'Austrália',
+    'JP': 'Japão',
+    'CN': 'China',
+    'KR': 'Coreia do Sul',
+    'IN': 'Índia',
+    'BR': 'Brasil',
+    'MX': 'México',
+    'AR': 'Argentina',
+    'RU': 'Rússia',
+    'HK': 'Hong Kong',
+    'NZ': 'Nova Zelândia',
+    'IE': 'Irlanda',
+    'SE': 'Suécia'
+};
+
+function traduzirGenero(genero) {
+    if (GENEROS_PT[genero]) {
+        return GENEROS_PT[genero];
+    }
+
+    return genero;
+}
+
+function traduzirPais(sigla) {
+    if (PAISES_PT[sigla]) {
+        return PAISES_PT[sigla];
+    }
+
+    return sigla;
+}
+
+// ---------- Formatação ----------
+// 2.45 -> "2,5"
+function formatarNumero(valor, casas) {
+    if (casas === undefined) {
+        casas = 1;
+    }
+
+    return Number(valor).toFixed(casas).replace('.', ',');
+}
+
+// 4800000000 -> "$ 4,8B" | 28000000 -> "$ 28,0M"
+function formatarDinheiro(valor) {
+    if (valor >= BILHAO) {
+        return "$ " + formatarNumero(valor / BILHAO) + "B";
+    }
+
+    return "$ " + formatarNumero(valor / MILHAO) + "M";
+}
+
+// 12 -> "+12" | -3 -> "-3"
+function comSinal(valor, casas) {
+    if (casas === undefined) {
+        casas = 0;
+    }
+
+    if (valor < 0) {
+        return "-" + formatarNumero(Math.abs(valor), casas);
+    }
+
+    return "+" + formatarNumero(valor, casas);
+}
+
+// ---------- Montagem dos dados dos gráficos ----------
+// As views devolvem várias linhas; estas funções tiram uma coluna de cada linha.
+
+// Lista de números de uma coluna, já dividida (ex.: lucro / BILHAO)
+function pegarNumeros(linhas, coluna, divisor) {
+    var lista = [];
+
+    for (var i = 0; i < linhas.length; i++) {
+        lista.push(Number(linhas[i][coluna]) / divisor);
+    }
+
+    return lista;
+}
+
+function pegarGeneros(linhas) {
+    var lista = [];
+
+    for (var i = 0; i < linhas.length; i++) {
+        lista.push(traduzirGenero(linhas[i].genero));
+    }
+
+    return lista;
+}
+
+function pegarPaises(linhas) {
+    var lista = [];
+
+    for (var i = 0; i < linhas.length; i++) {
+        lista.push(traduzirPais(linhas[i].pais));
+    }
+
+    return lista;
+}
+
+function pegarTextos(linhas, coluna) {
+    var lista = [];
+
+    for (var i = 0; i < linhas.length; i++) {
+        lista.push(linhas[i][coluna]);
+    }
+
+    return lista;
+}
+
+// Sempre devolve 12 posições (JAN a DEZ). Mês sem filme fica null (lacuna na linha).
+function pegarMeses(linhas, coluna, divisor) {
+    var lista = [null, null, null, null, null, null, null, null, null, null, null, null];
+
+    for (var i = 0; i < linhas.length; i++) {
+        var posicao = Number(linhas[i].mes) - 1;
+        lista[posicao] = Number(linhas[i][coluna]) / divisor;
+    }
+
+    return lista;
+}
+
+// Média que vem da view (repetida em todas as linhas, então pega da primeira)
+function pegarMedia(linhas, coluna, divisor) {
+    if (linhas.length == 0) {
+        return null;
+    }
+
+    return Number(linhas[0][coluna]) / divisor;
+}
+
+// ---------- Tela ----------
+// Escreve texto num elemento (textContent não interpreta HTML, então é seguro)
+function setTexto(id, texto) {
+    document.getElementById(id).textContent = texto;
+}
+
+// Troca rótulos e valores de um gráfico já criado.
+// "media" é a linha verde de média (use null para o gráfico calcular sozinho).
+function atualizarGrafico(grafico, rotulos, valores, media) {
+    grafico.data.labels = rotulos;
+    grafico.data.datasets[0].data = valores;
+    grafico.options.plugins.pluginMedia = { valor: media };
+    grafico.update();
+}
