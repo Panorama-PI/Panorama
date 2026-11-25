@@ -100,45 +100,12 @@ var GENEROS_PT = {
     'TV Movie': 'Filme para TV'
 };
 
-// O banco guarda o país como sigla; a tela mostra o nome em português.
-// Se a sigla não estiver na lista, mostra a própria sigla (é só acrescentar aqui).
-var PAISES_PT = {
-    'US': 'Estados Unidos',
-    'GB': 'Reino Unido',
-    'FR': 'França',
-    'DE': 'Alemanha',
-    'IT': 'Itália',
-    'ES': 'Espanha',
-    'CA': 'Canadá',
-    'AU': 'Austrália',
-    'JP': 'Japão',
-    'CN': 'China',
-    'KR': 'Coreia do Sul',
-    'IN': 'Índia',
-    'BR': 'Brasil',
-    'MX': 'México',
-    'AR': 'Argentina',
-    'RU': 'Rússia',
-    'HK': 'Hong Kong',
-    'NZ': 'Nova Zelândia',
-    'IE': 'Irlanda',
-    'SE': 'Suécia'
-};
-
 function traduzirGenero(genero) {
     if (GENEROS_PT[genero]) {
         return GENEROS_PT[genero];
     }
 
     return genero;
-}
-
-function traduzirPais(sigla) {
-    if (PAISES_PT[sigla]) {
-        return PAISES_PT[sigla];
-    }
-
-    return sigla;
 }
 
 // ---------- Formatação ----------
@@ -192,16 +159,6 @@ function pegarGeneros(linhas) {
 
     for (var i = 0; i < linhas.length; i++) {
         lista.push(traduzirGenero(linhas[i].genero));
-    }
-
-    return lista;
-}
-
-function pegarPaises(linhas) {
-    var lista = [];
-
-    for (var i = 0; i < linhas.length; i++) {
-        lista.push(traduzirPais(linhas[i].pais));
     }
 
     return lista;
