@@ -52,13 +52,13 @@
                 Gênero selecionado:
 
                 <select id="select_genero">
-                    <option value="Ficção Científica">Ficção Científica</option>
+                    <option value="Science Fiction">Ficção Científica</option>
                     <option value="Romance">Romance</option>
-                    <option value="Aventura">Aventura</option>
+                    <option value="Adventure">Aventura</option>
                     <option value="Drama">Drama</option>
-                    <option value="Comédia">Comédia</option>
-                    <option value="Ação">Ação</option>
-                    <option value="Terror">Terror</option>
+                    <option value="Comedy">Comédia</option>
+                    <option value="Action">Ação</option>
+                    <option value="Horror">Terror</option>
                 </select>
             </label>
 
@@ -68,20 +68,21 @@
 
             <div class="card kpi-card">
                 <p>País Mais Lucrativo</p>
-                <h2>Estados Unidos</h2>
-                <span id="lucro-pais">Representa 54% do lucro total do gênero</span>
+                <h2 id="kpi-pais-titulo">Carregando...</h2>
+                <span id="kpi-pais-detalhe">&nbsp;</span>
             </div>
 
             <div class="card kpi-card">
                 <p>Ator com Mais Aparições em Filmes Lucrativos</p>
-                <h2>Robert Downey Jr</h2>
-                <span id="lucro-pais">20 aparições <br>+4 aparições que o 2º colocado Leonardo DiCaprio</span>
+                <h2 id="kpi-ator-titulo">Carregando...</h2>
+                <span id="kpi-ator-detalhe">&nbsp;</span><br>
+                <span id="kpi-ator-detalhe2"></span>
             </div>
 
             <div class="card kpi-card">
                 <p>Período de Pico de Lucro</p>
-                <h2>Junho a Agosto</h2>
-                <span id="lucro-pais">+42% superior aos meses de baixa</span>
+                <h2 id="kpi-periodo-titulo">Carregando...</h2>
+                <span id="kpi-periodo-detalhe">&nbsp;</span>
             </div>
 
         </section>
@@ -122,12 +123,14 @@
 
     const selectGenero = document.getElementById('select_genero');
 
-    // ATENÇÃO: os valores abaixo ainda estão mockados.
-    // Todos os gráficos desta tela são FILTRADOS pelo gênero escolhido no select.
-    // Nas consultas, troque 'Ação' pelo gênero escolhido. No backend, use parâmetro (?)
-    // em vez de concatenar o texto: genero LIKE CONCAT('%', ?, '%')
-    // (a coluna genero pode guardar mais de um gênero no mesmo texto, por isso o LIKE).
-    // Lucro = receita - orcamento.
+    // Texto exibido no select (português); o value é o nome do gênero no banco (inglês)
+    function nomeGeneroSelecionado() {
+        return selectGenero.options[selectGenero.selectedIndex].text;
+    }
+
+    // Os dados vêm da API: GET /dashboards/produtor/especifica?genero=<nome no banco>
+    // (views vw_prod_esp_*). Todos os gráficos e KPIs são filtrados pelo gênero do select.
+    // Os gráficos são criados vazios abaixo e preenchidos em carregarGenero().
 
 
     // País de origem x Lucro (Em quais países o gênero escolhido mais lucra - Top 5)
@@ -144,7 +147,7 @@
 
         id: 'pluginMedia',
 
-        afterDraw(chart) {
+        afterDraw(chart, args, opcoes) {
 
             const valores = chart.data.datasets[0].data;
 
@@ -164,7 +167,11 @@
 
             if (quantidade === 0) return;
 
-            const media = soma / quantidade;
+            // Usa a média vinda da view do banco; se não vier, calcula a dos valores plotados
+            let media = soma / quantidade;
+            if (opcoes && typeof opcoes.valor === 'number') {
+                media = opcoes.valor;
+            }
 
             const ctx = chart.ctx;
             const area = chart.chartArea;
@@ -236,11 +243,9 @@
 
         data: {
 
-            labels: ['Estados Unidos', 'Reino Unido', 'China', 'França', 'Brasil'],
-
+            labels: [],
             datasets: [{
-
-                data: [7.2, 5.2, 4.8, 3.2, 2],
+                data: [],
 
                 backgroundColor: COR_ROSA_BARRA,
 
@@ -268,7 +273,7 @@
 
                 title: tituloGrafico('Lucro Total Acumulado por País', true),
 
-                subtitle: subtituloGrafico(selectGenero.value),
+                subtitle: subtituloGrafico(nomeGeneroSelecionado()),
 
                 datalabels: { display: false }
 
@@ -282,10 +287,7 @@
 
                     ticks: {
 
-                        stepSize: 1,
-
                         color: '#dfdfdf',
-
                         callback: (val) => `$ ${val}B`,
 
                         font: {size: 18}
@@ -332,11 +334,9 @@
 
         data: {
 
-            labels: ['Robert Downey Jr', 'Leonardo DiCaprio', 'Adam Sandler', 'Scarlett Johansson', 'Tom Cruise'],
-
+            labels: [],
             datasets: [{
-
-                data: [20, 16, 14, 12, 10],
+                data: [],
 
                 backgroundColor: COR_ROSA_BARRA,
 
@@ -364,7 +364,7 @@
 
                 title: tituloGrafico('Top 5 Atores com Maior Frequência em Filmes Lucrativos', true),
 
-                subtitle: subtituloGrafico(selectGenero.value),
+                subtitle: subtituloGrafico(nomeGeneroSelecionado()),
 
                 datalabels: {
 
@@ -388,9 +388,7 @@
 
                     display: true,
 
-                    ticks: { color: '#dfdfdf', font: {size: 18} },
-
-                    max: 25
+                    ticks: { color: '#dfdfdf', font: {size: 18}, precision: 0 }
 
                 },
 
@@ -428,7 +426,7 @@
 
             datasets: [{
 
-                data: [28, 24, 16, 18, 12, 32, 28, 24, 28, 20, 24, 30],
+                data: [],
 
                 borderColor: COR_ROSA_BARRA,
 
@@ -460,7 +458,7 @@
 
                 title: tituloGrafico('Janelas Mais Lucrativas de Lançamento do Gênero', true),
 
-                subtitle: subtituloGrafico(selectGenero.value),
+                subtitle: subtituloGrafico(nomeGeneroSelecionado()),
 
                 datalabels: { display: false }
 
@@ -471,8 +469,6 @@
                 y: {
 
                     min: 0,
-
-                    max: 40,
 
                     grid: { color: COR_LINHA_GRID },
 
@@ -518,11 +514,9 @@
 
         data: {
 
-            labels: ['Will Smith', 'Leonardo DiCaprio', 'Adam Sandler', 'Scarlett Johansson', 'Tom Cruise'],
-
+            labels: [],
             datasets: [{
-
-                data: [980, 765, 680, 500, 390],
+                data: [],
 
                 backgroundColor: COR_ROSA_BARRA,
 
@@ -548,7 +542,7 @@
 
                 title: tituloGrafico('Top 5 Atores Mais Rentáveis em Bilheteria', true),
 
-                subtitle: subtituloGrafico(selectGenero.value),
+                subtitle: subtituloGrafico(nomeGeneroSelecionado()),
 
                 datalabels: {
 
@@ -568,15 +562,11 @@
 
                 y: {
 
-                    max: 1000,
-
                     grid: { color: COR_LINHA_GRID },
 
                     ticks: {
 
-                        stepSize: 200,
-
-                        callback: (val) => val === 0 ? '0' : `${val}M`,
+                                                callback: (val) => val === 0 ? '0' : `${val}M`,
 
                         color: '#dfdfdf', 
                         
@@ -602,26 +592,109 @@
 
 
 
-    // Chamada pelo select de gênero.
-    // Por enquanto atualiza o texto do filtro e o subtítulo verde de cada gráfico.
+    // ===== Integração com o banco =====
+    function preencherKpis(kpis) {
+        // KPI 1: país mais lucrativo
+        var pais = kpis.paisMaisLucrativo;
 
-    const graficosFiltrados = [chartPaisLucro, chartAtoresAparicoes, chartPeriodoLucro, chartAtoresLucro];
+        if (pais === null) {
+            setTexto('kpi-pais-titulo', 'Sem dados');
+            setTexto('kpi-pais-detalhe', '');
+        } else {
+            setTexto('kpi-pais-titulo', traduzirPais(pais.pais));
 
+            if (pais.pct_do_genero !== null) {
+                setTexto('kpi-pais-detalhe', 'Representa ' + pais.pct_do_genero + '% do lucro total do gênero');
+            } else {
+                setTexto('kpi-pais-detalhe', 'Lucro total de ' + formatarDinheiro(pais.lucro_total));
+            }
+        }
 
-    function mudarGenero() {
+        // KPI 2: ator com mais aparições (o detalhe tem duas linhas)
+        var ator = kpis.atorMaisAparicoes;
 
-        const genero = selectGenero.value;
+        if (ator === null) {
+            setTexto('kpi-ator-titulo', 'Sem dados');
+            setTexto('kpi-ator-detalhe', '');
+            setTexto('kpi-ator-detalhe2', '');
+        } else {
+            setTexto('kpi-ator-titulo', ator.ator);
+            setTexto('kpi-ator-detalhe', ator.aparicoes + ' aparições');
 
-        document.getElementById('genero_escolhido').innerText = `Genero Escolhido: ${genero}`;
+            if (ator.segundo_ator !== null) {
+                setTexto('kpi-ator-detalhe2', comSinal(ator.diferenca) + ' aparições que o 2º colocado ' + ator.segundo_ator);
+            } else {
+                setTexto('kpi-ator-detalhe2', '');
+            }
+        }
 
-        graficosFiltrados.forEach(grafico => {
+        // KPI 3: período de pico de lucro
+        var pico = kpis.periodoPico;
 
-            grafico.options.plugins.subtitle.text = genero;
+        if (pico === null) {
+            setTexto('kpi-periodo-titulo', 'Sem dados');
+            setTexto('kpi-periodo-detalhe', '');
+        } else {
+            setTexto('kpi-periodo-titulo', pico.periodo);
 
-            grafico.update();
-
-        });
-
+            if (pico.vantagem_pct !== null) {
+                setTexto('kpi-periodo-detalhe', comSinal(pico.vantagem_pct) + '% acima da média anual do gênero');
+            } else {
+                setTexto('kpi-periodo-detalhe', 'Lucro médio de ' + formatarDinheiro(pico.lucro_medio_periodo));
+            }
+        }
     }
 
+    // Os valores chegam em dólar: país em bilhões, atores e período em milhões.
+    function preencherGraficos(g) {
+        atualizarGrafico(chartPaisLucro,
+            pegarPaises(g.paisLucro),
+            pegarNumeros(g.paisLucro, 'lucro_total', BILHAO),
+            pegarMedia(g.paisLucro, 'media_top5', BILHAO));
+
+        atualizarGrafico(chartAtoresAparicoes,
+            pegarTextos(g.atoresAparicoes, 'ator'),
+            pegarNumeros(g.atoresAparicoes, 'aparicoes', 1),
+            null);
+
+        atualizarGrafico(chartPeriodoLucro,
+            ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'],
+            pegarMeses(g.periodoLucro, 'lucro_medio', MILHAO),
+            pegarMedia(g.periodoLucro, 'media_anual', MILHAO));
+
+        atualizarGrafico(chartAtoresLucro,
+            pegarTextos(g.atoresLucro, 'ator'),
+            pegarNumeros(g.atoresLucro, 'lucro_total', MILHAO),
+            null);
+    }
+
+    function carregarGenero() {
+        var genero = selectGenero.value;
+
+        // Atualiza o subtítulo verde de cada gráfico
+        chartPaisLucro.options.plugins.subtitle.text = nomeGeneroSelecionado();
+        chartAtoresAparicoes.options.plugins.subtitle.text = nomeGeneroSelecionado();
+        chartPeriodoLucro.options.plugins.subtitle.text = nomeGeneroSelecionado();
+        chartAtoresLucro.options.plugins.subtitle.text = nomeGeneroSelecionado();
+
+        // Trava o select enquanto carrega, para não misturar respostas de gêneros diferentes
+        selectGenero.disabled = true;
+
+        buscarDados('/dashboards/produtor/especifica?genero=' + encodeURIComponent(genero))
+            .then(function (dados) {
+                preencherKpis(dados.kpis);
+                preencherGraficos(dados.graficos);
+                selectGenero.disabled = false;
+            })
+            .catch(function (erro) {
+                console.error('Erro ao carregar a dashboard específica do produtor:', erro);
+                setTexto('kpi-pais-titulo', 'Erro ao carregar');
+                setTexto('kpi-ator-titulo', 'Erro ao carregar');
+                setTexto('kpi-periodo-titulo', 'Erro ao carregar');
+                selectGenero.disabled = false;
+            });
+    }
+
+    selectGenero.addEventListener('change', carregarGenero);
+    carregarGenero();
 </script>
