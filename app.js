@@ -28,6 +28,7 @@ var publicacaoPRouter = require("./src/routes/publicacoes");
 var relatoriosRouter = require("./src/routes/relatorios");
 var feedbackProdutorRouter = require("./src/routes/feedbackProdutor");
 var feedbacksRoteiristaRouter = require("./src/routes/feedbackRoteirista");
+var dashboardsRouter = require("./src/routes/dashboards"); 
 
 // Importa o interceptor global de erros no server
 const errorHandler = require("./src/middleware/ErrorHandler");
@@ -58,6 +59,7 @@ app.use("/publicacoes/produtor", publicacaoPRouter);
 app.use("/relatorios", relatoriosRouter);
 app.use("/feedbacks/produtor", feedbackProdutorRouter);
 app.use("/feedbacks", feedbacksRoteiristaRouter);
+app.use("/dashboards", dashboardsRouter);
 app.all("*", (req, res, next) => {
   next(new NotFoundError(`Rota ${req.originalUrl} não encontrada.`));
 })
