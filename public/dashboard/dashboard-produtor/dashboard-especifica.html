@@ -51,15 +51,7 @@
             <label for="select_genero">
                 Gênero selecionado:
 
-                <select id="select_genero">
-                    <option value="Science Fiction">Ficção Científica</option>
-                    <option value="Romance">Romance</option>
-                    <option value="Adventure">Aventura</option>
-                    <option value="Drama">Drama</option>
-                    <option value="Comedy">Comédia</option>
-                    <option value="Action">Ação</option>
-                    <option value="Horror">Terror</option>
-                </select>
+                <select id="select_genero"></select>
             </label>
 
         </section>
@@ -122,6 +114,19 @@
     preencherUsuario();
 
     const selectGenero = document.getElementById('select_genero');
+
+    function preencherSelectGeneros() {
+        selectGenero.innerHTML = '';
+
+        Object.keys(GENEROS_PT).forEach(function (generoIngles) {
+            const option = document.createElement('option');
+            option.value = generoIngles;
+            option.textContent = GENEROS_PT[generoIngles];
+            selectGenero.appendChild(option);
+        });
+    }
+
+    preencherSelectGeneros();
 
     // Texto exibido no select (português); o value é o nome do gênero no banco (inglês)
     function nomeGeneroSelecionado() {
@@ -566,10 +571,10 @@
 
                     ticks: {
 
-                                                callback: (val) => val === 0 ? '0' : `${val}M`,
+                        callback: (val) => val === 0 ? '0' : `${val}M`,
 
-                        color: '#dfdfdf', 
-                        
+                        color: '#dfdfdf',
+
                         font: {size: 18}
 
                     }
