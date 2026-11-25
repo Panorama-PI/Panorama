@@ -5,6 +5,7 @@ import com.panorama.mail.dao.EmailDao;
 import com.panorama.mail.dao.FeedbackDao;
 import com.panorama.mail.dao.*;
 import com.panorama.mail.model.*;
+import com.panorama.mail.template.EmailTemplates;
 import jakarta.mail.MessagingException;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
@@ -12,6 +13,7 @@ import jakarta.mail.internet.MimeMessage;
 
 import java.time.LocalTime;
 import java.util.Properties;
+
 
 public class EmailService {
     private final EmailConfig config;
@@ -46,7 +48,7 @@ public class EmailService {
         if ("TOKEN".equals(tipo)) {
             Token token = pendencia.getToken();
             String assunto = "Envio do Token da Panorama";
-            String html = htmlToken(empresa, token);
+            String html = EmailTemplates.htmlToken(empresa, token);
 
             dispararEmail(roteirista.getEmail(), assunto, html);
             new TokenDao().marcarComoEnviado(token.getToken());
@@ -66,7 +68,7 @@ public class EmailService {
                 dispararEmail(
                         roteirista.getEmail(),
                         "Um produtor da sua empresa te mandou um feedback",
-                        htmlFeedback(roteirista, produtor, empresa)
+                        EmailTemplates.htmlFeedback(roteirista, produtor, empresa)
                 );
                 new FeedbackDao().marcarComoEnviado(feedback.getId());
 
@@ -74,7 +76,7 @@ public class EmailService {
                 dispararEmail(
                         roteirista.getEmail(),
                         "Um produtor da sua empresa te editou um feedback",
-                        htmlFeedbackEditado(roteirista, produtor, empresa)
+                        EmailTemplates.htmlFeedbackEditado(roteirista, produtor, empresa)
                 );
                 new FeedbackDao().marcarComoEnviado(feedback.getId());
             }
@@ -86,14 +88,14 @@ public class EmailService {
                 dispararEmail(
                         roteirista.getEmail(),
                         "Um produtor da sua empresa te mandou uma avaliação da publicação",
-                        htmlAvaliacao(roteirista, produtor, empresa)
+                        EmailTemplates.htmlAvaliacao(roteirista, produtor, empresa, avaliacao.getNota())
                 );
                 new AvaliacaoDao().marcarComoEnviado(avaliacao.getIdAvaliacao());
             } else if (Integer.valueOf(3).equals(status)) {
                 dispararEmail(
                         roteirista.getEmail(),
                         "Um produtor da sua empresa te editou uma avaliação da publicação",
-                        htmlAvaliacaoEditada(roteirista, produtor, empresa)
+                        EmailTemplates.htmlAvaliacaoEditada(roteirista, produtor, empresa, avaliacao.getNota())
                 );
                 new AvaliacaoDao().marcarComoEnviado(avaliacao.getIdAvaliacao());
             }
@@ -123,150 +125,9 @@ public class EmailService {
     }
 
 
-    public String htmlFeedback(Roteirista roteirista, Produtor produtor, Empresa empresa){
-        return "<div style=\"background-color: #0b0b0b; padding: 30px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e0e0e0;\">" +
-                "<table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"background-color: #141414; border: 1px solid #222222; border-radius: 8px; overflow: hidden;\">" +
-
-                // <!-- CABEÇALHO -->
-                "<tr>" +
-                "<td align=\"center\" style=\"background-color: #000000; padding: 25px 20px; border-bottom: 3px solid #e50914;\">" +
-                "<h1 style=\"color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 2px; text-transform: uppercase;\">" +
-                "Panorama" +
-                "</h1>" +
-                "</td>" +
-                "</tr>" +
-
-                // <!-- CONTEÚDO PRINCIPAL -->
-                "<tr>" +
-                "<td style=\"padding: 40px 30px; background-color: #141414; text-align: center;\">" +
-                "<h2 style=\"color: #ffffff; font-size: 20px; margin-top: 0; margin-bottom: 10px;\">Novo Feedback Recebido</h2>" +
-                "<p style=\"color: #b3b3b3; font-size: 15px; line-height: 1.5; margin-top: 0; margin-bottom: 30px;\">" +
-                "Olá, <strong>" + roteirista.getNome() + "</strong>! A empresa <strong>" + empresa.getNome() + "</strong> informou que há um novo feedback feito pelo produtor <strong>" + produtor.getNome() + "</strong> na sua publicação." +
-                "</p>" +
-
-                "<p style=\"color: #888888; font-size: 13px; margin-top: 30px; margin-bottom: 10px;\">" +
-                "Acesse a plataforma <strong>Panorama</strong> para conferir os detalhes e interagir." +
-                "</p>" +
-                "<p style=\"color: #777777; font-size: 13px; margin: 0; line-height: 1.4;\">" +
-                "Esta é uma mensagem automática, por favor não responda a este e-mail." +
-                "</p>" +
-
-                "</td>" +
-                "</tr>" +
-
-                // <!-- RODAPÉ -->
-                "<tr>" +
-                "<td align=\"center\" style=\"background-color: #000000; padding: 20px; border-top: 1px solid #222222;\">" +
-                "<p style=\"color: #666666; font-size: 12px; margin: 0;\">" +
-                "© 2026 Panorama. Todos os direitos reservados." +
-                "</p>" +
-                "</td>" +
-                "</tr>" +
-
-                "</table>" +
-                "</div>";
-    }
 
 
-    public String htmlFeedbackEditado(Roteirista roteirista, Produtor produtor, Empresa empresa){
-        return "<div style=\"background-color: #0b0b0b; padding: 30px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e0e0e0;\">" +
-                "<table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"background-color: #141414; border: 1px solid #222222; border-radius: 8px; overflow: hidden;\">" +
-
-                // <!-- CABEÇALHO -->
-                "<tr>" +
-                "<td align=\"center\" style=\"background-color: #000000; padding: 25px 20px; border-bottom: 3px solid #e50914;\">" +
-                "<h1 style=\"color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 2px; text-transform: uppercase;\">" +
-                "Panorama" +
-                "</h1>" +
-                "</td>" +
-                "</tr>" +
-
-                // <!-- CONTEÚDO PRINCIPAL -->
-                "<tr>" +
-                "<td style=\"padding: 40px 30px; background-color: #141414; text-align: center;\">" +
-                "<h2 style=\"color: #ffffff; font-size: 20px; margin-top: 0; margin-bottom: 10px;\">Feedback Editado</h2>" +
-                "<p style=\"color: #b3b3b3; font-size: 15px; line-height: 1.5; margin-top: 0; margin-bottom: 30px;\">" +
-                "Olá, <strong>" + roteirista.getNome() + "</strong>! A empresa <strong>" + empresa.getNome() + "</strong> informou que o feedback feito pelo produtor <strong>" + produtor.getNome() + "</strong> na sua publicação foi atualizado." +
-                "</p>" +
-
-                "<p style=\"color: #888888; font-size: 13px; margin-top: 30px; margin-bottom: 10px;\">" +
-                "Acesse diretamente a plataforma <strong>Panorama</strong> para conferir as alterações." +
-                "</p>" +
-                "<p style=\"color: #777777; font-size: 13px; margin: 0; line-height: 1.4;\">" +
-                "Esta é uma mensagem automática, por favor não responda a este e-mail." +
-                "</p>" +
-
-                "</td>" +
-                "</tr>" +
-
-                // <!-- RODAPÉ -->
-                "<tr>" +
-                "<td align=\"center\" style=\"background-color: #000000; padding: 20px; border-top: 1px solid #222222;\">" +
-                "<p style=\"color: #666666; font-size: 12px; margin: 0;\">" +
-                "© 2026 Panorama. Todos os direitos reservados." +
-                "</p>" +
-                "</td>" +
-                "</tr>" +
-
-                "</table>" +
-                "</div>";
-    }
-
-
-    public String htmlToken(Empresa empresa, Token token){
-        return "<div style=\"background-color: #0b0b0b; padding: 30px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e0e0e0;\">" +
-                "<table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"background-color: #141414; border: 1px solid #222222; border-radius: 8px; overflow: hidden;\">" +
-
-                // <!-- CABEÇALHO -->
-                "<tr>" +
-                "<td align=\"center\" style=\"background-color: #000000; padding: 25px 20px; border-bottom: 3px solid #e50914;\">" +
-                "<h1 style=\"color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 2px; text-transform: uppercase;\">" +
-                "Panorama" +
-                "</h1>" +
-                "</td>" +
-                "</tr>" +
-
-                // <!-- CONTEÚDO PRINCIPAL -->
-                "<tr>" +
-                "<td style=\"padding: 40px 30px; background-color: #141414; text-align: center;\">" +
-                "<h2 style=\"color: #ffffff; font-size: 20px; margin-top: 0; margin-bottom: 10px;\">Código de Verificação</h2>" +
-                "<p style=\"color: #b3b3b3; font-size: 15px; line-height: 1.5; margin-top: 0; margin-bottom: 30px;\">" +
-                "Olá, a empresa " + empresa.getNome() + " solicitou um código de acesso para a sua conta no <strong>Panorama</strong>. Utilize o token abaixo para prosseguir:" +
-                "</p>" +
-
-                // <!-- CAIXA DESTAQUE DO TOKEN -->
-                "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\" style=\"background-color: #1f1f1f; border: 2px dashed #e50914; border-radius: 8px; margin: 0 auto;\">" +
-                "<tr>" +
-                "<td style=\"padding: 20px 40px; text-align: center;\">" +
-                "<span style=\"font-family: 'Courier New', Courier, monospace; font-size: 36px; font-weight: bold; color: #ffffff; letter-spacing: 8px;\">" +
-                token.getToken() +
-                "</span>" +
-                "</td>" +
-                "</tr>" +
-                "</table>" +
-
-                "<p style=\"color: #888888; font-size: 13px; margin-top: 30px; margin-bottom: 10px;\">" +
-                "Este código é válido por 15 minutos" +
-                "</p>" +
-                "<p style=\"color: #777777; font-size: 13px; margin: 0; line-height: 1.4;\">" +
-                "Se você não solicitou este código, por favor ignore este e-mail. Nenhuma alteração será feita na sua conta." +
-                "</p>" +
-
-                "</td>" +
-                "</tr>" +
-
-                // <!-- RODAPÉ -->
-                "<tr>" +
-                "<td align=\"center\" style=\"background-color: #000000; padding: 20px; border-top: 1px solid #222222;\">" +
-                "<p style=\"color: #666666; font-size: 12px; margin: 0;\">" +
-                "© 2026 Panorama. Todos os direitos reservados." +
-                "</p>" +
-                "</td>" +
-                "</tr>" +
-
-                "</table>" +
-                "</div>";
-    }
+    /*
     // LEMBRETE SEMANAL DO PRODUTOR
 
     public void enviarLembreteProdutor(
@@ -595,5 +456,7 @@ public class EmailService {
                 roteirista.getMediaAvaliacoes()
         );
     }
+
+    */
 
 }
