@@ -164,6 +164,17 @@ function pegarGeneros(linhas) {
     return lista;
 }
 
+function pegarPaises(linhas) {
+    var lista = [];
+
+    for (var i = 0; i < linhas.length; i++) {
+        lista.push((linhas[i].pais));
+    }
+
+    return lista;
+}
+
+
 function pegarTextos(linhas, coluna) {
     var lista = [];
 

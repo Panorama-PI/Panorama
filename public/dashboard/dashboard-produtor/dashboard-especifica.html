@@ -601,7 +601,7 @@
             setTexto('kpi-pais-titulo', 'Sem dados');
             setTexto('kpi-pais-detalhe', '');
         } else {
-            setTexto('kpi-pais-titulo', traduzirPais(pais.pais));
+            setTexto('kpi-pais-titulo', (pais.pais));
 
             if (pais.pct_do_genero !== null) {
                 setTexto('kpi-pais-detalhe', 'Representa ' + pais.pct_do_genero + '% do lucro total do gênero');
