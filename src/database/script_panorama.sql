@@ -598,7 +598,6 @@ ADD CONSTRAINT fk_filtros_usuario
 FOREIGN KEY (usuario_id) REFERENCES usuario(id)
 ON DELETE CASCADE;
  
- 
 -- FEEDBACK → PUBLICACAO
 ALTER TABLE feedback
 DROP FOREIGN KEY fk_publicacao_feedback;
@@ -627,7 +626,9 @@ ALTER TABLE feedback DROP COLUMN avaliacao;
 -- (a versão ANTIGA, sem horarios e sem avaliacao). Ele sobrescrevia a view nova.
 -- Foi removido: a versão final é a que está logo depois do "desc feedback;".
  
--- VIEWS DAS DASHBOARDS - Para facilitar essas daqui são utilizadas por geral
+ -- VIEWS DASHBOARD -- VIEWS DASHBOARD -- VIEWS DASHBOARD -- VIEWS DASHBOARD -- VIEWS DASHBOARD -- VIEWS DASHBOARD
+ 
+-- VIEWS GERAIS - Para facilitar essas daqui são utilizadas por geral
     
 -- Data convertida, lucro/ROI calculados
 CREATE OR REPLACE VIEW vw_base_filme AS
@@ -684,6 +685,24 @@ INNER JOIN (
   GROUP BY genero
 ) tot ON tot.genero = a.genero
 GROUP BY a.genero, b.genero, tot.total_filmes;
+ 
+ 
+ 
+-- Um registro por filme x ator (evita duplicar quando o ator faz 2 personagens no mesmo filme)
+CREATE OR REPLACE VIEW vw_base_filme_ator_unico AS
+SELECT DISTINCT
+  fa.id_filme AS filme_id,
+  a.id        AS ator_id,
+  TRIM(a.nome) AS ator
+FROM filme_ator fa
+INNER JOIN ator a ON a.id = fa.id_ator
+WHERE a.nome IS NOT NULL AND TRIM(a.nome) <> '';
+ 
+-- Filme + gênero + ator (base da visão específica de atores)
+CREATE OR REPLACE VIEW vw_base_filme_genero_ator AS
+SELECT b.*, fa.ator
+FROM vw_base_filme_genero b
+INNER JOIN vw_base_filme_ator_unico fa ON fa.filme_id = b.filme_id;
  
 -- DASHBOARD GERAL ROTEIRISTA
 	-- Avaliação média x genero
@@ -770,9 +789,127 @@ SELECT
   ROW_NUMBER() OVER (PARTITION BY genero ORDER BY percentual DESC, genero_associado) AS ranking
 FROM vw_base_genero_associacao;
  
+-- DASHBOARD GERAL RPODUTOR -- DASHBOARD GERAL PRODUTOR -- DASHBOARD GERAL PRODUTOR 
+
+
+-- Gráfico: Lucro x Gênero (barras + linha "Média: 3,3B")
+CREATE OR REPLACE VIEW vw_prod_geral_grafico_lucro_genero AS
+SELECT
+  genero,
+  lucro_total,
+  qtd_filmes,
+  ROUND(AVG(lucro_total) OVER (), 2) AS media_geral,
+  ROW_NUMBER() OVER (ORDER BY lucro_total DESC) AS ranking
+FROM (
+  SELECT genero, SUM(lucro) AS lucro_total, COUNT(*) AS qtd_filmes
+  FROM vw_base_filme_genero
+  WHERE lucro IS NOT NULL
+  GROUP BY genero
+) t;
+
+
+-- Gráfico: Gênero x ROI (barras + linha "Média: 2,7x")
+-- o calculo do roi ta receita total / orçamento total do genero
+CREATE OR REPLACE VIEW vw_prod_geral_grafico_roi_genero AS
+SELECT
+  genero,
+  roi,
+  qtd_filmes,
+  ROUND(AVG(roi) OVER (), 1) AS media_geral,
+  ROW_NUMBER() OVER (ORDER BY roi DESC) AS ranking
+FROM (
+  SELECT
+    genero,
+    ROUND(SUM(receita) / SUM(orcamento), 1) AS roi,
+    COUNT(*) AS qtd_filmes
+  FROM vw_base_filme_genero
+  WHERE lucro IS NOT NULL            -- só filmes com orçamento e receita
+  GROUP BY genero
+) t;
+
+-- Gráfico: Gênero x % de filmes com lucro (barras + linha "Média: 62,8%")
+CREATE OR REPLACE VIEW vw_prod_geral_grafico_pct_lucro_genero AS
+SELECT
+  genero,
+  pct_com_lucro,
+  pct_sem_lucro,
+  qtd_filmes,
+  ROUND(AVG(pct_com_lucro) OVER (), 1) AS media_geral,
+  ROW_NUMBER() OVER (ORDER BY pct_com_lucro DESC) AS ranking
+FROM (
+  SELECT
+    genero,
+    ROUND(100 * SUM(lucro > 0) / COUNT(*), 1)       AS pct_com_lucro,
+    ROUND(100 - 100 * SUM(lucro > 0) / COUNT(*), 1) AS pct_sem_lucro,
+    COUNT(*) AS qtd_filmes
+  FROM vw_base_filme_genero
+  WHERE lucro IS NOT NULL
+  GROUP BY genero
+) t;
+
+-- Gráfico: Orçamento médio x Gênero (barras + linha "Média: 40,3M")
+CREATE OR REPLACE VIEW vw_prod_geral_grafico_orcamento_genero AS
+SELECT
+  genero,
+  orcamento_medio,
+  qtd_filmes,
+  ROUND(AVG(orcamento_medio) OVER (), 2) AS media_geral,
+  ROW_NUMBER() OVER (ORDER BY orcamento_medio DESC) AS ranking
+FROM (
+  SELECT genero, ROUND(AVG(orcamento), 2) AS orcamento_medio, COUNT(*) AS qtd_filmes
+  FROM vw_base_filme_genero
+  WHERE orcamento > 0
+  GROUP BY genero
+) t;
+
+-- Gráfico: Período de lançamento x Lucro (todos os gêneros) (linha + "Média: 25,5M")
+-- usa vw_base_filme (e não por gênero) para cada filme contar so uma vez
+CREATE OR REPLACE VIEW vw_prod_geral_grafico_periodo_lucro AS
+SELECT
+  mes,
+  ELT(mes, 'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+           'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro') AS nome_mes, -- isso aqui é p transformar em separadinho
+  lucro_medio,
+  qtd_filmes,
+  ROUND(AVG(lucro_medio) OVER (), 2) AS media_anual,
+  ROW_NUMBER() OVER (ORDER BY lucro_medio DESC) AS ranking
+FROM (
+  SELECT mes, ROUND(AVG(lucro), 2) AS lucro_medio, COUNT(*) AS qtd_filmes
+  FROM vw_base_filme
+  WHERE lucro IS NOT NULL AND mes IS NOT NULL
+  GROUP BY mes
+) t;
  
+ -- KPI: Gênero mais lucrativo geral
+CREATE OR REPLACE VIEW vw_prod_geral_kpi_genero_mais_lucrativo AS
+SELECT genero, lucro_total
+FROM vw_prod_geral_grafico_lucro_genero
+WHERE ranking = 1;
+
+-- KPI: Gênero com maior retorno
+CREATE OR REPLACE VIEW vw_prod_geral_kpi_genero_maior_roi AS
+SELECT genero, roi
+FROM vw_prod_geral_grafico_roi_genero
+WHERE ranking = 1;
+
+-- KPI: Gênero de maior risco (ROI < 2,5x) (ex.: Ação - 45% dos filmes sem lucro)
+-- entre os generos com roi abaixo de 2,5x pega o que tem maior % de filmes sem lucro, acho que era isso ne
+CREATE OR REPLACE VIEW vw_prod_geral_kpi_genero_maior_risco AS
+SELECT r.genero, r.roi, p.pct_sem_lucro
+FROM vw_prod_geral_grafico_roi_genero r
+INNER JOIN vw_prod_geral_grafico_pct_lucro_genero p ON p.genero = r.genero
+WHERE r.roi < 2.5
+ORDER BY p.pct_sem_lucro DESC
+LIMIT 1;
+
+-- KPI: Melhor mês para lançar filmes
+CREATE OR REPLACE VIEW vw_prod_geral_kpi_melhor_mes AS
+SELECT mes, nome_mes, lucro_medio
+FROM vw_prod_geral_grafico_periodo_lucro
+WHERE ranking = 1;
  
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+ 
  
