@@ -791,7 +791,6 @@ FROM vw_base_genero_associacao;
  
 -- DASHBOARD GERAL RPODUTOR -- DASHBOARD GERAL PRODUTOR -- DASHBOARD GERAL PRODUTOR 
 
-
 -- Gráfico: Lucro x Gênero (barras + linha "Média: 3,3B")
 CREATE OR REPLACE VIEW vw_prod_geral_grafico_lucro_genero AS
 SELECT
@@ -907,6 +906,137 @@ CREATE OR REPLACE VIEW vw_prod_geral_kpi_melhor_mes AS
 SELECT mes, nome_mes, lucro_medio
 FROM vw_prod_geral_grafico_periodo_lucro
 WHERE ranking = 1;
+ 
+ -- DASHBOARD ESPECIFICA RPODUTOR -- DASHBOARD ESPECIFICA PRODUTOR -- DASHBOARD ESPECIFICA PRODUTOR -- AQUI DAVID
+ 
+ -- antes de tudo deixa eu explicar umas coisas
+ -- o row nuumber() é pra numerar as linhas e o over eh pra definir o criterio
+ -- ai, por exemplo, o partition by genero divide as linhas em grupo por generos, entao cada grupo tem seu 1 2 3 tendeu
+ --  e o order by basico ne
+ 
+ -- ai no model vc meio q so vai precisar puxar as views daqui botando um where genero = ? e ranking <= 5 tendeu
+ 
+ -- Gráfico: País de origem x Lucro (top 5 -> WHERE ranking <= 5) + linha "Média"
+-- media_top5 = média dos 5 países exibidos (é isso que a linha do grafico ta mostrando)
+CREATE OR REPLACE VIEW vw_prod_esp_grafico_pais_lucro AS
+SELECT
+  genero,
+  pais,
+  lucro_total,
+  qtd_filmes,
+  ranking,
+  ROUND(AVG(CASE WHEN ranking <= 5 THEN lucro_total END)
+        OVER (PARTITION BY genero), 2) AS media_top5
+FROM (
+  SELECT
+    genero,
+    pais,
+    SUM(lucro) AS lucro_total,
+    COUNT(*)   AS qtd_filmes,
+    ROW_NUMBER() OVER (PARTITION BY genero ORDER BY SUM(lucro) DESC) AS ranking
+  FROM vw_base_filme_genero
+  WHERE lucro IS NOT NULL AND pais IS NOT NULL
+  GROUP BY genero, pais
+) t;
+
+-- Gráfico: Atores x Aparições em produções lucrativas (top 5 -> WHERE ranking <= 5)
+CREATE OR REPLACE VIEW vw_prod_esp_grafico_atores_aparicoes AS
+SELECT
+  genero,
+  ator,
+  aparicoes,
+  ROW_NUMBER() OVER (PARTITION BY genero ORDER BY aparicoes DESC, ator) AS ranking
+FROM (
+  SELECT genero, ator, COUNT(DISTINCT filme_id) AS aparicoes
+  FROM vw_base_filme_genero_ator
+  WHERE lucro > 0
+  GROUP BY genero, ator
+) t;
+
+-- Gráfico: Atores x Gênero x Lucro (top 5 -> WHERE ranking <= 5)
+CREATE OR REPLACE VIEW vw_prod_esp_grafico_atores_lucro AS
+SELECT
+  genero,
+  ator,
+  lucro_total,
+  qtd_filmes,
+  ROW_NUMBER() OVER (PARTITION BY genero ORDER BY lucro_total DESC, ator) AS ranking
+FROM (
+  SELECT genero, ator, SUM(lucro) AS lucro_total, COUNT(DISTINCT filme_id) AS qtd_filmes
+  FROM vw_base_filme_genero_ator
+  WHERE lucro IS NOT NULL
+  GROUP BY genero, ator
+) t;
+
+-- Gráfico: Período x Lucro x Gênero (média anual) (linha de 12 meses)
+CREATE OR REPLACE VIEW vw_prod_esp_grafico_periodo_lucro AS
+SELECT
+  genero,
+  mes,
+  ELT(mes, 'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+           'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro') AS nome_mes,
+  lucro_medio,
+  qtd_filmes,
+  ROUND(AVG(lucro_medio) OVER (PARTITION BY genero), 2) AS media_anual
+FROM (
+  SELECT genero, mes, ROUND(AVG(lucro), 2) AS lucro_medio, COUNT(*) AS qtd_filmes
+  FROM vw_base_filme_genero
+  WHERE lucro IS NOT NULL AND mes IS NOT NULL -- sem null aquiiiii
+  GROUP BY genero, mes
+) t;
+
+-- Auxiliar: janelas de 3 meses consecutivos (ex.: Jun-Ago) por gênero
+-- view demoniaca por sinal deus melivre
+CREATE OR REPLACE VIEW vw_prod_esp_base_janela_pico AS
+SELECT
+  genero,
+  mes_inicio,
+  mes_fim,
+  lucro_medio_periodo,
+  ROW_NUMBER() OVER (PARTITION BY genero ORDER BY lucro_medio_periodo DESC) AS ranking
+FROM (
+  SELECT
+    m1.genero,
+    m1.mes AS mes_inicio,
+    m3.mes AS mes_fim,
+    ROUND((m1.lucro_medio + m2.lucro_medio + m3.lucro_medio) / 3, 2) AS lucro_medio_periodo
+  FROM vw_prod_esp_grafico_periodo_lucro m1
+  INNER JOIN vw_prod_esp_grafico_periodo_lucro m2
+          ON m2.genero = m1.genero AND m2.mes = m1.mes + 1
+  INNER JOIN vw_prod_esp_grafico_periodo_lucro m3
+          ON m3.genero = m1.genero AND m3.mes = m1.mes + 2
+) t;
+
+-- KPI: País mais lucrativo
+CREATE OR REPLACE VIEW vw_prod_esp_kpi_pais_mais_lucrativo AS
+SELECT genero, pais, lucro_total
+FROM vw_prod_esp_grafico_pais_lucro
+WHERE ranking = 1;
+
+-- KPI: Ator com mais aparições em filmes lucrativos
+CREATE OR REPLACE VIEW vw_prod_esp_kpi_ator_mais_aparicoes AS
+SELECT genero, ator, aparicoes
+FROM vw_prod_esp_grafico_atores_aparicoes
+WHERE ranking = 1;
+
+-- KPI: Período de pico de lucro (ex.: Junho a Agosto - média $28M)
+CREATE OR REPLACE VIEW vw_prod_esp_kpi_periodo_pico AS
+SELECT
+  genero,
+  mes_inicio,
+  mes_fim,
+  CONCAT(
+    ELT(mes_inicio, 'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'),
+    ' a ',
+    ELT(mes_fim, 'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                 'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro')
+  ) AS periodo,
+  lucro_medio_periodo
+FROM vw_prod_esp_base_janela_pico
+WHERE ranking = 1;
+
+
  
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
