@@ -382,9 +382,6 @@ CREATE TABLE IF NOT EXISTS email_envio_semanal (
 -- Nome do gênero único.
 -- Se der erro 1062 (Duplicate entry), há gêneros repetidos em genero: remova os duplicados antes.
 ALTER TABLE genero ADD CONSTRAINT uq_genero_nome UNIQUE (nome);
--- Se a intenção era a palavra da tabela genero_palavra, use esta linha no lugar da de cima:
--- ALTER TABLE genero_palavra ADD CONSTRAINT uq_genero_palavra_nome UNIQUE (nome);
- 
 ALTER TABLE projeto ADD COLUMN genero_id INT NULL;
 ALTER TABLE projeto ADD CONSTRAINT fk_projeto_genero FOREIGN KEY (genero_id) REFERENCES genero(id) ON DELETE SET NULL;
  
