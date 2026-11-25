@@ -2,6 +2,25 @@ var anotacaoModel = require("../models/anotacaoModel");
 // Importe as classes de erro fornecidas pelo seu colega
 const { NotFoundError, ConflictError } = require("../errors"); // Ajuste o caminho
 
+// aceita so ids inteiros positivos, sem repetir
+function limparGeneros(generos) {
+    if (!Array.isArray(generos)) {
+        return [];
+    }
+
+    var ids = [];
+
+    for (var i = 0; i < generos.length; i++) {
+        var id = Number(generos[i]);
+
+        if (Number.isInteger(id) && id > 0 && ids.indexOf(id) === -1) {
+            ids.push(id);
+        }
+    }
+
+    return ids;
+}
+
 function listarProjetos(req, res, next) { // <-- Adicione 'next'
     var idUsuario = req.params.idUsuario;
 
@@ -16,11 +35,23 @@ function listarProjetos(req, res, next) { // <-- Adicione 'next'
         });
 }
 
+function listarGeneros(req, res, next) {
+    anotacaoModel.listarGeneros()
+        .then(function (resultado) {
+            res.json(resultado);
+        })
+        .catch(function (erro) {
+            console.log(erro);
+            next(erro);
+        });
+}
+
 function criarProjeto(req, res, next) {
     var idUsuario = req.body.idUsuario;
     var nome = req.body.nome;
+    var generos = limparGeneros(req.body.generos);
 
-    anotacaoModel.criarProjeto(idUsuario, nome)
+    anotacaoModel.criarProjeto(idUsuario, nome, generos)
         .then(function (resultado) {
             res.status(201).json({ id: resultado.insertId });
         })
@@ -104,8 +135,9 @@ function editarProjeto(req, res, next) {
     var idProjeto = req.body.id;
     var idUsuario = req.body.idUsuario;
     var nome = req.body.nome;
+    var generos = limparGeneros(req.body.generos);
 
-    anotacaoModel.editarProjeto(idProjeto, idUsuario, nome)
+    anotacaoModel.editarProjeto(idProjeto, idUsuario, nome, generos)
         .then(function (resultado) {
             if (resultado.affectedRows === 0) {
                 return next(new NotFoundError("Projeto não encontrado para este usuário!"));
@@ -137,6 +169,7 @@ function excluirProjeto(req, res, next) {
 
 module.exports = {
     listarProjetos,
+    listarGeneros,
     criarProjeto,
     listarAnotacoes,
     criarAnotacao,

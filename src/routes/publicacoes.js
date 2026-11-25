@@ -11,4 +11,6 @@ router.get("/roteiristas/:idEmpresa", publicacaoController.buscarRoteiristas);
 
 router.get("/:id/anotacoes", publicacaoController.buscarPublicacoesAnotacoes);
 
+router.put("/:id/avaliacao", publicacaoController.salvarAvaliacao);
+
 module.exports = router;

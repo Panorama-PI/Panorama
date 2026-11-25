@@ -6,6 +6,8 @@ var anotacaoController = require("../controllers/anotacaoController");
 // projetos
 router.get("/projetos/listar/:idUsuario", anotacaoController.listarProjetos);
 
+router.get("/generos/listar", anotacaoController.listarGeneros);
+
 router.post("/projetos/criar", anotacaoController.criarProjeto);
 
 router.put("/projetos/editar", anotacaoController.editarProjeto);
