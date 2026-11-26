@@ -12,6 +12,8 @@ router.get("/produtor/especifica", function (req, res, next) {
     dashboardsController.produtorEspecifica(req, res, next);
 });
 
-
+router.get("/roteirista/especifica", function (req, res, next) {
+    dashboardsController.roteiristaEspecifica(req, res, next);
+});
 
 module.exports = router;
