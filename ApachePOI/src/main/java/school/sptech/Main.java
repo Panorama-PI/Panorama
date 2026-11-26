@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) {
         String nomeArquivo = "imdb_movies 1.xlsx"; 
 
-        
+
         try (FileInputStream fileInputStream = new FileInputStream(nomeArquivo);
              Workbook workbook = new XSSFWorkbook(fileInputStream)) {
 

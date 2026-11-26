@@ -13,6 +13,8 @@ public class Roteirista extends Usuario{
 
     public Roteirista(String nome, String email,Time horarioInicio, Time horarioFim) {
         super(nome, email);
+        this.horarioInicio = horarioInicio;
+        this.horarioFim = horarioFim;
     }
 
     public Time getHorarioInicio() {
