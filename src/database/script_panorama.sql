@@ -382,6 +382,9 @@ CREATE TABLE IF NOT EXISTS email_envio_semanal (
 -- Nome do gênero único.
 -- Se der erro 1062 (Duplicate entry), há gêneros repetidos em genero: remova os duplicados antes.
 ALTER TABLE genero ADD CONSTRAINT uq_genero_nome UNIQUE (nome);
+-- Se a intenção era a palavra da tabela genero_palavra, use esta linha no lugar da de cima:
+-- ALTER TABLE genero_palavra ADD CONSTRAINT uq_genero_palavra_nome UNIQUE (nome);
+ 
 ALTER TABLE projeto ADD COLUMN genero_id INT NULL;
 ALTER TABLE projeto ADD CONSTRAINT fk_projeto_genero FOREIGN KEY (genero_id) REFERENCES genero(id) ON DELETE SET NULL;
  
@@ -701,82 +704,135 @@ SELECT b.*, fa.ator
 FROM vw_base_filme_genero b
 INNER JOIN vw_base_filme_ator_unico fa ON fa.filme_id = b.filme_id;
  
--- DASHBOARD GERAL ROTEIRISTA
-	-- Avaliação média x genero
-CREATE OR REPLACE VIEW vw_rot_geral_grafico_nota_genero AS
+-- DASHBOARD GERAL ROTEIRISTA -- DASHBOARD GERAL ROTEIRISTA -- DASHBOARD GERAL ROTEIRISTA -- DASHBOARD GERAL ROTEIRISTA
+
+
+-- VIEW DE PALAVRAS genero_palavra x sinopses
+-- Fica no topo porque a view geral de palavras le daqui
+-- ocorrencias = quantidade de sinopses do genero que contem a palavra
+-- Top 5 -> WHERE genero = ? AND ranking <= 5, eh meio q isso aqui
+CREATE OR REPLACE VIEW vw_rot_esp_grafico_palavras AS
 SELECT
-  genero,
-  nota_media,
-  qtd_filmes,
-  ROUND(AVG(nota_media) OVER (), 1) AS media_geral,
-  ROW_NUMBER() OVER (ORDER BY nota_media DESC) AS ranking
-FROM (
-  SELECT genero, ROUND(AVG(score), 1) AS nota_media, COUNT(*) AS qtd_filmes
-  FROM vw_base_filme_genero
-  WHERE score IS NOT NULL
-  GROUP BY genero
-) t;
+  g.nome  AS genero,
+  gp.nome AS palavra,
+  COUNT(*) AS ocorrencias,
+  ROW_NUMBER() OVER (PARTITION BY g.nome ORDER BY COUNT(*) DESC, gp.nome) AS ranking
+FROM genero_palavra gp
+INNER JOIN genero g ON g.id = gp.id_genero
+INNER JOIN vw_base_filme_genero_unico u ON u.genero = g.nome
+INNER JOIN filme f ON f.id = u.filme_id
+WHERE f.sinopse LIKE CONCAT('%', gp.nome, '%')
+GROUP BY g.nome, gp.nome;
  
-	-- Avaliação média x País de origem (use ranking <= 5)
+-- Gráfico: Avaliação média x genero
+CREATE OR REPLACE VIEW vw_rot_geral_grafico_nota_genero AS
+SELECT  genero, ROUND(AVG(score), 1) AS nota_media, COUNT(*) AS qtd_filmes,
+		ROUND(AVG(AVG(score)) OVER (), 1) AS media_geral,
+		ROW_NUMBER() OVER (ORDER BY AVG(score) DESC, genero) AS ranking
+FROM vw_base_filme_genero
+WHERE score IS NOT NULL -- sem nullll
+GROUP BY genero;
+ 
+-- Gráfico: Avaliação média x país de origem (top 5 eh WHERE ranking <= 5)
+-- media_top5  = média dos 5 países exibidos (eh a linha do gráfico
+-- media_geral = média de todos os países com amostra mínima
 CREATE OR REPLACE VIEW vw_rot_geral_grafico_nota_pais AS
+WITH por_pais AS (
+  SELECT
+    pais,
+    ROUND(AVG(score), 1) AS nota_media,
+    COUNT(*)             AS qtd_filmes,
+    ROW_NUMBER() OVER (ORDER BY AVG(score) DESC, pais) AS ranking
+  FROM filme
+  WHERE score IS NOT NULL AND pais IS NOT NULL
+  GROUP BY pais
+  HAVING COUNT(*) >= 5                      -- amostra mínima por país
+)
 SELECT
   pais,
   nota_media,
   qtd_filmes,
   ROUND(AVG(nota_media) OVER (), 1) AS media_geral,
-  ROW_NUMBER() OVER (ORDER BY nota_media DESC) AS ranking
-FROM (
-  SELECT pais, ROUND(AVG(score), 1) AS nota_media, COUNT(*) AS qtd_filmes
-  FROM filme
-  WHERE score IS NOT NULL AND pais IS NOT NULL
-  GROUP BY pais
-  HAVING COUNT(*) >= 5  -- amostra mínima por país
-) t;
- 
-	-- Genero com melhro média de avaliações
+  ranking,
+  ROUND(AVG(CASE WHEN ranking <= 5 THEN nota_media END) OVER (), 1) AS media_top5
+FROM por_pais;
+
+-- Gráfico: Palavras mais frequentes nas sinopses (top 6 eh WHERE ranking <= 6)
+-- Soma as palavras de todos os gêneros, pega de vw_rot_esp_grafico_palavras
+CREATE OR REPLACE VIEW vw_rot_geral_grafico_palavras AS
+WITH por_palavra AS (
+  SELECT
+    palavra,
+    SUM(ocorrencias) AS ocorrencias,
+    ROW_NUMBER() OVER (ORDER BY SUM(ocorrencias) DESC, palavra) AS ranking
+  FROM vw_rot_esp_grafico_palavras
+  GROUP BY palavra
+)
+SELECT
+  palavra,
+  ocorrencias,
+  ranking,
+  ROUND(AVG(CASE WHEN ranking <= 6 THEN ocorrencias END) OVER (), 1) AS media_top6
+FROM por_palavra;
+
+-- KPI: genero com melhor média de avaliações
 CREATE OR REPLACE VIEW vw_rot_geral_kpi_genero_melhor_nota AS
 SELECT genero, nota_media
 FROM vw_rot_geral_grafico_nota_genero
 WHERE ranking = 1;
- 
-	-- País com melhor média de avaliações
+
+-- KPI: país com melhor média de avaliações
 CREATE OR REPLACE VIEW vw_rot_geral_kpi_pais_melhor_nota AS
 SELECT pais, nota_media
 FROM vw_rot_geral_grafico_nota_pais
 WHERE ranking = 1;
  
-	-- Gênero mais associado a outros gêneros
-CREATE OR REPLACE VIEW vw_rot_geral_kpi_genero_associado AS
-SELECT genero, total_associacoes
-FROM (
-  SELECT
-    genero,
-    SUM(qtd_filmes) AS total_associacoes,
-    ROW_NUMBER() OVER (ORDER BY SUM(qtd_filmes) DESC) AS ranking
-  FROM vw_base_genero_associacao
-  GROUP BY genero
-) t
+ -- KPI: palavra mais recorrente nas sinopses
+CREATE OR REPLACE VIEW vw_rot_geral_kpi_palavra_recorrente AS
+SELECT palavra, ocorrencias
+FROM vw_rot_geral_grafico_palavras
 WHERE ranking = 1;
  
--- DASHBOARD ESPECIFICA ROTEIRISTA
-	-- Avaliação média x Pais origem (barras + linha media_genero)
+-- KPI: genero mais associado a outros gêneros
+CREATE OR REPLACE VIEW vw_rot_geral_kpi_genero_associado AS
+SELECT genero, SUM(qtd_filmes) AS total_associacoes
+FROM vw_base_genero_associacao
+GROUP BY genero
+ORDER BY total_associacoes DESC, genero
+LIMIT 1;
+ 
+-- DASHBOARD ESPECIFICA ROTEIRISTA -- DASHBOARD ESPECIFICA ROTEIRISTA -- DASHBOARD ESPECIFICA ROTEIRISTA -- DASHBOARD ESPECIFICA ROTEIRISTA
+-- aqui no model filtra por genero = ? vcs sabem ne 
+
+
+-- Gráfico: avaliação média x País de origem 
+-- media_top5   = média dos 5 países exibidos
+-- media_genero = média de todos os países do gênero com amostra mínima
 CREATE OR REPLACE VIEW vw_rot_esp_grafico_nota_pais AS
+WITH por_pais AS (
+  SELECT
+    genero,
+    pais,
+    ROUND(AVG(score), 1) AS nota_media,
+    COUNT(*)             AS qtd_filmes,
+    ROW_NUMBER() OVER (PARTITION BY genero ORDER BY AVG(score) DESC, pais) AS ranking
+  FROM vw_base_filme_genero
+  WHERE score IS NOT NULL AND pais IS NOT NULL
+  GROUP BY genero, pais
+  HAVING COUNT(*) >= 3                      -- amostra mínima por país
+)
 SELECT
   genero,
   pais,
   nota_media,
   qtd_filmes,
   ROUND(AVG(nota_media) OVER (PARTITION BY genero), 1) AS media_genero,
-  ROW_NUMBER() OVER (PARTITION BY genero ORDER BY nota_media DESC) AS ranking
-FROM (
-  SELECT genero, pais, ROUND(AVG(score), 1) AS nota_media, COUNT(*) AS qtd_filmes
-  FROM vw_base_filme_genero
-  WHERE score IS NOT NULL AND pais IS NOT NULL
-  GROUP BY genero, pais
-  HAVING COUNT(*) >= 3          -- amostra mínima por país
-) t;    
+  ranking,
+  ROUND(AVG(CASE WHEN ranking <= 5 THEN nota_media END)
+        OVER (PARTITION BY genero), 1) AS media_top5
+FROM por_pais;
  
-	-- Proporção de Gêneros Associados (%)
+-- Gráfico: proporção de Gêneros Associados % 
 CREATE OR REPLACE VIEW vw_rot_esp_grafico_generos_associados AS
 SELECT
   genero,
@@ -785,6 +841,59 @@ SELECT
   percentual,
   ROW_NUMBER() OVER (PARTITION BY genero ORDER BY percentual DESC, genero_associado) AS ranking
 FROM vw_base_genero_associacao;
+
+-- Gráfico: Distribuição das avaliações (0-20, 21-40, 41-60, 61-80, 81-100)
+-- Faixas sem nenhum filme não aparecem (o front deve considerar 0%)
+CREATE OR REPLACE VIEW vw_rot_esp_grafico_distribuicao_notas AS
+WITH faixas AS (
+  SELECT
+    genero,
+    CASE WHEN score <= 20 THEN 1
+         WHEN score <= 40 THEN 2
+         WHEN score <= 60 THEN 3
+         WHEN score <= 80 THEN 4
+         ELSE 5 END AS ordem,
+    COUNT(*) AS qtd_filmes
+  FROM vw_base_filme_genero
+  WHERE score IS NOT NULL
+  GROUP BY genero, ordem
+)
+SELECT
+  genero,
+  ordem,
+  ELT(ordem, '0-20', '21-40', '41-60', '61-80', '81-100') AS faixa,
+  qtd_filmes,
+  ROUND(100 * qtd_filmes / SUM(qtd_filmes) OVER (PARTITION BY genero), 1) AS percentual
+FROM faixas;
+
+-- KPI: percentual de avaliações positivas - acima de 80
+CREATE OR REPLACE VIEW vw_rot_esp_kpi_pct_avaliacoes_positivas AS
+SELECT
+  genero,
+  ROUND(100 * SUM(score > 80) / COUNT(*), 0) AS pct_positivas,
+  SUM(score > 80)                            AS qtd_positivas,
+  COUNT(*)                                   AS qtd_filmes
+FROM vw_base_filme_genero
+WHERE score IS NOT NULL
+GROUP BY genero;
+
+-- KPI: país com melhor média de avaliações
+CREATE OR REPLACE VIEW vw_rot_esp_kpi_pais_melhor_nota AS
+SELECT genero, pais, nota_media
+FROM vw_rot_esp_grafico_nota_pais
+WHERE ranking = 1;
+
+-- KPI: palavra mais recorrente nas sinopses
+CREATE OR REPLACE VIEW vw_rot_esp_kpi_palavra_recorrente AS
+SELECT genero, palavra, ocorrencias
+FROM vw_rot_esp_grafico_palavras
+WHERE ranking = 1;
+
+-- KPI: genero mais associado
+CREATE OR REPLACE VIEW vw_rot_esp_kpi_genero_associado AS
+SELECT genero, genero_associado, percentual
+FROM vw_rot_esp_grafico_generos_associados
+WHERE ranking = 1;
  
 -- DASHBOARD GERAL RPODUTOR -- DASHBOARD GERAL PRODUTOR -- DASHBOARD GERAL PRODUTOR 
 
