@@ -33,7 +33,7 @@ public class Main {
                 List<PendenciaEmailEnvio> pendentes = emailDao.verificarEmailPendente();
                 for (PendenciaEmailEnvio pendente : pendentes) {
                     emailService.enviarEmail(pendente);
-                    System.out.println("[DEBUG] Email enviado com sucesso");z
+                    System.out.println("[DEBUG] Email enviado com sucesso");
                 }
                 if(pendentes.isEmpty()){
                     System.out.println("[DEBUG] Nenhum email pendente encontrado...");
