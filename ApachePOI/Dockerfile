@@ -18,4 +18,4 @@ WORKDIR /app
 COPY --from=builder /app/target/servico-apache-poi.jar app.jar
 
 # Executa o fat JAR diretamente
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
