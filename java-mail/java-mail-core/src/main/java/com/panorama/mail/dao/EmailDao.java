@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
