@@ -14,7 +14,7 @@ public class FilmeDAO {
         String sqlFilme = "INSERT INTO filme (nome, data_lancamento, score, titulo_original, status_filme, idioma_original, orcamento, receita, pais) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlGeneroCadastro = "INSERT IGNORE INTO genero (nome) VALUES (?)";
         String sqlGenero = "INSERT INTO filme_genero (id_filme, id_genero) SELECT ?, id FROM genero WHERE nome = ?";
-        String sqlPalavra = "INSERT INTO genero_palavra (nome, id_genero) SELECT ?, id FROM genero WHERE nome = ?";
+        String sqlPalavra = "INSERT IGNORE INTO genero_palavra (nome, id_genero) SELECT ?, id FROM genero WHERE nome = ?";
         String sqlAtor = "INSERT IGNORE INTO ator (nome) VALUES (?)";
         String sqlFilmeAtor = "INSERT INTO filme_ator (id_filme, id_ator, personagem) SELECT ?, id, ? FROM ator WHERE nome = ?";
 

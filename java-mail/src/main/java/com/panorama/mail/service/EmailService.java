@@ -39,7 +39,7 @@ public class EmailService {
         });
     }
 
-    public void enviarEmail(PendenciaEmailEnvio pendencia) throws MessagingException {
+    public boolean enviarEmail(PendenciaEmailEnvio pendencia) throws MessagingException {
         String tipo = pendencia.getTipo();
         Integer status = pendencia.getStatus();
         Roteirista roteirista = pendencia.getRoteirista();
@@ -50,19 +50,28 @@ public class EmailService {
             String assunto = "Envio do Token da Panorama";
             String html = EmailTemplates.htmlToken(empresa, token);
 
+            System.out.println("[DEBUG] enviando email de token...");
+
             dispararEmail(roteirista.getEmail(), assunto, html);
             new TokenDao().marcarComoEnviado(token.getToken());
-            return;
+
+            return true;
         }
+        
 
         if (!dentroDoHorarioPermitido(roteirista)) {
-            return;
+            System.out.println("[DEBUG] Horario de Inicio do roteirista "+ roteirista.getNome() + " : " + roteirista.getHorarioInicio().toLocalTime());
+            System.out.println("[DEBUG] Horario de Fim do roteirista "+ roteirista.getNome() + " : "  + roteirista.getHorarioFim().toLocalTime());
+            System.out.println("[DEBUG] O " + roteirista.getNome() + " não recebe email esse horario");
+            return false;
         }
 
         Produtor produtor = pendencia.getProdutor();
 
         if ("FEEDBACK".equals(tipo)) {
             Feedback feedback = pendencia.getFeedback();
+
+            System.out.println("[DEBUG] enviando email de feedback...");
 
             if (Integer.valueOf(2).equals(status)) {
                 dispararEmail(
@@ -84,14 +93,17 @@ public class EmailService {
         } else if ("AVALIACAO".equals(tipo)) {
             Avaliacao avaliacao = pendencia.getAvaliacao();
 
-            if (Integer.valueOf(2).equals(status)) {
+            System.out.println("[DEBUG] enviando email de avaliação...");
+
+
+            if (Integer.valueOf(0).equals(status)) {
                 dispararEmail(
                         roteirista.getEmail(),
                         "Um produtor da sua empresa te mandou uma avaliação da publicação",
                         EmailTemplates.htmlAvaliacao(roteirista, produtor, empresa, avaliacao.getNota())
                 );
                 new AvaliacaoDao().marcarComoEnviado(avaliacao.getIdAvaliacao());
-            } else if (Integer.valueOf(3).equals(status)) {
+            } else if (Integer.valueOf(2).equals(status)) {
                 dispararEmail(
                         roteirista.getEmail(),
                         "Um produtor da sua empresa te editou uma avaliação da publicação",
@@ -100,6 +112,8 @@ public class EmailService {
                 new AvaliacaoDao().marcarComoEnviado(avaliacao.getIdAvaliacao());
             }
         }
+
+        return true;
     }
 
     private boolean dentroDoHorarioPermitido(Roteirista roteirista) {

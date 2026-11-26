@@ -51,7 +51,7 @@ public class EmailDao {
             Object idAvaliacaoObj = rs.getObject("id_avaliacao");
             if (idAvaliacaoObj != null) {
                 avaliacao = new Avaliacao(
-                        ((Number) idFeedbackObj).intValue(),
+                        ((Number) idAvaliacaoObj).intValue(),
                         rs.getDouble("texto_feedback")
                 );
             }

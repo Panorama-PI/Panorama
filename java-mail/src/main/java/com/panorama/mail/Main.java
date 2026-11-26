@@ -12,7 +12,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
-    private static Dotenv dotenv = Dotenv.load();
+    private static final Dotenv dotenv = Dotenv.configure()
+            .ignoreIfMissing()
+            .load();
 
     public static void main(String[] args) {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -28,21 +30,29 @@ public class Main {
         EmailService emailService = new EmailService(config);
         EmailDao emailDao = new EmailDao();
 
-        scheduler.scheduleAtFixedRate(() ->{
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("[INFO] Encerrando worker de e-mails...");
+            scheduler.shutdown();
+        }));
+
+        scheduler.scheduleWithFixedDelay(() -> {
             try {
                 List<PendenciaEmailEnvio> pendentes = emailDao.verificarEmailPendente();
                 for (PendenciaEmailEnvio pendente : pendentes) {
-                    emailService.enviarEmail(pendente);
-                    System.out.println("[DEBUG] Email enviado com sucesso");z
+                    Boolean enviado = emailService.enviarEmail(pendente);
+
+                    if(enviado){
+                        System.out.println("[DEBUG] Email enviado com sucesso");
+                    }
                 }
-                if(pendentes.isEmpty()){
+                if (pendentes.isEmpty()) {
                     System.out.println("[DEBUG] Nenhum email pendente encontrado...");
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 System.err.println("[ERRO] Erro ao enviar e-mail: " + e.getMessage());
                 e.printStackTrace();
             }
-        }, 0, 30, TimeUnit.SECONDS);
+        }, 0, 15, TimeUnit.SECONDS);
 
     }
 }
