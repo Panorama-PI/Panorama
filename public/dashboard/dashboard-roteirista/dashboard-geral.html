@@ -1,37 +1,37 @@
-
+ 
 <!DOCTYPE html>
 <html lang="pt-br">
-
+ 
 <head>
     <link rel="shortcut icon" href="../../assets/icon/favicon2.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panorama | Roteirista - Visão Geral</title>
-
+ 
     <link rel="stylesheet" href="../../css/dashboard.css">
     <script src="../../js/sessao.js"></script>
-
+ 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+ 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../js/dashboard.js"></script>
-
+ 
     <script src="https://kit.fontawesome.com/9f7414eb10.js" crossorigin="anonymous"></script>
 </head>
-
+ 
 <body>
-
+ 
     <aside class="aside-left">
-
+ 
         <div class="usuario-side">
             <img src="../../assets/imgs/foto-usuario.png" alt="Foto do usuário">
             <h2 id="a_usuario">Usuário</h2>
             <h3 id="b_produtor">Roteirista</h3>
             <h4 id="c_email">email@gmail.com</h4>
         </div>
-
+ 
         <div class="btns-side">
             <a href="./dashboard-geral.html" class="active"><img src="../../assets/icon/chart-icon.png" alt="">Visão Geral</a>
             <a href="./dashboard-especifica.html"><img src="../../assets/icon/chart-icon.png" alt="">Visão Específica</a>
@@ -41,150 +41,126 @@
             <a href="./feedbacks.html"><img src="../../assets/icon/mail-icon.png" alt="">Feedbacks</a>
             <a href="../../index.html"><img src="../../assets/icon/sair-icon.png" alt="">Sair</a>
         </div>
-
+ 
     </aside>
-
+ 
     <main class="dash">
-
+ 
         <section class="filter">
             <h2>Dashboard de Roteirista - Visão Geral &nbsp; (1903-2023)</h2>
         </section>
-
+ 
         <section class="kpi-cards">
-
+ 
             <div class="card kpi-card">
                 <p>Gênero com melhor média de avaliações</p>
-
-                <h2>Romance</h2>
-
-                <span id="melhor-genero" class="valor-kpi">
-                    8,4 <small>estrelas IMDb</small>
-                </span>
-
-                <span class="comparacao-kpi">
-                    <i class="fa-solid fa-arrow-trend-up"></i>
-                    10,5% acima da média 
-                </span>
+                <h2 id="kpi-genero-titulo">Carregando...</h2>
+                <span id="kpi-genero-valor" class="valor-kpi">&nbsp;</span>
+                <span id="kpi-genero-comparacao" class="comparacao-kpi">&nbsp;</span>
             </div>
-
+ 
             <div class="card kpi-card">
                 <p>País com melhor média de avaliações</p>
-
-                <h2>Estados Unidos</h2>
-
-                <span id="melhor-pais" class="valor-kpi">
-                    8,2 <small>estrelas IMDb</small>
-                </span>
-
-                <span class="comparacao-kpi">
-                    <i class="fa-solid fa-arrow-trend-up"></i>
-                    2,5% acima do 2º lugar
-                </span>
+                <h2 id="kpi-pais-titulo">Carregando...</h2>
+                <span id="kpi-pais-valor" class="valor-kpi">&nbsp;</span>
+                <span id="kpi-pais-comparacao" class="comparacao-kpi">&nbsp;</span>
             </div>
-
+ 
             <div class="card kpi-card">
                 <p>Palavra mais recorrente nas sinopses</p>
-
-                <h2>Genialidade</h2>
-
-                <span id="palavra-recorrente" class="valor-kpi">
-                    76 <small>aparições</small>
-                </span>
-
-                <span class="comparacao-kpi">
-                    <i class="fa-solid fa-arrow-trend-up"></i>
-                    24,6% acima do 2º lugar
-                </span>
+                <h2 id="kpi-palavra-titulo">Carregando...</h2>
+                <span id="kpi-palavra-valor" class="valor-kpi">&nbsp;</span>
+                <span id="kpi-palavra-comparacao" class="comparacao-kpi">&nbsp;</span>
             </div>
-
+ 
             <div class="card kpi-card">
                 <p>Gênero mais associado a outros gêneros</p>
-
-                <h2>Aventura</h2>
-
-                <span id="genero-associado" class="valor-kpi">
-                    12 <small>associações</small>
-                </span>
-
-                <span class="comparacao-kpi">
-                    <i class="fa-solid fa-arrow-trend-up"></i>
-                    20% acima do 2º lugar
-                </span>
+                <h2 id="kpi-associado-titulo">Carregando...</h2>
+                <span id="kpi-associado-valor" class="valor-kpi">&nbsp;</span>
+                <span id="kpi-associado-comparacao" class="comparacao-kpi">&nbsp;</span>
             </div>
-
+ 
         </section>
-
+ 
         <section class="card chart-lucro">
             <canvas id="chartAvaliacaoGenero"></canvas>
         </section>
-
+ 
         <section class="charts">
-
+ 
             <div class="card chart-card">
                 <canvas id="chartAvaliacaoPaisGeral"></canvas>
             </div>
-
+ 
             <div class="card chart-card">
                 <canvas id="chartElementosGeral"></canvas>
             </div>
-
+ 
         </section>
-
+ 
     </main>
-
+ 
     <script>
-
+ 
         preencherUsuario();
-
+ 
+        // Os dados vêm da API: GET /dashboards/roteirista/geral (views vw_rot_geral_*).
+        // Os gráficos são criados vazios abaixo e preenchidos em carregarDashboard().
+ 
+        // Plugin de linha de média para todos os gráficos
         const pluginMedia = {
             id: 'pluginMedia',
-
-            afterDraw(chart) {
-
+ 
+            afterDraw(chart, args, opcoes) {
+ 
                 const valores = chart.data.datasets[0].data;
-
+ 
                 if (!valores || valores.length === 0) return;
-
+ 
                 let soma = 0;
                 let quantidade = 0;
-
+ 
                 for (let i = 0; i < valores.length; i++) {
                     if (typeof valores[i] === 'number') {
                         soma += valores[i];
                         quantidade++;
                     }
                 }
-
+ 
                 if (quantidade === 0) return;
-
-                const media = soma / quantidade;
-
+ 
+                // Usa a média vinda da view do banco; se não vier, calcula a dos valores plotados
+                let media = soma / quantidade;
+                if (opcoes && typeof opcoes.valor === 'number') {
+                    media = opcoes.valor;
+                }
+ 
                 const ctx = chart.ctx;
                 const area = chart.chartArea;
-
+ 
                 const horizontal = chart.config.type === 'bar' &&
                     chart.options.indexAxis === 'y';
-
+ 
                 const posicao = horizontal
                     ? chart.scales.x.getPixelForValue(media)
                     : chart.scales.y.getPixelForValue(media);
-
+ 
                 let sufixo = '';
-
+ 
                 if (chart.canvas.id === 'chartAvaliacaoGenero' ||
                     chart.canvas.id === 'chartAvaliacaoPaisGeral') {
                     sufixo = ' / 10';
                 }
-
+ 
                 const texto = `Média: ${media.toFixed(1).replace('.', ',')}${sufixo}`;
-
+ 
                 ctx.save();
-
+ 
                 ctx.beginPath();
                 ctx.setLineDash([6, 5]);
                 ctx.strokeStyle = '#00C853';
                 ctx.lineWidth = 2;
-
+ 
                 if (horizontal) {
                     ctx.moveTo(posicao, area.top);
                     ctx.lineTo(posicao, area.bottom);
@@ -192,13 +168,13 @@
                     ctx.moveTo(area.left, posicao);
                     ctx.lineTo(area.right, posicao);
                 }
-
+ 
                 ctx.stroke();
-
+ 
                 ctx.setLineDash([]);
                 ctx.fillStyle = '#00C853';
                 ctx.font = "bold 14px 'Barlow', sans-serif";
-
+ 
                 if (horizontal) {
                     ctx.textAlign = 'left';
                     ctx.fillText(texto, posicao + 5, area.top + 12);
@@ -206,43 +182,36 @@
                     ctx.textAlign = 'left';
                     ctx.fillText(texto, area.left + 5, posicao - 6);
                 }
-
+ 
                 ctx.restore();
             }
         };
-
+ 
         Chart.register(pluginMedia);
-
-
-        new Chart(document.getElementById('chartAvaliacaoGenero'), {
-
+ 
+ 
+        // Avaliação média x Gênero
+        const graficoAvaliacaoGenero = new Chart(document.getElementById('chartAvaliacaoGenero'), {
+ 
             type: 'bar',
-
+ 
             data: {
-                labels: [
-                    'Romance',
-                    'Ficção',
-                    'Aventura',
-                    'Comédia',
-                    'Ação',
-                    'Drama',
-                    'Terror'
-                ],
-
+                labels: [],
+ 
                 datasets: [{
-                    data: [8.4, 8.1, 7.9, 7.8, 7.3, 7.1, 6.8],
-
+                    data: [],
+ 
                     backgroundColor: COR_ROSA_BARRA,
                     borderRadius: { topLeft: 8, topRight: 8 },
                     borderSkipped: false,
                     barThickness: 34
                 }]
             },
-
+ 
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-
+ 
                 layout: {
                     padding: {
                         top: 20,
@@ -251,10 +220,10 @@
                         bottom: 10
                     }
                 },
-
+ 
                 plugins: {
                     legend: { display: false },
-
+ 
                     title: {
                         display: true,
                         text: 'Avaliação média dos filmes por gênero (IMDb)',
@@ -269,7 +238,7 @@
                             bottom: 28
                         }
                     },
-
+ 
                     tooltip: {
                         callbacks: {
                             label: (ctx) =>
@@ -277,7 +246,7 @@
                         }
                     }
                 },
-
+ 
                 scales: {
                     y: {
                         min: 0,
@@ -288,7 +257,7 @@
                             font: { size: 14 }
                         }
                     },
-
+ 
                     x: {
                         grid: { display: false },
                         ticks: {
@@ -299,29 +268,24 @@
                 }
             }
         });
-
-
+ 
+ 
         const formatarNota = (valor) =>
             `${valor.toFixed(1).replace('.', ',')}`;
-
-        new Chart(document.getElementById('chartAvaliacaoPaisGeral'), {
-
+ 
+        // Avaliação média x País de origem (top 5)
+        const graficoAvaliacaoPais = new Chart(document.getElementById('chartAvaliacaoPaisGeral'), {
+ 
             type: 'bar',
-
+ 
             plugins: [pluginRotuloFimBarra(formatarNota)],
-
+ 
             data: {
-                labels: [
-                    'Estados Unidos',
-                    'Coreia do Sul',
-                    'Reino Unido',
-                    'França',
-                    'Brasil'
-                ],
-
+                labels: [],
+ 
                 datasets: [{
-                    data: [8.2, 8.0, 7.7, 7.5, 7.2],
-
+                    data: [],
+ 
                     backgroundColor: 'rgba(255, 107, 107, 0.16)',
                     borderColor: COR_ROSA_BARRA,
                     borderWidth: 2,
@@ -330,19 +294,19 @@
                     barThickness: 18
                 }]
             },
-
+ 
             options: {
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-
+ 
                 plugins: {
                     legend: { display: false },
-
+ 
                     title: tituloGrafico(
                         'Países com as maiores avaliações médias (IMDb)'
                     ),
-
+ 
                     tooltip: {
                         callbacks: {
                             label: (ctx) =>
@@ -350,7 +314,7 @@
                         }
                     }
                 },
-
+ 
                 scales: {
                     x: {
                         min: 0,
@@ -361,7 +325,7 @@
                             font: { size: 14 }
                         }
                     },
-
+ 
                     y: {
                         grid: { display: false },
                         ticks: {
@@ -372,28 +336,23 @@
                 }
             }
         });
-
-
+ 
+ 
         const formatarQuantidade = (valor) => `${valor}`;
-
-        new Chart(document.getElementById('chartElementosGeral'), {
-
+ 
+        // Palavras mais frequentes nas sinopses (top 6)
+        const graficoElementos = new Chart(document.getElementById('chartElementosGeral'), {
+ 
             type: 'bar',
-
+ 
             plugins: [pluginRotuloFimBarra(formatarQuantidade)],
-
+ 
             data: {
-                labels: [
-                    'Genialidade',
-                    'Destino',
-                    'Amizade',
-                    'Vingança',
-                    'Segredo'
-                ],
-
+                labels: [],
+ 
                 datasets: [{
-                    data: [76, 61, 58, 53, 48],
-
+                    data: [],
+ 
                     backgroundColor: 'rgba(255, 107, 107, 0.10)',
                     borderColor: COR_ROSA_BARRA,
                     borderWidth: 2,
@@ -402,19 +361,19 @@
                     barThickness: 17
                 }]
             },
-
+ 
             options: {
                 indexAxis: 'y',
                 responsive: true,
                 maintainAspectRatio: false,
-
+ 
                 plugins: {
                     legend: { display: false },
-
+ 
                     title: tituloGrafico(
                         'Elementos narrativos mais frequentes nas sinopses'
                     ),
-
+ 
                     tooltip: {
                         callbacks: {
                             label: (ctx) =>
@@ -422,18 +381,20 @@
                         }
                     }
                 },
-
+ 
                 scales: {
                     x: {
                         min: 0,
-                        max: 100,
+                        // sem "max" fixo: a contagem real vem do banco e muda com os dados.
+                        // grace deixa folga à direita para o número no fim da barra.
+                        grace: '12%',
                         grid: { color: COR_LINHA_GRID },
                         ticks: {
                             precision: 0,
                             color: '#dfdfdf',
                             font: { size: 14 }
                         },
-
+ 
                         title: {
                             display: true,
                             text: 'Quantidade de aparições',
@@ -441,7 +402,7 @@
                             font: { size: 14 }
                         }
                     },
-
+ 
                     y: {
                         grid: { display: false },
                         ticks: {
@@ -452,8 +413,142 @@
                 }
             }
         });
-
+ 
+ 
+        // ===== Integração com o banco =====
+        // O ETL já divide o score por 10 (TratamentoUtils.extrairScore), então o banco guarda
+        // a nota na escala 0-10, a mesma da tela. Por isso não precisa converter (divisor 1).
+        var ESCALA_NOTA = 1;
+ 
+        // 20 -> "20" | 10.6 -> "10,6" (sem ",0" sobrando)
+        function formatarPct(valor) {
+            return formatarNumero(valor, Number.isInteger(valor) ? 0 : 1);
+        }
+ 
+        // 1230 -> "1.230"
+        function formatarContagem(valor) {
+            return Number(valor).toLocaleString('pt-BR');
+        }
+ 
+        function preencherKpis(kpis) {
+            // KPI 1: gênero com melhor média de avaliações
+            var genero = kpis.generoMelhorNota;
+ 
+            if (genero === null) {
+                setTexto('kpi-genero-titulo', 'Sem dados');
+                setValorKpi('kpi-genero-valor', '-', '');
+                setComparacaoKpi('kpi-genero-comparacao', '');
+            } else {
+                setTexto('kpi-genero-titulo', traduzirGenero(genero.genero));
+                setValorKpi('kpi-genero-valor', formatarNumero(genero.nota_media / ESCALA_NOTA), 'estrelas IMDb');
+ 
+                if (genero.acima_media_pct !== null) {
+                    setComparacaoKpi('kpi-genero-comparacao',
+                        formatarPct(genero.acima_media_pct) + '% acima da média');
+                } else {
+                    setComparacaoKpi('kpi-genero-comparacao', '');
+                }
+            }
+ 
+            // KPI 2: país com melhor média de avaliações
+            var pais = kpis.paisMelhorNota;
+ 
+            if (pais === null) {
+                setTexto('kpi-pais-titulo', 'Sem dados');
+                setValorKpi('kpi-pais-valor', '-', '');
+                setComparacaoKpi('kpi-pais-comparacao', '');
+            } else {
+                setTexto('kpi-pais-titulo', pais.pais);
+                setValorKpi('kpi-pais-valor', formatarNumero(pais.nota_media / ESCALA_NOTA), 'estrelas IMDb');
+ 
+                if (pais.vantagem_pct !== null) {
+                    setComparacaoKpi('kpi-pais-comparacao',
+                        formatarPct(pais.vantagem_pct) + '% acima do 2º lugar',
+                        '2º lugar: ' + pais.segundo_pais);
+                } else {
+                    setComparacaoKpi('kpi-pais-comparacao', '');
+                }
+            }
+ 
+            // KPI 3: palavra mais recorrente nas sinopses
+            var palavra = kpis.palavraRecorrente;
+ 
+            if (palavra === null) {
+                setTexto('kpi-palavra-titulo', 'Sem dados');
+                setValorKpi('kpi-palavra-valor', '-', '');
+                setComparacaoKpi('kpi-palavra-comparacao', '');
+            } else {
+                setTexto('kpi-palavra-titulo', capitalizar(palavra.palavra));
+                setValorKpi('kpi-palavra-valor', formatarContagem(palavra.ocorrencias), 'aparições');
+ 
+                if (palavra.vantagem_pct !== null) {
+                    setComparacaoKpi('kpi-palavra-comparacao',
+                        formatarPct(palavra.vantagem_pct) + '% acima do 2º lugar',
+                        '2º lugar: ' + capitalizar(palavra.segunda_palavra));
+                } else {
+                    setComparacaoKpi('kpi-palavra-comparacao', '');
+                }
+            }
+ 
+            // KPI 4: gênero mais associado a outros gêneros
+            var associado = kpis.generoAssociado;
+ 
+            if (associado === null) {
+                setTexto('kpi-associado-titulo', 'Sem dados');
+                setValorKpi('kpi-associado-valor', '-', '');
+                setComparacaoKpi('kpi-associado-comparacao', '');
+            } else {
+                setTexto('kpi-associado-titulo', traduzirGenero(associado.genero));
+                setValorKpi('kpi-associado-valor', formatarContagem(associado.total_associacoes), 'associações');
+ 
+                if (associado.vantagem_pct !== null) {
+                    setComparacaoKpi('kpi-associado-comparacao',
+                        formatarPct(associado.vantagem_pct) + '% acima do 2º lugar',
+                        '2º lugar: ' + traduzirGenero(associado.segundo_genero));
+                } else {
+                    setComparacaoKpi('kpi-associado-comparacao', '');
+                }
+            }
+        }
+ 
+        function preencherGraficos(g) {
+            atualizarGrafico(graficoAvaliacaoGenero,
+                pegarGeneros(g.notaGenero),
+                pegarNumeros(g.notaGenero, 'nota_media', ESCALA_NOTA),
+                pegarMedia(g.notaGenero, 'media_geral', ESCALA_NOTA));
+ 
+            // A linha de média do gráfico de países é a dos 5 países exibidos (media_top5)
+            atualizarGrafico(graficoAvaliacaoPais,
+                pegarPaises(g.notaPais),
+                pegarNumeros(g.notaPais, 'nota_media', ESCALA_NOTA),
+                pegarMedia(g.notaPais, 'media_top5', ESCALA_NOTA));
+ 
+            // A linha de média das palavras é a dos 6 exibidos (media_top6)
+            atualizarGrafico(graficoElementos,
+                pegarPalavras(g.palavras),
+                pegarNumeros(g.palavras, 'ocorrencias', 1),
+                pegarMedia(g.palavras, 'media_top6', 1));
+        }
+ 
+        function carregarDashboard() {
+            buscarDados('/dashboards/roteirista/geral')
+                .then(function (dados) {
+                    preencherKpis(dados.kpis);
+                    preencherGraficos(dados.graficos);
+                })
+                .catch(function (erro) {
+                    console.error('Erro ao carregar a dashboard do roteirista:', erro);
+                    setTexto('kpi-genero-titulo', 'Erro ao carregar');
+                    setTexto('kpi-pais-titulo', 'Erro ao carregar');
+                    setTexto('kpi-palavra-titulo', 'Erro ao carregar');
+                    setTexto('kpi-associado-titulo', 'Erro ao carregar');
+                });
+        }
+ 
+        carregarDashboard();
+ 
     </script>
-
+ 
 </body>
 </html>
+ 

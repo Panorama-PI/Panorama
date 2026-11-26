@@ -1,7 +1,7 @@
 var database = require("../database/config");
-
-
-
+ 
+ 
+ 
 // Gráfico: Lucro x Gênero
 function produtorGeralLucroGenero(limite) {
     var instrucaoSql = `
@@ -12,7 +12,7 @@ function produtorGeralLucroGenero(limite) {
     `;
     return database.executar(instrucaoSql, [limite]);
 }
-
+ 
 // Gráfico: ROI x Gênero
 function produtorGeralRoiGenero(limite) {
     var instrucaoSql = `
@@ -23,7 +23,7 @@ function produtorGeralRoiGenero(limite) {
     `;
     return database.executar(instrucaoSql, [limite]);
 }
-
+ 
 // Gráfico: % de filmes com lucro x Gênero
 function produtorGeralTaxaSucesso(limite) {
     var instrucaoSql = `
@@ -34,7 +34,7 @@ function produtorGeralTaxaSucesso(limite) {
     `;
     return database.executar(instrucaoSql, [limite]);
 }
-
+ 
 // Gráfico: Orçamento médio x Gênero
 function produtorGeralOrcamentoGenero(limite) {
     var instrucaoSql = `
@@ -45,7 +45,7 @@ function produtorGeralOrcamentoGenero(limite) {
     `;
     return database.executar(instrucaoSql, [limite]);
 }
-
+ 
 // Gráfico: Lucro médio por mês de lançamento (ordenado de JAN a DEZ)
 function produtorGeralPeriodoLucro() {
     var instrucaoSql = `
@@ -55,7 +55,7 @@ function produtorGeralPeriodoLucro() {
     `;
     return database.executar(instrucaoSql);
 }
-
+ 
 // KPIs
 function produtorGeralKpiGeneroMaisLucrativo() {
     var instrucaoSql = `
@@ -64,7 +64,7 @@ function produtorGeralKpiGeneroMaisLucrativo() {
     `;
     return database.executar(instrucaoSql);
 }
-
+ 
 function produtorGeralKpiGeneroMaiorRoi() {
     var instrucaoSql = `
         SELECT genero, roi
@@ -72,7 +72,7 @@ function produtorGeralKpiGeneroMaiorRoi() {
     `;
     return database.executar(instrucaoSql);
 }
-
+ 
 function produtorGeralKpiGeneroMaiorRisco() {
     var instrucaoSql = `
         SELECT genero, roi, pct_sem_lucro
@@ -80,7 +80,7 @@ function produtorGeralKpiGeneroMaiorRisco() {
     `;
     return database.executar(instrucaoSql);
 }
-
+ 
 function produtorGeralKpiMelhorMes() {
     var instrucaoSql = `
         SELECT mes, nome_mes, lucro_medio
@@ -88,12 +88,12 @@ function produtorGeralKpiMelhorMes() {
     `;
     return database.executar(instrucaoSql);
 }
-
-
+ 
+ 
 // ---------------------------------------------------------------------
 // 2) PRODUTOR · VISÃO ESPECÍFICA  (todas filtradas pelo gênero)
 // ---------------------------------------------------------------------
-
+ 
 // Gráfico: País x Lucro (top 5)
 function produtorEspecificaPaisLucro(genero, limite) {
     var instrucaoSql = `
@@ -104,7 +104,7 @@ function produtorEspecificaPaisLucro(genero, limite) {
     `;
     return database.executar(instrucaoSql, [genero, limite]);
 }
-
+ 
 // Gráfico: Atores x Aparições em filmes lucrativos (top 5)
 function produtorEspecificaAtoresAparicoes(genero, limite) {
     var instrucaoSql = `
@@ -115,7 +115,7 @@ function produtorEspecificaAtoresAparicoes(genero, limite) {
     `;
     return database.executar(instrucaoSql, [genero, limite]);
 }
-
+ 
 // Gráfico: Atores x Lucro (top 5)
 function produtorEspecificaAtoresLucro(genero, limite) {
     var instrucaoSql = `
@@ -126,7 +126,7 @@ function produtorEspecificaAtoresLucro(genero, limite) {
     `;
     return database.executar(instrucaoSql, [genero, limite]);
 }
-
+ 
 // Gráfico: Lucro médio por mês de lançamento do gênero (JAN a DEZ)
 function produtorEspecificaPeriodoLucro(genero) {
     var instrucaoSql = `
@@ -137,7 +137,7 @@ function produtorEspecificaPeriodoLucro(genero) {
     `;
     return database.executar(instrucaoSql, [genero]);
 }
-
+ 
 // Lucro total do gênero (usado só para calcular "Representa X% do lucro total do gênero")
 // Reaproveita a view da visão geral, sem criar view nova.
 function produtorEspecificaLucroTotalGenero(genero) {
@@ -148,7 +148,7 @@ function produtorEspecificaLucroTotalGenero(genero) {
     `;
     return database.executar(instrucaoSql, [genero]);
 }
-
+ 
 // KPIs
 function produtorEspecificaKpiPaisMaisLucrativo(genero) {
     var instrucaoSql = `
@@ -158,7 +158,7 @@ function produtorEspecificaKpiPaisMaisLucrativo(genero) {
     `;
     return database.executar(instrucaoSql, [genero]);
 }
-
+ 
 function produtorEspecificaKpiAtorMaisAparicoes(genero) {
     var instrucaoSql = `
         SELECT ator, aparicoes
@@ -167,7 +167,7 @@ function produtorEspecificaKpiAtorMaisAparicoes(genero) {
     `;
     return database.executar(instrucaoSql, [genero]);
 }
-
+ 
 function produtorEspecificaKpiPeriodoPico(genero) {
     var instrucaoSql = `
         SELECT mes_inicio, mes_fim, periodo, lucro_medio_periodo
@@ -176,14 +176,14 @@ function produtorEspecificaKpiPeriodoPico(genero) {
     `;
     return database.executar(instrucaoSql, [genero]);
 }
-
-
+ 
+ 
 // ---------------------------------------------------------------------
 // 3) ROTEIRISTA · VISÃO GERAL
 // ---------------------------------------------------------------------
-
+ 
 // Gráfico: Avaliação média x Gênero
-// (nota_media vem na escala 0-100; o front divide por 10 para mostrar "x / 10")
+// (nota_media já vem na escala 0-10, a mesma mostrada no front como "x / 10")
 function roteiristaGeralNotaGenero(limite) {
     var instrucaoSql = `
         SELECT genero, nota_media, qtd_filmes, media_geral, ranking
@@ -193,7 +193,7 @@ function roteiristaGeralNotaGenero(limite) {
     `;
     return database.executar(instrucaoSql, [limite]);
 }
-
+ 
 // Gráfico: Avaliação média x País de origem (top 5)
 // media_top5 = média dos países exibidos | media_geral = média de todos os países
 function roteiristaGeralNotaPais(limite) {
@@ -205,7 +205,7 @@ function roteiristaGeralNotaPais(limite) {
     `;
     return database.executar(instrucaoSql, [limite]);
 }
-
+ 
 // Gráfico: Palavras mais frequentes nas sinopses (top 6)
 function roteiristaGeralPalavras(limite) {
     var instrucaoSql = `
@@ -216,7 +216,7 @@ function roteiristaGeralPalavras(limite) {
     `;
     return database.executar(instrucaoSql, [limite]);
 }
-
+ 
 // KPIs
 function roteiristaGeralKpiGeneroMelhorNota() {
     var instrucaoSql = `
@@ -225,7 +225,7 @@ function roteiristaGeralKpiGeneroMelhorNota() {
     `;
     return database.executar(instrucaoSql);
 }
-
+ 
 function roteiristaGeralKpiPaisMelhorNota() {
     var instrucaoSql = `
         SELECT pais, nota_media
@@ -233,7 +233,7 @@ function roteiristaGeralKpiPaisMelhorNota() {
     `;
     return database.executar(instrucaoSql);
 }
-
+ 
 function roteiristaGeralKpiPalavraRecorrente() {
     var instrucaoSql = `
         SELECT palavra, ocorrencias
@@ -241,7 +241,7 @@ function roteiristaGeralKpiPalavraRecorrente() {
     `;
     return database.executar(instrucaoSql);
 }
-
+ 
 function roteiristaGeralKpiGeneroAssociado() {
     var instrucaoSql = `
         SELECT genero, total_associacoes
@@ -249,7 +249,7 @@ function roteiristaGeralKpiGeneroAssociado() {
     `;
     return database.executar(instrucaoSql);
 }
-
+ 
 // 2º gênero mais associado (usado só para o "X% acima do 2º lugar" do KPI).
 // A view do KPI só devolve o 1º (LIMIT 1), então reaproveita a view base
 // vw_base_genero_associacao com a MESMA ordenação, sem criar view nova.
@@ -263,9 +263,9 @@ function roteiristaGeralGeneroAssociadoSegundo() {
     `;
     return database.executar(instrucaoSql);
 }
-
-
-
+ 
+ 
+ 
 module.exports = {
   
     produtorGeralLucroGenero,
@@ -277,7 +277,7 @@ module.exports = {
     produtorGeralKpiGeneroMaiorRoi,
     produtorGeralKpiGeneroMaiorRisco,
     produtorGeralKpiMelhorMes,
-
+ 
     produtorEspecificaPaisLucro,
     produtorEspecificaAtoresAparicoes,
     produtorEspecificaAtoresLucro,
@@ -286,7 +286,7 @@ module.exports = {
     produtorEspecificaKpiPaisMaisLucrativo,
     produtorEspecificaKpiAtorMaisAparicoes,
     produtorEspecificaKpiPeriodoPico,
-
+ 
     roteiristaGeralNotaGenero,
     roteiristaGeralNotaPais,
     roteiristaGeralPalavras,
@@ -296,3 +296,4 @@ module.exports = {
     roteiristaGeralKpiGeneroAssociado,
     roteiristaGeralGeneroAssociadoSegundo
 };
+ 
