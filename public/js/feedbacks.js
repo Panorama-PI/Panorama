@@ -1,163 +1,69 @@
 
+var idUsuario = sessionStorage.ID_USUARIO;
+var ehProdutor = sessionStorage.PERFIL_ID_USUARIO == 1;
 
-// DADOS MOCKADOS
-
-// Limite de caracteres de um feedback (o produtor escreve até 2000).
-var LIMITE_CARACTERES = 2000;
-
-// Tempo que a carga simulada demora, para dar para ver o carregamento.
-var ATRASO_SIMULADO_MS = 900;
-
-// Aviso mostrado ao mexer no sininho. Apague quando a preferência for salva de verdade.
-var AVISO_SIMULACAO = "Nesta etapa a preferência é apenas visual e ainda não é salva.";
-
-var FEEDBACKS_MOCK = [
-    {
-        id: 1,
-        publicacao: "O Último Farol",
-        produtor: "Camila Duarte",
-        data: "2026-10-22T14:32:00-03:00",
-        conteudo: "Gostei muito da premissa e do ritmo do primeiro ato. Abrir a história com a protagonista já dentro do conflito prende a atenção e deixa claro, em poucas cenas, o que está em jogo para ela.\n\n" +
-            "Pontos fortes\n" +
-            "- A relação entre os dois irmãos tem tensão real e rende os melhores diálogos do material.\n" +
-            "- O mundo da história é apresentado sem excesso de explicação, o que facilita a leitura.\n" +
-            "- O final do segundo ato cria um bom gancho para a virada.\n\n" +
-            "Pontos que precisam de ajuste\n" +
-            "1. O objetivo da protagonista muda entre a cena 12 e a cena 18. Vale decidir qual é o desejo central e manter essa linha até a virada, senão o público perde a referência do que ela quer.\n" +
-            "2. O vilão aparece tarde e pouco. Hoje ele é mais uma ameaça distante do que um personagem. Uma cena anterior ao meio da história, mostrando o ponto de vista dele, ajudaria a construir o conflito.\n" +
-            "3. Há três cenas de exposição seguidas no começo do segundo ato. Tente espalhar essas informações em ação ou em conflito entre personagens.\n" +
-            "4. O tom oscila entre drama e comédia sem uma regra clara. Se o humor faz parte da identidade do projeto, ele precisa aparecer desde o primeiro ato.\n\n" +
-            "Sobre os diálogos\n" +
-            "Os diálogos entre os irmãos são o ponto alto, mas alguns personagens secundários falam todos do mesmo jeito. Experimente dar a cada um uma forma própria de falar, com ritmo, vocabulário e manias diferentes, para que o leitor reconheça quem está falando mesmo sem o nome acima da fala.\n\n" +
-            "Do ponto de vista de produção\n" +
-            "O orçamento parece viável: poucas locações e elenco enxuto. A cena do porto, porém, pode custar bem mais do que o restante. Vale pensar em uma alternativa que preserve o efeito dramático com menos recursos.\n\n" +
-            "Próximos passos: revisar o objetivo da protagonista, reforçar o vilão e enviar uma nova versão do primeiro e do segundo atos. Se fizer sentido, avalio essa versão em seguida. Parabéns pelo trabalho, o material tem muito potencial. Fico no aguardo da nova versão e à disposição para conversar."
-    },
-    {
-        id: 2,
-        publicacao: "Cartas de um Verão Incerto",
-        produtor: "Rafael Monteiro",
-        data: "2026-10-20T09:15:00-03:00",
-        conteudo: "A voz narrativa é o ponto mais forte do material: as cartas dão intimidade sem pesar o ritmo.\n\nSugiro encurtar o terceiro bloco. Ele repete a ideia do segundo e atrasa a virada. Com esse corte, a história ganha fôlego."
-    },
-    {
-        id: 3,
-        publicacao: "Sinal Perdido",
-        produtor: "Beatriz Nogueira",
-        data: "2026-10-18T17:48:00-03:00",
-        conteudo: "Conceito interessante, mas a explicação científica ocupa espaço demais. Prefira mostrar as consequências do sinal em vez de explicá-lo."
-    },
-    {
-        id: 4,
-        publicacao: "Entre Duas Margens",
-        produtor: "Lucas Andrade",
-        data: "2026-10-15T11:05:00-03:00",
-        conteudo: "Ótimo uso das locações! Referência visual para o segundo ato: https://exemplo.com/referencias/entre-duas-margens/segundo-ato/moodboard-completo-com-paleta-de-cores-e-planos-sugeridos-versao-final-revisada-2026 (confira com calma, tem bastante coisa)."
-    },
-    {
-        id: 5,
-        publicacao: "A Casa dos Ecos",
-        produtor: "Helena Prado",
-        data: "2026-10-12T16:20:00-03:00",
-        conteudo: "O suspense funciona, mas o final entrega a resposta cedo demais. Teste <b>adiar</b> a revelação para o último ato & manter a dúvida: \"quem estava na casa?\". Nota técnica: 5 < 7 e 7 > 3 não são tags, só símbolos."
-    },
-    {
-        id: 6,
-        publicacao: "Um título bem longo para testar a quebra de linha",
-        produtor: "Camila Duarte",
-        data: "2026-10-08T10:00:00-03:00",
-        conteudo: "Feedback curto: o título está forte, mas o logline ainda não diz qual é o conflito principal."
-    },
-    {
-        id: 7,
-        publicacao: "Projeto Aurora, primeiro ato",
-        produtor: "Rafael Monteiro",
-        data: "2026-09-30T13:40:00-03:00",
-        conteudo: "Boa estrutura de primeiro ato. Falta um incidente incitante mais claro por volta da cena 6. Hoje o público só entende o problema da protagonista na cena 9."
-    }
-];
-
-
-// ---------------------------------------------------------------- ELEMENTOS DA TELA
+var feedbacksAtuais = [];
 
 var telaLista = document.getElementById("tela-lista");
 var telaDetalhe = document.getElementById("tela-detalhe");
-
 var estadoCarregando = document.getElementById("estado-carregando");
 var estadoVazio = document.getElementById("estado-vazio");
 var estadoErro = document.getElementById("estado-erro");
-var botaoTentarNovamente = document.getElementById("btn-tentar-novamente");
-
 var listaFeedbacks = document.getElementById("lista-feedbacks");
-var contadorFeedbacks = document.getElementById("contador-feedbacks");
+var contador = document.getElementById("contador-feedbacks");
 var avisoPagina = document.getElementById("aviso-pagina");
 
-var botaoVoltar = document.getElementById("btn-voltar");
-var detalheTitulo = document.getElementById("detalhe-titulo");
-var detalheProdutor = document.getElementById("detalhe-produtor");
-var detalheData = document.getElementById("detalhe-data");
-var detalhePublicacao = document.getElementById("detalhe-publicacao");
-var detalheTexto = document.getElementById("detalhe-texto");
-
-var painelSino = document.getElementById("sino-painel");
-var botaoSino = document.getElementById("sino-botao");
+var sinoPainel = document.getElementById("sino-painel");
+var sinoBotao = document.getElementById("sino-botao");
 var sinoEstado = document.getElementById("sino-estado");
 var sinoStatus = document.getElementById("sino-status");
 var sinoMensagem = document.getElementById("sino-mensagem");
+var btnConfigurarPreferencias = document.getElementById("btn-configurar-preferencias");
 
+var horarioInicio = document.getElementById("horario-inicio");
+var horarioFim = document.getElementById("horario-fim");
+var preferenciasMensagem = document.getElementById("preferencias-mensagem");
+var btnSalvarPreferencias = document.getElementById("btn-salvar-preferencias");
 
-// ESTADO DA TELA
+var campoPesquisa = document.getElementById("filtro-pesquisa");
+var filtroEstrelas = document.getElementById("filtro-estrelas");
+var filtroDataInicial = document.getElementById("filtro-data-inicial");
+var filtroDataFinal = document.getElementById("filtro-data-final");
+var filtroSemana = document.getElementById("filtro-semana");
+var btnLimparFiltros = document.getElementById("btn-limpar-filtros");
 
-var feedbacks = [];
-var feedbacksCarregados = false;
-var ultimoBotaoUsado = null;      
-var tentativasDeCarga = 0;
-var simulacao = new URLSearchParams(window.location.search).get("estado");
+var ultimaDataInicialValida = filtroDataInicial.value;
+var ultimaDataFinalValida = filtroDataFinal.value;
 
-// Preferência do sininho. Mockada: vale só enquanto a página está aberta.
-var notificacoesAtivas = true;
-
-
-// FUNÇÕES AUXILIARES
-
-var formatoDataCurta = new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit", month: "2-digit", year: "numeric", timeZone: "America/Sao_Paulo"
-});
-
-var formatoDataLonga = new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo"
-});
-
-// Resume o texto para a listagem, cortando em uma palavra inteira.
-function criarPrevia(texto, limite) {
-    var limpo = String(texto).replace(/\s+/g, " ").trim();
-
-    if (limpo.length <= limite) {
-        return limpo;
+function formatarData(valor) {
+    if (!valor) {
+        return "";
     }
 
-    var corte = limpo.slice(0, limite);
-    var ultimoEspaco = corte.lastIndexOf(" ");
+    var data = new Date(String(valor).replace(" ", "T"));
 
-    if (ultimoEspaco > limite * 0.6) {
-        corte = corte.slice(0, ultimoEspaco);
+    if (isNaN(data.getTime())) {
+        return "";
     }
 
-    return corte.replace(/[\s.,;:!?-]+$/, "") + "…";
+    return data.toLocaleDateString("pt-BR");
 }
 
-// Cria um elemento com texto. Usa textContent: o conteúdo dos feedbacks
-function criarElemento(tag, classe, texto) {
-    var elemento = document.createElement(tag);
-
-    if (classe) {
-        elemento.className = classe;
-    }
-    if (texto !== undefined) {
-        elemento.textContent = texto;
+function obterDataComparacao(valor) {
+    if (!valor) {
+        return "";
     }
 
-    return elemento;
+    return String(valor).substring(0, 10);
+}
+
+function lerErro(resposta, mensagemPadrao) {
+    return resposta.json()
+        .then(function (corpo) {
+            throw new Error(corpo.mensagem || corpo.erro || mensagemPadrao);
+        }, function () {
+            throw new Error(mensagemPadrao);
+        });
 }
 
 function mostrarAviso(texto) {
@@ -170,229 +76,633 @@ function esconderAviso() {
     avisoPagina.hidden = true;
 }
 
-// Mostra só um dos estados da listagem: carregando, vazio, erro ou lista.
-function mostrarEstado(nome) {
-    estadoCarregando.hidden = nome !== "carregando";
-    estadoVazio.hidden = nome !== "vazio";
-    estadoErro.hidden = nome !== "erro";
-    listaFeedbacks.hidden = nome !== "lista";
+function preencherUsuario() {
+    document.getElementById("a_usuario").textContent =
+        sessionStorage.NOME_USUARIO || "Usuário";
 
-    telaLista.setAttribute("aria-busy", nome === "carregando" ? "true" : "false");
+    document.getElementById("c_email").textContent =
+        sessionStorage.EMAIL_USUARIO || "";
+
+    document.getElementById("b_cargo").textContent =
+        ehProdutor ? "Produtor" : "Roteirista";
 }
 
+function mostrarEstado(estado) {
+    estadoCarregando.hidden = estado != "carregando";
+    estadoVazio.hidden = estado != "vazio";
+    estadoErro.hidden = estado != "erro";
+    listaFeedbacks.hidden = estado != "lista";
 
-// CARGA DOS FEEDBACKS
+    telaLista.setAttribute("aria-busy", estado == "carregando" ? "true" : "false");
 
-// INTEGRAÇÃO: trocar o corpo desta função por um fetch ao backend
-// (por exemplo GET /feedbacks/recebidos), mantendo o retorno em Promise.
-function buscarFeedbacks() {
-    return new Promise(function (resolver, rejeitar) {
+    if (estado != "lista") {
+        contador.textContent = "";
+    }
+}
 
-        // ?estado=carregando: a promessa nunca termina, só para ver o carregamento.
-        if (simulacao === "carregando") {
-            return;
+function obterFeedbacksFiltrados() {
+    var pesquisa = campoPesquisa.value.trim().toLowerCase();
+    var estrelasSelecionadas = filtroEstrelas.value;
+    var dataInicial = filtroDataInicial.value;
+    var dataFinal = filtroDataFinal.value;
+
+    return feedbacksAtuais.filter(function (feedback) {
+        var tituloPublicacao = String(feedback.titulo_publicacao || "").toLowerCase();
+        var nomeProdutor = String(feedback.nome_produtor || "").toLowerCase();
+
+        var dataFeedback = obterDataComparacao(feedback.criado_em);
+
+        var nota = Number(feedback.avaliacao);
+
+        if (pesquisa &&
+            !tituloPublicacao.includes(pesquisa) &&
+            !nomeProdutor.includes(pesquisa)) {
+            return false;
         }
 
-        setTimeout(function () {
-            tentativasDeCarga++;
+        if (estrelasSelecionadas &&
+            nota !== Number(estrelasSelecionadas)) {
+            return false;
+        }
 
-            // ?estado=erro: a primeira tentativa falha, a segunda funciona.
-            if (simulacao === "erro" && tentativasDeCarga === 1) {
-                rejeitar(new Error("Falha simulada"));
-                return;
-            }
+        if (dataInicial && dataFeedback < dataInicial) {
+            return false;
+        }
 
-            if (simulacao === "vazio") {
-                resolver([]);
-                return;
-            }
+        if (dataFinal && dataFeedback > dataFinal) {
+            return false;
+        }
 
-            resolver(FEEDBACKS_MOCK.slice().sort(function (a, b) {
-                return new Date(b.data) - new Date(a.data);
-            }));
-        }, ATRASO_SIMULADO_MS);
+        return true;
     });
 }
 
-function carregarFeedbacks() {
-    feedbacksCarregados = false;
-    mostrarEstado("carregando");
+function obterInicioSemana(data) {
+    var dataSemana = new Date(data + "T12:00:00");
+    var dia = dataSemana.getDay();
 
-    buscarFeedbacks()
-        .then(function (resultado) {
-            feedbacks = resultado;
-            feedbacksCarregados = true;
+    var diferenca = dia == 0 ? -6 : 1 - dia;
 
-            if (feedbacks.length === 0) {
-                mostrarEstado("vazio");
+    dataSemana.setDate(dataSemana.getDate() + diferenca);
+
+    return dataSemana;
+}
+
+function formatarDataInput(data) {
+    var ano = data.getFullYear();
+    var mes = String(data.getMonth() + 1).padStart(2, "0");
+    var dia = String(data.getDate()).padStart(2, "0");
+
+    return ano + "-" + mes + "-" + dia;
+}
+
+function formatarPeriodoSemana(inicio, fim) {
+    return inicio.toLocaleDateString("pt-BR") + " até " +
+        fim.toLocaleDateString("pt-BR");
+}
+
+function preencherSemanas() {
+    filtroSemana.innerHTML = '<option value="">Todas as semanas</option>';
+
+    var semanas = {};
+
+    feedbacksAtuais.forEach(function (feedback) {
+        var data = obterDataComparacao(feedback.criado_em);
+
+        if (!data) {
+            return;
+        }
+
+        var inicio = obterInicioSemana(data);
+        var fim = new Date(inicio);
+
+        fim.setDate(fim.getDate() + 6);
+
+        var inicioTexto = formatarDataInput(inicio);
+
+        semanas[inicioTexto] = {
+            inicio: inicioTexto,
+            fim: formatarDataInput(fim),
+            descricao: formatarPeriodoSemana(inicio, fim)
+        };
+    });
+
+    var semanasOrdenadas = Object.values(semanas).sort(function (a, b) {
+        return b.inicio.localeCompare(a.inicio);
+    });
+
+    semanasOrdenadas.forEach(function (semana) {
+        var opcao = document.createElement("option");
+
+        opcao.value = semana.inicio;
+        opcao.textContent = semana.descricao;
+        opcao.dataset.fim = semana.fim;
+
+        filtroSemana.appendChild(opcao);
+    });
+}
+
+function renderizarFeedbacks() {
+    listaFeedbacks.innerHTML = "";
+
+    var feedbacksFiltrados = obterFeedbacksFiltrados();
+
+    if (feedbacksAtuais.length == 0) {
+        document.getElementById("estado-vazio-titulo").textContent =
+            "Você ainda não recebeu avaliações";
+
+        document.getElementById("estado-vazio-texto").textContent =
+            "Quando um produtor avaliar uma das suas publicações, a avaliação aparecerá aqui.";
+
+        mostrarEstado("vazio");
+        return;
+    }
+
+    if (feedbacksFiltrados.length == 0) {
+        document.getElementById("estado-vazio-titulo").textContent =
+            "Nenhuma avaliação encontrada";
+
+        document.getElementById("estado-vazio-texto").textContent =
+            "Não encontramos avaliações com os filtros selecionados. Experimente alterar ou limpar os filtros.";
+
+        mostrarEstado("vazio");
+        return;
+    }
+
+    for (var i = 0; i < feedbacksFiltrados.length; i++) {
+        var feedback = feedbacksFiltrados[i];
+
+        var item = document.createElement("li");
+        item.className = "feedback-item";
+
+        var corpo = document.createElement("div");
+        corpo.className = "feedback-item-corpo";
+
+        var titulo = document.createElement("h3");
+        titulo.className = "feedback-item-titulo";
+        titulo.textContent = feedback.titulo_publicacao || "Publicação sem título";
+
+        var meta = document.createElement("p");
+        meta.className = "feedback-item-meta";
+
+        var rotuloProdutor = document.createElement("strong");
+        rotuloProdutor.textContent = feedback.nome_produtor || "";
+
+        var data = formatarData(feedback.criado_em);
+
+        meta.appendChild(document.createTextNode("Produtor: "));
+        meta.appendChild(rotuloProdutor);
+
+        if (data) {
+            meta.appendChild(document.createTextNode(" • " + data));
+        }
+
+        var avaliacao = document.createElement("div");
+        avaliacao.className = "feedback-avaliacao";
+
+        var estrelas = document.createElement("span");
+        estrelas.className = "feedback-estrelas";
+
+        var nota = Number(feedback.avaliacao) || 0;
+
+        for (var j = 1; j <= 5; j++) {
+            var estrela = document.createElement("span");
+
+            if (j <= Math.round(nota)) {
+                estrela.textContent = "★";
             } else {
-                desenharLista();
-                mostrarEstado("lista");
+                estrela.textContent = "☆";
+                estrela.className = "estrela-vazia";
             }
 
-            sincronizarTela();
+            estrelas.appendChild(estrela);
+        }
+
+        var notaTexto = document.createElement("span");
+        notaTexto.textContent = nota.toFixed(1) + "/5";
+
+        avaliacao.appendChild(estrelas);
+        avaliacao.appendChild(notaTexto);
+
+        corpo.appendChild(titulo);
+        corpo.appendChild(meta);
+        corpo.appendChild(avaliacao);
+
+        var temComentario =
+            typeof feedback.texto === "string" &&
+            feedback.texto.trim() !== "";
+
+        if (temComentario) {
+            var previa = document.createElement("p");
+            previa.className = "feedback-item-previa";
+            previa.textContent = feedback.texto;
+
+            corpo.appendChild(previa);
+        }
+
+        var botao = document.createElement("button");
+        botao.type = "button";
+        botao.className = "feedbacks-btn-secundario";
+        botao.textContent = temComentario
+            ? "Ver feedback"
+            : "Ver avaliação";
+
+        botao.addEventListener("click", (function (id) {
+            return function () {
+                abrirDetalhe(id);
+            };
+        })(feedback.id));
+
+        item.appendChild(corpo);
+        item.appendChild(botao);
+
+        listaFeedbacks.appendChild(item);
+    }
+
+    contador.textContent = feedbacksFiltrados.length == 1
+        ? "1 avaliação"
+        : feedbacksFiltrados.length + " avaliações";
+
+    mostrarEstado("lista");
+}
+
+function obterFeedbacks() {
+    mostrarEstado("carregando");
+    esconderAviso();
+
+    fetch("/feedbacks/roteirista/" + idUsuario, { cache: "no-store" })
+        .then(function (resposta) {
+            if (resposta.ok) {
+                return resposta.json();
+            }
+
+            return lerErro(resposta, "Erro ao buscar avaliações.");
+        })
+        .then(function (corpo) {
+            feedbacksAtuais = corpo.feedbacks || [];
+            preencherSemanas();
+            renderizarFeedbacks();
         })
         .catch(function (erro) {
-            console.log("Erro ao carregar os feedbacks:", erro.message);
+            console.error("Erro ao obter avaliações: " + erro.message);
             mostrarEstado("erro");
         });
 }
 
+function abrirDetalhe(idAvaliacao) {
+    esconderAviso();
 
-// LISTAGEM
+    fetch("/feedbacks/roteirista/" + idUsuario + "/" + idAvaliacao, { cache: "no-store" })
+        .then(function (resposta) {
+            if (resposta.ok) {
+                return resposta.json();
+            }
 
-function desenharLista() {
-    listaFeedbacks.textContent = "";
+            return lerErro(resposta, "Erro ao buscar a avaliação.");
+        })
+        .then(function (corpo) {
+            var feedback = corpo.feedback;
 
-    feedbacks.forEach(function (feedback) {
-        var item = criarElemento("li", "feedback-item");
-        item.dataset.id = feedback.id;
+            document.getElementById("detalhe-titulo").textContent =
+                feedback.titulo_publicacao || "Publicação sem título";
 
-        var corpo = criarElemento("div", "feedback-item-corpo");
-        corpo.appendChild(criarElemento("h3", "feedback-item-titulo", feedback.publicacao));
+            document.getElementById("detalhe-publicacao").textContent =
+                feedback.titulo_publicacao || "";
 
-        var meta = criarElemento("p", "feedback-item-meta");
-        meta.appendChild(document.createTextNode("Produtor: "));
-        meta.appendChild(criarElemento("strong", "", feedback.produtor));
-        meta.appendChild(document.createTextNode(" · " + formatoDataCurta.format(new Date(feedback.data))));
-        corpo.appendChild(meta);
+            document.getElementById("detalhe-produtor").textContent =
+                feedback.nome_produtor || "";
 
-        corpo.appendChild(criarElemento("p", "feedback-item-previa", criarPrevia(feedback.conteudo, 160)));
+            document.getElementById("detalhe-data").textContent =
+                formatarData(feedback.criado_em);
 
-        var botao = criarElemento("button", "feedbacks-btn-secundario", "Ver feedback");
-        botao.type = "button";
-        botao.setAttribute("aria-label", "Ver feedback de " + feedback.produtor + " sobre " + feedback.publicacao);
-        botao.addEventListener("click", function () {
-            ultimoBotaoUsado = botao;
-            abrirFeedback(feedback.id);
+            var nota = Number(feedback.avaliacao) || 0;
+            var avaliacaoDetalhe = document.getElementById("detalhe-avaliacao");
+
+            var estrelas = document.createElement("div");
+            estrelas.className = "feedback-estrelas";
+
+            avaliacaoDetalhe.innerHTML = "";
+
+            for (var i = 1; i <= 5; i++) {
+                var estrela = document.createElement("span");
+
+                if (i <= Math.round(nota)) {
+                    estrela.textContent = "★";
+                } else {
+                    estrela.textContent = "☆";
+                    estrela.className = "estrela-vazia";
+                }
+
+                estrelas.appendChild(estrela);
+            }
+
+            avaliacaoDetalhe.appendChild(estrelas);
+
+            var notaTexto = document.createElement("span");
+            notaTexto.textContent = " " + nota.toFixed(1) + "/5";
+
+            avaliacaoDetalhe.appendChild(notaTexto);
+
+            var textoDetalhe = document.getElementById("detalhe-texto");
+
+            var temComentario =
+                typeof feedback.texto === "string" &&
+                feedback.texto.trim() !== "";
+
+            if (temComentario) {
+                textoDetalhe.textContent = feedback.texto;
+            } else {
+                textoDetalhe.textContent =
+                    "O produtor avaliou esta publicação, mas não deixou um comentário.";
+            }
+
+            telaLista.hidden = true;
+            telaDetalhe.hidden = false;
+
+            document.getElementById("detalhe-titulo").focus();
+        })
+        .catch(function (erro) {
+            console.error("Erro ao abrir avaliação: " + erro.message);
+            mostrarAviso(erro.message);
+            obterFeedbacks();
         });
-
-        item.appendChild(corpo);
-        item.appendChild(botao);
-        listaFeedbacks.appendChild(item);
-    });
-
-    contadorFeedbacks.textContent = feedbacks.length === 1
-        ? "1 feedback recebido"
-        : feedbacks.length + " feedbacks recebidos";
-}
-
-
-// VISUALIZAÇÃO DETALHADA
-
-// A navegação usa o endereço (#feedback-3): o botão "voltar" do navegador
-// e links diretos funcionam sem recarregar a página.
-function abrirFeedback(id) {
-    window.location.hash = "feedback-" + id;
 }
 
 function voltarParaLista() {
-    history.pushState("", document.title, window.location.pathname + window.location.search);
-    sincronizarTela();
-}
-
-function mostrarDetalhe(feedback) {
-    detalheTitulo.textContent = feedback.publicacao;
-    detalhePublicacao.textContent = feedback.publicacao;
-    detalheProdutor.textContent = feedback.produtor;
-    detalheData.textContent = formatoDataLonga.format(new Date(feedback.data));
-    detalheTexto.textContent = feedback.conteudo;
-
-    telaLista.hidden = true;
-    telaDetalhe.hidden = false;
-    window.scrollTo(0, 0);
-
-    detalheTitulo.focus();
-}
-
-function mostrarLista() {
-    var vindoDoDetalhe = !telaDetalhe.hidden;
-
     telaDetalhe.hidden = true;
     telaLista.hidden = false;
-
-    if (vindoDoDetalhe && ultimoBotaoUsado) {
-        ultimoBotaoUsado.focus();
-    }
 }
 
-// Decide qual tela mostrar de acordo com o endereço.
-function sincronizarTela() {
-    var encontrado = /^#feedback-(\d+)$/.exec(window.location.hash);
+function desenharSino(ativo) {
+    ativo = ativo === true || ativo === 1 || ativo === "1";
 
-    if (!encontrado) {
-        mostrarLista();
-        return;
-    }
+    sinoPainel.classList.toggle("sino-ativo", ativo);
+    sinoBotao.setAttribute("aria-checked", ativo ? "true" : "false");
 
-    // Os dados ainda estão carregando: a lista aparece e o detalhe abre quando terminar.
-    if (!feedbacksCarregados) {
-        mostrarLista();
-        return;
-    }
+    sinoEstado.textContent = ativo ? "Ativado" : "Desativado";
 
-    var id = Number(encontrado[1]);
-    var feedback = feedbacks.find(function (f) { return f.id === id; });
-
-    if (!feedback) {
-        history.replaceState("", document.title, window.location.pathname + window.location.search);
-        mostrarLista();
-        mostrarAviso("Não encontramos esse feedback. Escolha um da lista abaixo.");
-        return;
-    }
-
-    esconderAviso();
-    mostrarDetalhe(feedback);
-}
-
-
-// SININHO
-
-// INTEGRAÇÃO: ao clicar, enviar a nova preferência ao backend
-// (por exemplo PUT /usuarios/notificacoes) e só então atualizar a tela.
-function atualizarSino() {
-    botaoSino.setAttribute("aria-checked", String(notificacoesAtivas));
-    painelSino.classList.toggle("sino-ativo", notificacoesAtivas);
-
-    sinoEstado.textContent = notificacoesAtivas ? "Ativado" : "Desativado";
-    sinoStatus.textContent = notificacoesAtivas
+    sinoStatus.textContent = ativo
         ? "Você optou por receber notificações por e-mail."
         : "Você optou por não receber notificações por e-mail.";
 }
 
+function preencherPreferencias(preferencias) {
+    if (!preferencias) {
+        return;
+    }
+
+    horarioInicio.value = preferencias.horario_inicio
+        ? String(preferencias.horario_inicio).substring(0, 5)
+        : "";
+
+    horarioFim.value = preferencias.horario_fim
+        ? String(preferencias.horario_fim).substring(0, 5)
+        : "";
+}
+
+function obterNotificacao() {
+    sinoBotao.disabled = true;
+
+    fetch("/feedbacks/roteirista/" + idUsuario + "/notificacao", { cache: "no-store" })
+        .then(function (resposta) {
+            if (resposta.ok) {
+                return resposta.json();
+            }
+
+            return lerErro(resposta, "Erro ao buscar a preferência de notificação.");
+        })
+        .then(function (corpo) {
+            desenharSino(corpo.notificacao);
+            preencherPreferencias(corpo.preferencias);
+        })
+        .catch(function (erro) {
+            console.error("Erro ao obter notificação: " + erro.message);
+            desenharSino(false);
+            sinoMensagem.textContent =
+                "Não foi possível carregar as suas preferências de notificação.";
+        })
+        .finally(function () {
+            sinoBotao.disabled = false;
+        });
+}
+
 function alternarSino() {
-    notificacoesAtivas = !notificacoesAtivas;
-    atualizarSino();
+    var estavaAtivo = sinoBotao.getAttribute("aria-checked") == "true";
+    var novoValor = !estavaAtivo;
 
-    // A escolha muda só os avisos por e-mail: a lista de feedbacks não é alterada.
-    sinoMensagem.textContent = notificacoesAtivas
-        ? "Notificações por e-mail ativadas. Você será avisado por e-mail sobre novos feedbacks. " + AVISO_SIMULACAO
-        : "Notificações por e-mail desativadas. Você não receberá e-mails sobre novos feedbacks, mas todos continuam disponíveis aqui. " + AVISO_SIMULACAO;
+    sinoBotao.disabled = true;
+    sinoMensagem.textContent = "";
+
+    fetch("/feedbacks/roteirista/" + idUsuario + "/notificacao", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ ativo: novoValor })
+    })
+        .then(function (resposta) {
+            if (resposta.ok) {
+                return resposta.json();
+            }
+
+            return lerErro(resposta, "Não foi possível atualizar as notificações.");
+        })
+        .then(function (corpo) {
+            desenharSino(corpo.notificacao);
+            sinoMensagem.textContent = corpo.mensagem || "Preferência atualizada.";
+        })
+        .catch(function (erro) {
+            console.error("Erro ao atualizar notificação: " + erro.message);
+            desenharSino(estavaAtivo);
+            sinoMensagem.textContent =
+                "Não foi possível atualizar as notificações. Tente novamente.";
+        })
+        .finally(function () {
+            sinoBotao.disabled = false;
+        });
 }
 
+function alternarPreferencias() {
+    var estaAberto = btnConfigurarPreferencias.getAttribute("aria-expanded") == "true";
 
-// DADOS DO USUÁRIO NA BARRA LATERAL
+    btnConfigurarPreferencias.setAttribute("aria-expanded", estaAberto ? "false" : "true");
 
-function preencherUsuario() {
-    var nome = sessionStorage.NOME_USUARIO;
-    var email = sessionStorage.EMAIL_USUARIO;
+    document.getElementById("sino-preferencias").hidden = estaAberto;
 
-    if (nome) {
-        document.getElementById("a_usuario").textContent = nome;
-    }
-    if (email) {
-        document.getElementById("c_email").textContent = email;
-    }
+    btnConfigurarPreferencias.innerHTML = estaAberto
+        ? 'Configurar notificações <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>'
+        : 'Fechar configurações <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 }
 
+function salvarPreferencias() {
+    var inicio = horarioInicio.value;
+    var fim = horarioFim.value;
 
-// INICIALIZAÇÃO
+    preferenciasMensagem.textContent = "";
 
-botaoVoltar.addEventListener("click", voltarParaLista);
-botaoTentarNovamente.addEventListener("click", carregarFeedbacks);
-botaoSino.addEventListener("click", alternarSino);
-window.addEventListener("hashchange", sincronizarTela);
+    if (!inicio || !fim) {
+        preferenciasMensagem.textContent =
+            "Para salvar, preencha o horário inicial e o horário final.";
+        return;
+    }
+
+    if (inicio >= fim) {
+        preferenciasMensagem.textContent =
+            "O horário final precisa ser maior que o horário inicial.";
+        return;
+    }
+
+    btnSalvarPreferencias.disabled = true;
+
+    fetch("/feedbacks/roteirista/" + idUsuario + "/notificacao", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            horario_inicio: inicio,
+            horario_fim: fim
+        })
+    })
+        .then(function (resposta) {
+            if (resposta.ok) {
+                return resposta.json();
+            }
+
+            return lerErro(resposta, "Não foi possível salvar as preferências.");
+        })
+        .then(function (corpo) {
+            preencherPreferencias(corpo.preferencias || {
+                horario_inicio: inicio,
+                horario_fim: fim
+            });
+
+            preferenciasMensagem.textContent =
+                corpo.mensagem || "Preferências salvas com sucesso.";
+        })
+        .catch(function (erro) {
+            console.error("Erro ao salvar preferências: " + erro.message);
+
+            preferenciasMensagem.textContent =
+                "Não foi possível salvar as preferências. Tente novamente.";
+        })
+        .finally(function () {
+            btnSalvarPreferencias.disabled = false;
+        });
+}
+
+function atualizarLimitesDatas() {
+    filtroDataInicial.max = filtroDataFinal.value || "";
+    filtroDataFinal.min = filtroDataInicial.value || "";
+}
+
+function aplicarFiltroSemana() {
+    var inicio = filtroSemana.value;
+
+    if (!inicio) {
+        ultimaDataInicialValida = filtroDataInicial.value;
+        ultimaDataFinalValida = filtroDataFinal.value;
+
+        atualizarLimitesDatas();
+        renderizarFeedbacks();
+        return;
+    }
+
+    var opcao = filtroSemana.options[filtroSemana.selectedIndex];
+
+    filtroDataInicial.value = inicio;
+    filtroDataFinal.value = opcao.dataset.fim;
+
+    ultimaDataInicialValida = inicio;
+    ultimaDataFinalValida = opcao.dataset.fim;
+
+    atualizarLimitesDatas();
+    esconderAviso();
+    renderizarFeedbacks();
+}
+
+function limparFiltros() {
+    campoPesquisa.value = "";
+    filtroEstrelas.value = "";
+    filtroDataInicial.value = "";
+    filtroDataFinal.value = "";
+    filtroSemana.value = "";
+
+    ultimaDataInicialValida = "";
+    ultimaDataFinalValida = "";
+
+    atualizarLimitesDatas();
+    esconderAviso();
+    renderizarFeedbacks();
+}
+
+function atualizarFiltroData(evento) {
+    var campoAlterado = evento.target;
+
+    if (
+        filtroDataInicial.value &&
+        filtroDataFinal.value &&
+        filtroDataInicial.value > filtroDataFinal.value
+    ) {
+        if (campoAlterado === filtroDataInicial) {
+            filtroDataInicial.value = ultimaDataInicialValida;
+        } else {
+            filtroDataFinal.value = ultimaDataFinalValida;
+        }
+
+        atualizarLimitesDatas();
+
+        mostrarAviso(
+            "A data inicial não pode ser posterior à data final. Verifique o período selecionado."
+        );
+
+        return;
+    }
+
+    ultimaDataInicialValida = filtroDataInicial.value;
+    ultimaDataFinalValida = filtroDataFinal.value;
+
+    filtroSemana.value = "";
+
+    atualizarLimitesDatas();
+    esconderAviso();
+    renderizarFeedbacks();
+}
+
+document.getElementById("btn-tentar-novamente")
+    .addEventListener("click", obterFeedbacks);
+
+document.getElementById("btn-voltar")
+    .addEventListener("click", voltarParaLista);
+
+sinoBotao.addEventListener("click", alternarSino);
+
+btnSalvarPreferencias.addEventListener("click", salvarPreferencias);
+
+campoPesquisa.addEventListener("input", function () {
+    renderizarFeedbacks();
+});
+
+filtroEstrelas.addEventListener("change", function () {
+    renderizarFeedbacks();
+});
+
+filtroDataInicial.addEventListener("change", atualizarFiltroData);
+filtroDataFinal.addEventListener("change", atualizarFiltroData);
+filtroSemana.addEventListener("change", aplicarFiltroSemana);
+
+btnLimparFiltros.addEventListener("click", limparFiltros);
+
+btnConfigurarPreferencias.addEventListener("click", alternarPreferencias);
 
 preencherUsuario();
-atualizarSino();
-carregarFeedbacks();
+
+atualizarLimitesDatas();
+
+if (ehProdutor) {
+    sinoPainel.hidden = true;
+} else {
+    obterNotificacao();
+}
+
+obterFeedbacks();

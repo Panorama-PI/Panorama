@@ -1,3 +1,4 @@
+
 var feedbackRoteiristaModel = require("../models/feedbackRoteiristaModel");
 
 var BadRequestError = require("../errors/BadRequestError");
@@ -25,6 +26,13 @@ function obterIdRoteirista(req) {
     return Number(idRoteirista);
 }
 
+function horarioValido(horario) {
+    return (
+        typeof horario === "string" &&
+        /^([01]\d|2[0-3]):[0-5]\d$/.test(horario)
+    );
+}
+
 function listarFeedbacks(req, res, next) {
     try {
         var idRoteirista = obterIdRoteirista(req);
@@ -46,22 +54,22 @@ function listarFeedbacks(req, res, next) {
 function buscarFeedback(req, res, next) {
     try {
         var idRoteirista = obterIdRoteirista(req);
-        var idFeedback = req.params.id;
+        var idAvaliacao = req.params.id;
 
-        if (!idValido(idFeedback)) {
+        if (!idValido(idAvaliacao)) {
             throw new BadRequestError(
-                "O ID do feedback é inválido."
+                "O ID da avaliação é inválido."
             );
         }
 
         feedbackRoteiristaModel.buscarFeedback(
-            idFeedback,
+            Number(idAvaliacao),
             idRoteirista
         )
             .then((resultado) => {
                 if (resultado.length === 0) {
                     throw new NotFoundError(
-                        "Feedback não encontrado."
+                        "Avaliação não encontrada."
                     );
                 }
 
@@ -77,7 +85,6 @@ function buscarFeedback(req, res, next) {
     }
 }
 
-// Sininho: devolve se o roteirista quer receber e-mails
 function buscarNotificacao(req, res, next) {
     try {
         var idRoteirista = obterIdRoteirista(req);
@@ -90,13 +97,15 @@ function buscarNotificacao(req, res, next) {
                     );
                 }
 
-                // notificacao nula = nunca mexeu no sininho = ativado (padrão da tela)
-                var valor = resultado[0].notificacao;
-                var ativo = valor === null || Number(valor) === 1;
+                var dados = resultado[0];
 
                 return res.status(200).json({
                     sucesso: true,
-                    notificacao: ativo
+                    notificacao: Number(dados.notificacao) === 1,
+                    preferencias: {
+                        horario_inicio: dados.horario_inicio,
+                        horario_fim: dados.horario_fim
+                    }
                 });
             })
             .catch(next);
@@ -106,16 +115,65 @@ function buscarNotificacao(req, res, next) {
     }
 }
 
-// Sininho: liga ou desliga os e-mails
 function atualizarNotificacao(req, res, next) {
     try {
         var idRoteirista = obterIdRoteirista(req);
-        var ativo = req.body.ativo;
+        var corpo = req.body || {};
 
-        if (typeof ativo !== "boolean") {
+        var possuiAtivo = Object.prototype.hasOwnProperty.call(
+            corpo,
+            "ativo"
+        );
+
+        var camposPreferencia = [
+            "horario_inicio",
+            "horario_fim"
+        ];
+
+        var recebeuPreferencias = camposPreferencia.some(
+            (campo) => Object.prototype.hasOwnProperty.call(
+                corpo,
+                campo
+            )
+        );
+
+        if (possuiAtivo && recebeuPreferencias) {
+            throw new BadRequestError(
+                "Atualize a notificação e as preferências separadamente."
+            );
+        }
+
+        if (!possuiAtivo && !recebeuPreferencias) {
+            throw new BadRequestError(
+                "Informe a notificação ou as preferências que deseja atualizar."
+            );
+        }
+
+        var ativo = corpo.ativo;
+        var horarioInicio = corpo.horario_inicio;
+        var horarioFim = corpo.horario_fim;
+
+        if (possuiAtivo && typeof ativo !== "boolean") {
             throw new BadRequestError(
                 "O campo 'ativo' deve ser verdadeiro ou falso."
             );
+        }
+
+        if (recebeuPreferencias) {
+            if (
+                !horarioValido(horarioInicio) ||
+                !horarioValido(horarioFim)
+            ) {
+                throw new BadRequestError(
+                    "Informe horários válidos no formato HH:MM."
+                );
+            }
+
+            if (horarioInicio >= horarioFim) {
+                throw new BadRequestError(
+                    "O horário final precisa ser maior que o horário inicial."
+                );
+            }
         }
 
         feedbackRoteiristaModel.buscarNotificacao(idRoteirista)
@@ -126,18 +184,43 @@ function atualizarNotificacao(req, res, next) {
                     );
                 }
 
-                return feedbackRoteiristaModel.atualizarNotificacao(
+                if (possuiAtivo) {
+                    return feedbackRoteiristaModel.atualizarNotificacao(
+                        idRoteirista,
+                        ativo
+                    );
+                }
+
+                return feedbackRoteiristaModel.atualizarPreferencias(
                     idRoteirista,
-                    ativo
+                    horarioInicio,
+                    horarioFim
                 );
             })
             .then(() => {
+                return feedbackRoteiristaModel.buscarNotificacao(
+                    idRoteirista
+                );
+            })
+            .then((resultado) => {
+                if (resultado.length === 0) {
+                    throw new NotFoundError(
+                        "Roteirista não encontrado."
+                    );
+                }
+
+                var dados = resultado[0];
+
                 return res.status(200).json({
                     sucesso: true,
-                    mensagem: ativo
-                        ? "Notificações por e-mail ativadas."
-                        : "Notificações por e-mail desativadas.",
-                    notificacao: ativo
+                    mensagem: possuiAtivo
+                        ? "Preferência de notificação atualizada com sucesso."
+                        : "Preferências salvas com sucesso.",
+                    notificacao: Number(dados.notificacao) === 1,
+                    preferencias: {
+                        horario_inicio: dados.horario_inicio,
+                        horario_fim: dados.horario_fim
+                    }
                 });
             })
             .catch(next);
