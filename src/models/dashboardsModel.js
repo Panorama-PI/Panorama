@@ -178,6 +178,91 @@ function produtorEspecificaKpiPeriodoPico(genero) {
 }
 
 
+// ---------------------------------------------------------------------
+// 3) ROTEIRISTA · VISÃO GERAL
+// ---------------------------------------------------------------------
+
+// Gráfico: Avaliação média x Gênero
+// (nota_media vem na escala 0-100; o front divide por 10 para mostrar "x / 10")
+function roteiristaGeralNotaGenero(limite) {
+    var instrucaoSql = `
+        SELECT genero, nota_media, qtd_filmes, media_geral, ranking
+        FROM vw_rot_geral_grafico_nota_genero
+        WHERE ranking <= ?
+        ORDER BY ranking
+    `;
+    return database.executar(instrucaoSql, [limite]);
+}
+
+// Gráfico: Avaliação média x País de origem (top 5)
+// media_top5 = média dos países exibidos | media_geral = média de todos os países
+function roteiristaGeralNotaPais(limite) {
+    var instrucaoSql = `
+        SELECT pais, nota_media, qtd_filmes, media_geral, media_top5, ranking
+        FROM vw_rot_geral_grafico_nota_pais
+        WHERE ranking <= ?
+        ORDER BY ranking
+    `;
+    return database.executar(instrucaoSql, [limite]);
+}
+
+// Gráfico: Palavras mais frequentes nas sinopses (top 6)
+function roteiristaGeralPalavras(limite) {
+    var instrucaoSql = `
+        SELECT palavra, ocorrencias, media_top6, ranking
+        FROM vw_rot_geral_grafico_palavras
+        WHERE ranking <= ?
+        ORDER BY ranking
+    `;
+    return database.executar(instrucaoSql, [limite]);
+}
+
+// KPIs
+function roteiristaGeralKpiGeneroMelhorNota() {
+    var instrucaoSql = `
+        SELECT genero, nota_media
+        FROM vw_rot_geral_kpi_genero_melhor_nota
+    `;
+    return database.executar(instrucaoSql);
+}
+
+function roteiristaGeralKpiPaisMelhorNota() {
+    var instrucaoSql = `
+        SELECT pais, nota_media
+        FROM vw_rot_geral_kpi_pais_melhor_nota
+    `;
+    return database.executar(instrucaoSql);
+}
+
+function roteiristaGeralKpiPalavraRecorrente() {
+    var instrucaoSql = `
+        SELECT palavra, ocorrencias
+        FROM vw_rot_geral_kpi_palavra_recorrente
+    `;
+    return database.executar(instrucaoSql);
+}
+
+function roteiristaGeralKpiGeneroAssociado() {
+    var instrucaoSql = `
+        SELECT genero, total_associacoes
+        FROM vw_rot_geral_kpi_genero_associado
+    `;
+    return database.executar(instrucaoSql);
+}
+
+// 2º gênero mais associado (usado só para o "X% acima do 2º lugar" do KPI).
+// A view do KPI só devolve o 1º (LIMIT 1), então reaproveita a view base
+// vw_base_genero_associacao com a MESMA ordenação, sem criar view nova.
+function roteiristaGeralGeneroAssociadoSegundo() {
+    var instrucaoSql = `
+        SELECT genero, SUM(qtd_filmes) AS total_associacoes
+        FROM vw_base_genero_associacao
+        GROUP BY genero
+        ORDER BY total_associacoes DESC, genero
+        LIMIT 1 OFFSET 1
+    `;
+    return database.executar(instrucaoSql);
+}
 
 
 
@@ -200,5 +285,14 @@ module.exports = {
     produtorEspecificaLucroTotalGenero,
     produtorEspecificaKpiPaisMaisLucrativo,
     produtorEspecificaKpiAtorMaisAparicoes,
-    produtorEspecificaKpiPeriodoPico
+    produtorEspecificaKpiPeriodoPico,
+
+    roteiristaGeralNotaGenero,
+    roteiristaGeralNotaPais,
+    roteiristaGeralPalavras,
+    roteiristaGeralKpiGeneroMelhorNota,
+    roteiristaGeralKpiPaisMelhorNota,
+    roteiristaGeralKpiPalavraRecorrente,
+    roteiristaGeralKpiGeneroAssociado,
+    roteiristaGeralGeneroAssociadoSegundo
 };

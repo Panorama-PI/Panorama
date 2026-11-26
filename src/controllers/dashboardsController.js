@@ -5,6 +5,7 @@ const { BadRequestError } = require("../errors");
 // Quantidade de itens em cada gráfico
 var LIMITE_GENEROS = 6;
 var LIMITE_TOP = 5;
+var LIMITE_PALAVRAS = 6;
 
 // ---------------------------------------------------------------------
 function produtorGeral(req, res, next) {
@@ -211,7 +212,130 @@ function produtorEspecifica(req, res, next) {
 
 
 
+
+// ---------------------------------------------------------------------
+// ROTEIRISTA · VISÃO GERAL
+// ---------------------------------------------------------------------
+
+// Quanto "a" está acima de "b", em % com 1 casa (ex.: 8,4 vs 7,6 -> 10,5)
+// Devolve null se não der para comparar (sem valor de referência ou referência 0)
+function percentualAcima(a, b) {
+    if (b === null || b === undefined || Number(b) <= 0) {
+        return null;
+    }
+
+    return Math.round((Number(a) / Number(b) - 1) * 1000) / 10;
+}
+
+function roteiristaGeral(req, res, next) {
+    Promise.all([
+        dashboardsModel.roteiristaGeralNotaGenero(LIMITE_GENEROS),        // r[0]
+        dashboardsModel.roteiristaGeralNotaPais(LIMITE_TOP),              // r[1]
+        dashboardsModel.roteiristaGeralPalavras(LIMITE_PALAVRAS),         // r[2]
+        dashboardsModel.roteiristaGeralKpiGeneroMelhorNota(),             // r[3]
+        dashboardsModel.roteiristaGeralKpiPaisMelhorNota(),               // r[4]
+        dashboardsModel.roteiristaGeralKpiPalavraRecorrente(),            // r[5]
+        dashboardsModel.roteiristaGeralKpiGeneroAssociado(),              // r[6]
+        dashboardsModel.roteiristaGeralGeneroAssociadoSegundo()           // r[7]
+    ])
+        .then(function (r) {
+            var notaGenero = r[0];
+            var notaPais = r[1];
+            var palavras = r[2];
+
+            // Cada KPI fica null se a view vier vazia
+            var kpis = {
+                generoMelhorNota: null,
+                paisMelhorNota: null,
+                palavraRecorrente: null,
+                generoAssociado: null
+            };
+
+            // KPI 1: gênero com melhor avaliação (compara com a média geral dos gêneros)
+            if (r[3].length > 0 && notaGenero.length > 0) {
+                var mediaGeral = Number(notaGenero[0].media_geral);
+
+                kpis.generoMelhorNota = {
+                    genero: r[3][0].genero,
+                    nota_media: Number(r[3][0].nota_media),
+                    media_geral: mediaGeral,
+                    acima_media_pct: percentualAcima(r[3][0].nota_media, mediaGeral)
+                };
+            }
+
+            // KPI 2: país com melhor avaliação (compara com o 2º colocado)
+            if (r[4].length > 0) {
+                var segundoPais = null;
+                var vantagemPais = null;
+
+                if (notaPais.length > 1) {
+                    segundoPais = notaPais[1].pais;
+                    vantagemPais = percentualAcima(r[4][0].nota_media, notaPais[1].nota_media);
+                }
+
+                kpis.paisMelhorNota = {
+                    pais: r[4][0].pais,
+                    nota_media: Number(r[4][0].nota_media),
+                    segundo_pais: segundoPais,
+                    vantagem_pct: vantagemPais
+                };
+            }
+
+            // KPI 3: palavra mais recorrente nas sinopses (compara com a 2ª colocada)
+            if (r[5].length > 0) {
+                var segundaPalavra = null;
+                var vantagemPalavra = null;
+
+                if (palavras.length > 1) {
+                    segundaPalavra = palavras[1].palavra;
+                    vantagemPalavra = percentualAcima(r[5][0].ocorrencias, palavras[1].ocorrencias);
+                }
+
+                kpis.palavraRecorrente = {
+                    palavra: r[5][0].palavra,
+                    ocorrencias: Number(r[5][0].ocorrencias),
+                    segunda_palavra: segundaPalavra,
+                    vantagem_pct: vantagemPalavra
+                };
+            }
+
+            // KPI 4: gênero mais associado a outros gêneros (compara com o 2º colocado)
+            if (r[6].length > 0) {
+                var segundoGenero = null;
+                var vantagemGenero = null;
+
+                if (r[7].length > 0) {
+                    segundoGenero = r[7][0].genero;
+                    vantagemGenero = percentualAcima(r[6][0].total_associacoes, r[7][0].total_associacoes);
+                }
+
+                kpis.generoAssociado = {
+                    genero: r[6][0].genero,
+                    total_associacoes: Number(r[6][0].total_associacoes),
+                    segundo_genero: segundoGenero,
+                    vantagem_pct: vantagemGenero
+                };
+            }
+
+            // Os gráficos vão do jeito que vieram das views (o front converte e formata)
+            res.json({
+                kpis: kpis,
+                graficos: {
+                    notaGenero: notaGenero,
+                    notaPais: notaPais,
+                    palavras: palavras
+                }
+            });
+        })
+        .catch(function (erro) {
+            console.log(erro);
+            next(erro);
+        });
+}
+
+
 module.exports = {
     produtorGeral,
-    produtorEspecifica
+    produtorEspecifica,
+    roteiristaGeral
 };

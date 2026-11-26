@@ -12,6 +12,9 @@ router.get("/produtor/especifica", function (req, res, next) {
     dashboardsController.produtorEspecifica(req, res, next);
 });
 
+router.get("/roteirista/geral", function (req, res, next) {
+    dashboardsController.roteiristaGeral(req, res, next);
+});
 
 
 module.exports = router;
