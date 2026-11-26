@@ -22,8 +22,8 @@ public class Main {
         EmailConfig config = new EmailConfig(
                 "smtp.gmail.com",
                 "587",
-                dotenv.get("EMAIL"),
-                dotenv.get("PASSWORD")
+                config("EMAIL"),
+                config("PASSWORD")
         );
 
 
@@ -54,5 +54,10 @@ public class Main {
             }
         }, 0, 15, TimeUnit.SECONDS);
 
+    }
+
+    private static String config(String key) {
+        String value = System.getenv(key);
+        return value != null && !value.isBlank() ? value : dotenv.get(key);
     }
 }

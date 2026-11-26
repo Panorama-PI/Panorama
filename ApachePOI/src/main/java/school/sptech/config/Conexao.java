@@ -8,16 +8,17 @@ import java.sql.SQLException;
 
 public class Conexao {
 
-    private static final String URL = Dotenv.load().get("DATABASE_URL");
-    private static final String USER = Dotenv.load().get("DATABASE_USER");
-    private static final String PASS = Dotenv.load().get("DATABASE_PASS");
+    private static final Dotenv DOTENV = Dotenv.configure().ignoreIfMissing().load();
+    private static final String URL = config("DATABASE_URL");
+    private static final String USER = config("DATABASE_USER");
+    private static final String PASS = config("DATABASE_PASS");
 
-    public static Connection Conexao(){
-        try{
-            return DriverManager.getConnection(URL, USER, PASS);
-        } catch (SQLException e) {
-            System.out.println("Erro ao se conectar no banco de dados " + e.getMessage());
-            return null;
-        }
+    private static String config(String key) {
+        String value = System.getenv(key);
+        return value != null && !value.isBlank() ? value : DOTENV.get(key);
+    }
+
+    public static Connection Conexao() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASS);
     }
 }

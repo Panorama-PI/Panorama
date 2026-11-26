@@ -107,6 +107,7 @@ public class FilmeDAO {
 
         } catch (SQLException e) {
             System.err.println("❌ Erro no banco de dados: " + e.getMessage());
+            throw new RuntimeException("Falha ao importar os filmes.", e);
         }
     }
 }

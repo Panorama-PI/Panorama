@@ -8,15 +8,21 @@ import javax.sql.DataSource;
 
 public class ConnectionProvider {
 
+    private static final Dotenv DOTENV = Dotenv.configure().ignoreIfMissing().load();
     private final DataSource dataSource;
 
     public ConnectionProvider() {
         BasicDataSource basicDataSource = new BasicDataSource();
-        basicDataSource.setUrl(Dotenv.load().get("DB_URL"));
-        basicDataSource.setUsername(Dotenv.load().get("DB_USER"));
-        basicDataSource.setPassword(Dotenv.load().get("DB_PASSWORD"));
+        basicDataSource.setUrl(config("DB_URL"));
+        basicDataSource.setUsername(config("DB_USER"));
+        basicDataSource.setPassword(config("DB_PASSWORD"));
 
         this.dataSource = basicDataSource;
+    }
+
+    private static String config(String key) {
+        String value = System.getenv(key);
+        return value != null && !value.isBlank() ? value : DOTENV.get(key);
     }
 
     public JdbcTemplate getConnection(){

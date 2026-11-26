@@ -1,0 +1,8 @@
+.env
+.env.*
+target
+jar
+.idea
+*.iml
+*.xlsx
+*.xls

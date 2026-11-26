@@ -1,0 +1,77 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-filmes_db}
+      MYSQL_USER: ${DB_USER:?Configure DB_USER em .env.docker}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Configure DB_PASSWORD em .env.docker}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Configure MYSQL_ROOT_PASSWORD em .env.docker}
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/database/script_panorama.sql:/docker-entrypoint-initdb.d/01-panorama.sql:ro
+      - ./src/database/migration_projeto_genero.sql:/docker-entrypoint-initdb.d/02-projeto-genero.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+  apachepoi:
+    build:
+      context: ./ApachePOI
+      dockerfile: Dockerfile
+    profiles: ["import"]
+    restart: "no"
+    working_dir: /data
+    environment:
+      DATABASE_URL: jdbc:mysql://db:3306/${DB_DATABASE:-filmes_db}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DATABASE_USER: ${DB_USER:?Configure DB_USER em .env.docker}
+      DATABASE_PASS: ${DB_PASSWORD:?Configure DB_PASSWORD em .env.docker}
+      AWS_REGION: ${AWS_REGION:?Configure AWS_REGION em .env.docker}
+      S3_BUCKET: ${S3_BUCKET:?Configure S3_BUCKET em .env.docker}
+      S3_OBJECT_KEY: ${S3_OBJECT_KEY:?Configure S3_OBJECT_KEY em .env.docker}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  site:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      AMBIENTE_PROCESSO: producao
+      APP_PORT: 3333
+      DB_HOST: db
+      DB_DATABASE: ${DB_DATABASE:-filmes_db}
+      DB_USER: ${DB_USER:?Configure DB_USER em .env.docker}
+      DB_PASSWORD: ${DB_PASSWORD:?Configure DB_PASSWORD em .env.docker}
+      DB_PORT: 3306
+      AWS_EC2_METADATA_DISABLED: "true"
+    ports:
+      - "${APP_PUBLIC_PORT:-8080}:3333"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  javamail:
+    build:
+      context: ./java-mail
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:mysql://db:3306/${DB_DATABASE:-filmes_db}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USER: ${DB_USER:?Configure DB_USER em .env.docker}
+      DB_PASSWORD: ${DB_PASSWORD:?Configure DB_PASSWORD em .env.docker}
+      EMAIL: ${EMAIL:?Configure EMAIL em .env.docker}
+      PASSWORD: ${EMAIL_APP_PASSWORD:?Configure EMAIL_APP_PASSWORD em .env.docker}
+      AWS_EC2_METADATA_DISABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
