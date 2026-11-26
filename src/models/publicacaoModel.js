@@ -29,7 +29,7 @@ function buscarPublicacoes(idEmpresa, idProdutor) {
 function salvarAvaliacao(idPublicacao, idProdutor, nota) {
     return database.executarTransacao(async function ({ query }) {
         const publicacaoElegivel = await query(`
-            SELECT p.id
+            SELECT p.id, roteirista.notificacao
             FROM publicacao AS p
             INNER JOIN usuario AS roteirista ON roteirista.id = p.usuario_id
             INNER JOIN usuario AS produtor ON produtor.id = ?
@@ -40,6 +40,8 @@ function salvarAvaliacao(idPublicacao, idProdutor, nota) {
         `, [idProdutor, idPublicacao]);
 
         if (publicacaoElegivel.length === 0) return false;
+
+        const enviarNotificacao = Number(publicacaoElegivel[0].notificacao) === 1;
 
         const avaliacaoExistente = await query(`
             SELECT id
@@ -53,14 +55,14 @@ function salvarAvaliacao(idPublicacao, idProdutor, nota) {
         if (avaliacaoExistente.length > 0) {
             await query(`
                 UPDATE avaliacao
-                SET texto = ?
+                SET texto = ?, status_enviado = ?
                 WHERE id = ?;
-            `, [nota, avaliacaoExistente[0].id]);
+            `, [nota, enviarNotificacao ? 3 : 1, avaliacaoExistente[0].id]);
         } else {
             await query(`
-                INSERT INTO avaliacao (publicacao_id, autor_id, texto)
-                VALUES (?, ?, ?);
-            `, [idPublicacao, idProdutor, nota]);
+                INSERT INTO avaliacao (publicacao_id, autor_id, texto, status_enviado)
+                VALUES (?, ?, ?, ?);
+            `, [idPublicacao, idProdutor, nota, enviarNotificacao ? 2 : 1]);
         }
 
         return true;
@@ -108,9 +110,33 @@ function buscarRoteiristas(idEmpresa) {
     return database.executar(sql);
 }
 
+function buscarNotificacaoProdutor(idProdutor) {
+    return database.executar(`
+        SELECT notificacao, horario_inicio, horario_fim
+        FROM usuario
+        WHERE id = ? AND perfil_id = 1;
+    `, [idProdutor]);
+}
+
+function atualizarNotificacaoProdutor(idProdutor, ativo, horarioInicio, horarioFim) {
+    if (ativo !== undefined) {
+        return database.executar(`
+            UPDATE usuario SET notificacao = ?
+            WHERE id = ? AND perfil_id = 1;
+        `, [ativo ? 1 : 0, idProdutor]);
+    }
+
+    return database.executar(`
+        UPDATE usuario SET horario_inicio = ?, horario_fim = ?
+        WHERE id = ? AND perfil_id = 1;
+    `, [horarioInicio, horarioFim, idProdutor]);
+}
+
 module.exports = {
     buscarPublicacoes,
     salvarAvaliacao,
     buscarPublicacoesAnotacoes,
-    buscarRoteiristas
+    buscarRoteiristas,
+    buscarNotificacaoProdutor,
+    atualizarNotificacaoProdutor
 };

@@ -96,14 +96,14 @@ public class EmailService {
             System.out.println("[DEBUG] enviando email de avaliação...");
 
 
-            if (Integer.valueOf(0).equals(status)) {
+            if (Integer.valueOf(0).equals(status) || Integer.valueOf(2).equals(status)) {
                 dispararEmail(
                         roteirista.getEmail(),
                         "Um produtor da sua empresa te mandou uma avaliação da publicação",
                         EmailTemplates.htmlAvaliacao(roteirista, produtor, empresa, avaliacao.getNota())
                 );
                 new AvaliacaoDao().marcarComoEnviado(avaliacao.getIdAvaliacao());
-            } else if (Integer.valueOf(2).equals(status)) {
+            } else if (Integer.valueOf(3).equals(status)) {
                 dispararEmail(
                         roteirista.getEmail(),
                         "Um produtor da sua empresa te editou uma avaliação da publicação",
