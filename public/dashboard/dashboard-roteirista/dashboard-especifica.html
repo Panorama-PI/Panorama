@@ -75,15 +75,7 @@
             <label for="select_genero">
                 Gênero selecionado:
 
-                <select id="select_genero">
-                    <option value="Ficção Científica">Ficção Científica</option>
-                    <option value="Romance">Romance</option>
-                    <option value="Aventura">Aventura</option>
-                    <option value="Drama">Drama</option>
-                    <option value="Comédia">Comédia</option>
-                    <option value="Ação">Ação</option>
-                    <option value="Terror">Terror</option>
-                </select>
+                <select id="select_genero"></select>
             </label>
 
         </section>
@@ -94,15 +86,13 @@
 
                 <p>Percentual de filmes com avaliações positivas</p>
 
-                <h2>72%</h2>
+                <h2 id="kpi-positivas-titulo">Carregando...</h2>
 
                 <span class="valor-kpi">
                     <small>Notas acima de</small> 8,0
                 </span>
 
-                <span class="comparacao-kpi">
-                    20% acima da referência
-                </span>
+                <span class="comparacao-kpi" id="kpi-positivas-detalhe">&nbsp;</span>
 
             </div>
 
@@ -110,15 +100,13 @@
 
                 <p>País com melhor média de avaliações</p>
 
-                <h2>Estados Unidos</h2>
+                <h2 id="kpi-pais-titulo">Carregando...</h2>
 
                 <span class="valor-kpi">
-                    8,7 <small>estrelas IMDb</small>
+                    <span id="kpi-pais-valor">&nbsp;</span> <small>estrelas IMDb</small>
                 </span>
 
-                <span class="comparacao-kpi">
-                    4,8% acima do 2º lugar
-                </span>
+                <span class="comparacao-kpi" id="kpi-pais-detalhe">&nbsp;</span>
 
             </div>
 
@@ -126,15 +114,13 @@
 
                 <p>Palavra mais recorrente nas sinopses</p>
 
-                <h2>Genialidade</h2>
+                <h2 id="kpi-palavra-titulo">Carregando...</h2>
 
                 <span class="valor-kpi">
-                    80 <small>aparições</small>
+                    <span id="kpi-palavra-valor">&nbsp;</span> <small>sinopses</small>
                 </span>
 
-                <span class="comparacao-kpi">
-                    14,3% acima do 2º lugar
-                </span>
+                <span class="comparacao-kpi" id="kpi-palavra-detalhe">&nbsp;</span>
 
             </div>
 
@@ -142,15 +128,13 @@
 
                 <p>Gênero com maior frequência de associações</p>
 
-                <h2>Aventura</h2>
+                <h2 id="kpi-associado-titulo">Carregando...</h2>
 
                 <span class="valor-kpi">
-                    80% <small>de associação</small>
+                    <span id="kpi-associado-valor">&nbsp;</span> <small>de associação</small>
                 </span>
 
-                <span class="comparacao-kpi">
-                    11,1% acima do 2º lugar
-                </span>
+                <span class="comparacao-kpi" id="kpi-associado-detalhe">&nbsp;</span>
 
             </div>
 
@@ -187,7 +171,29 @@
         preencherUsuario();
 
         const selectGenero = document.getElementById('select_genero');
-        const kpiRelacionado = document.getElementById('kpi-relacionado');
+
+        // O select mostra o gênero em português; o value é o nome do gênero no banco (inglês)
+        function preencherSelectGeneros() {
+            selectGenero.innerHTML = '';
+
+            Object.keys(GENEROS_PT).forEach(function (generoIngles) {
+                const option = document.createElement('option');
+                option.value = generoIngles;
+                option.textContent = GENEROS_PT[generoIngles];
+                selectGenero.appendChild(option);
+            });
+        }
+
+        preencherSelectGeneros();
+
+        // Texto exibido no select (português)
+        function nomeGeneroSelecionado() {
+            return selectGenero.options[selectGenero.selectedIndex].text;
+        }
+
+        // Os dados vêm da API: GET /dashboards/roteirista/especifica?genero=<nome no banco>
+        // (views vw_rot_esp_*). Todos os gráficos e KPIs são filtrados pelo gênero do select.
+        // Os gráficos são criados vazios abaixo e preenchidos em carregarGenero().
 
         /*
          * LINHA DE REFERÊNCIA DA MÉDIA
@@ -196,7 +202,7 @@
         const linhaReferencia80 = {
             id: 'linhaReferencia80',
 
-            afterDraw(chart) {
+            afterDraw(chart, args, opcoes) {
 
                 const valores = chart.data.datasets[0].data;
 
@@ -208,7 +214,11 @@
                     soma += valores[i];
                 }
 
-                const media = soma / valores.length;
+                // Usa a média vinda da view do banco; se não vier, calcula a dos valores plotados
+                let media = soma / valores.length;
+                if (opcoes && typeof opcoes.valor === 'number') {
+                    media = opcoes.valor;
+                }
 
                 const ctx = chart.ctx;
                 const area = chart.chartArea;
@@ -264,16 +274,10 @@
                 type: 'bar',
 
                 data: {
-                    labels: [
-                        'Estados Unidos',
-                        'Japão',
-                        'Reino Unido',
-                        'Canadá',
-                        'Brasil'
-                    ],
+                    labels: [],
 
                     datasets: [{
-                        data: [8.7, 8.3, 8.0, 7.6, 7.2],
+                        data: [],
 
                         backgroundColor: COR_ROSA_BARRA,
                         borderRadius: {
@@ -300,7 +304,7 @@
                             'Avaliação média por país de origem (IMDb)'
                         ),
 
-                        subtitle: subtituloGrafico(selectGenero.value),
+                        subtitle: subtituloGrafico(nomeGeneroSelecionado()),
 
                         tooltip: {
                             callbacks: {
@@ -346,13 +350,19 @@
         const pluginMediaHorizontal = {
             id: 'pluginMediaHorizontal',
 
-            afterDraw(chart) {
+            afterDraw(chart, args, opcoes) {
 
                 const valores = chart.data.datasets[0].data;
 
                 if (!valores || valores.length === 0) return;
 
-                const media = valores.reduce((soma, valor) => soma + valor, 0) / valores.length;
+                let media = valores.reduce((soma, valor) => soma + valor, 0) / valores.length;
+                if (opcoes && typeof opcoes.valor === 'number') {
+                    media = opcoes.valor;
+                }
+
+                // "%" só no gráfico de gêneros associados (opcoes.sufixo); o de palavras é contagem
+                const sufixo = (opcoes && opcoes.sufixo) ? opcoes.sufixo : '';
 
                 const ctx = chart.ctx;
                 const area = chart.chartArea;
@@ -375,7 +385,7 @@
                 ctx.textAlign = 'left';
 
                 ctx.fillText(
-                    `Média: ${media.toFixed(1).replace('.', ',')}%`,
+                    `Média: ${media.toFixed(1).replace('.', ',')}${sufixo}`,
                     x + 5,
                     area.top + 12
                 );
@@ -394,16 +404,10 @@
                 ],
 
                 data: {
-                    labels: [
-                        'Aventura',
-                        'Ação',
-                        'Terror',
-                        'Comédia',
-                        'Drama'
-                    ],
+                    labels: [],
 
                     datasets: [{
-                        data: [80, 72, 63, 47, 35],
+                        data: [],
 
                         backgroundColor: 'rgba(255, 107, 107, 0.16)',
                         borderColor: COR_ROSA_BARRA,
@@ -424,11 +428,13 @@
                             display: false
                         },
 
+                        pluginMediaHorizontal: { sufixo: '%' },
+
                         title: tituloGrafico(
                             'Proporção de gêneros associados (%)'
                         ),
 
-                        subtitle: subtituloGrafico(selectGenero.value),
+                        subtitle: subtituloGrafico(nomeGeneroSelecionado()),
 
                         tooltip: {
                             callbacks: {
@@ -484,16 +490,10 @@
                 ],
 
                 data: {
-                    labels: [
-                        'Genialidade',
-                        'Surpresa',
-                        'Passado',
-                        'Investigação',
-                        'Curiosidade'
-                    ],
+                    labels: [],
 
                     datasets: [{
-                        data: [80, 70, 55, 42, 35],
+                        data: [],
 
                         backgroundColor: 'rgba(255, 107, 107, 0.10)',
                         borderColor: COR_ROSA_BARRA,
@@ -518,12 +518,12 @@
                             'Elementos narrativos mais frequentes nas sinopses'
                         ),
 
-                        subtitle: subtituloGrafico(selectGenero.value),
+                        subtitle: subtituloGrafico(nomeGeneroSelecionado()),
 
                         tooltip: {
                             callbacks: {
                                 label: (ctx) =>
-                                    ` ${ctx.parsed.x} ocorrências`
+                                    ` ${ctx.parsed.x} sinopses`
                             }
                         }
                     },
@@ -531,7 +531,6 @@
                     scales: {
                         x: {
                             min: 0,
-                            max: 100,
                             beginAtZero: true,
 
                             grid: {
@@ -545,7 +544,7 @@
 
                             title: {
                                 display: true,
-                                text: 'Quantidade de aparições',
+                                text: 'Sinopses que contêm a palavra',
                                 color: '#FFFFFF',
                                 font: {
                                     size: 12
@@ -588,7 +587,7 @@
                     ],
 
                     datasets: [{
-                        data: [12, 25, 31, 26, 6],
+                        data: [],
 
                         backgroundColor: [
                             '#7C2D35',
@@ -623,7 +622,7 @@
                             align: 'center',
 
                             formatter: (value) => {
-                                return value > 5 ? `${value}%` : '';
+                                return value > 5 ? `${formatarNumero(value, 0)}%` : '';
                             }
                         },
 
@@ -640,12 +639,12 @@
                             'Distribuição das avaliações por faixa de nota'
                         ),
 
-                        subtitle: subtituloGrafico(selectGenero.value),
+                        subtitle: subtituloGrafico(nomeGeneroSelecionado()),
 
                         tooltip: {
                             callbacks: {
                                 label: (ctx) =>
-                                    ` ${ctx.label}: ${ctx.parsed}%`
+                                    ` ${ctx.label}: ${formatarNumero(ctx.parsed, 1)}%`
                             }
                         }
                     }
@@ -655,8 +654,154 @@
 
 
         /*
-         * ALTERAÇÃO DO GÊNERO SELECIONADO
+         * INTEGRAÇÃO COM O BANCO
          */
+
+        function preencherKpis(kpis) {
+            // KPI 1: % de filmes com nota acima de 8,0 (referência = todos os gêneros)
+            var positivas = kpis.pctPositivas;
+
+            if (positivas === null) {
+                setTexto('kpi-positivas-titulo', 'Sem dados');
+                setTexto('kpi-positivas-detalhe', '');
+            } else {
+                setTexto('kpi-positivas-titulo', formatarNumero(positivas.pct_positivas, 0) + '%');
+
+                if (positivas.vantagem_pct !== null) {
+                    setTexto('kpi-positivas-detalhe', comSinal(positivas.vantagem_pct) + '% vs. a referência de todos os gêneros (' + formatarNumero(positivas.pct_referencia, 0) + '%)');
+                } else {
+                    setTexto('kpi-positivas-detalhe', '');
+                }
+            }
+
+            // KPI 2: país com melhor média de avaliações
+            var pais = kpis.paisMelhorNota;
+
+            if (pais === null) {
+                setTexto('kpi-pais-titulo', 'Sem dados');
+                setTexto('kpi-pais-valor', '-');
+                setTexto('kpi-pais-detalhe', '');
+            } else {
+                setTexto('kpi-pais-titulo', pais.pais);
+                setTexto('kpi-pais-valor', formatarNumero(pais.nota_media));
+
+                if (pais.vantagem_pct !== null) {
+                    setTexto('kpi-pais-detalhe', comSinal(pais.vantagem_pct, 1) + '% acima do 2º lugar (' + pais.segundo_pais + ')');
+                } else {
+                    setTexto('kpi-pais-detalhe', '');
+                }
+            }
+
+            // KPI 3: palavra mais recorrente nas sinopses (palavras em inglês, como estão no banco)
+            var palavra = kpis.palavraMaisRecorrente;
+
+            if (palavra === null) {
+                setTexto('kpi-palavra-titulo', 'Sem dados');
+                setTexto('kpi-palavra-valor', '-');
+                setTexto('kpi-palavra-detalhe', '');
+            } else {
+                setTexto('kpi-palavra-titulo', palavra.palavra);
+                setTexto('kpi-palavra-valor', palavra.aparicoes);
+
+                if (palavra.vantagem_pct !== null) {
+                    setTexto('kpi-palavra-detalhe', comSinal(palavra.vantagem_pct, 1) + '% acima do 2º lugar (' + palavra.segunda_palavra + ')');
+                } else {
+                    setTexto('kpi-palavra-detalhe', '');
+                }
+            }
+
+            // KPI 4: gênero com maior frequência de associações
+            var associado = kpis.generoAssociado;
+
+            if (associado === null) {
+                setTexto('kpi-associado-titulo', 'Sem dados');
+                setTexto('kpi-associado-valor', '-');
+                setTexto('kpi-associado-detalhe', '');
+            } else {
+                setTexto('kpi-associado-titulo', traduzirGenero(associado.genero));
+                setTexto('kpi-associado-valor', formatarNumero(associado.percentual, 0) + '%');
+
+                if (associado.vantagem_pct !== null) {
+                    setTexto('kpi-associado-detalhe', comSinal(associado.vantagem_pct, 1) + '% acima do 2º lugar (' + traduzirGenero(associado.segundo_genero) + ')');
+                } else {
+                    setTexto('kpi-associado-detalhe', '');
+                }
+            }
+        }
+
+        // Troca rótulos e valores de um gráfico já criado.
+        // "plugin" é o id do plugin de linha de média do gráfico e "media" o valor da linha
+        // (null = o plugin calcula a média dos valores plotados).
+        function atualizarGraficoRoteirista(grafico, plugin, rotulos, valores, media) {
+            grafico.data.labels = rotulos;
+            grafico.data.datasets[0].data = valores;
+
+            if (plugin !== null) {
+                grafico.options.plugins[plugin] = Object.assign({}, grafico.options.plugins[plugin], { valor: media });
+            }
+
+            grafico.update();
+        }
+
+        // A view só devolve as faixas que têm filme: monta sempre as 5 posições (0-2 a 8-10)
+        // usando a coluna "ordem" (1 a 5); faixa sem filme fica com 0%
+        function pegarFaixas(linhas) {
+            var lista = [0, 0, 0, 0, 0];
+
+            for (var i = 0; i < linhas.length; i++) {
+                lista[Number(linhas[i].ordem) - 1] = Number(linhas[i].percentual);
+            }
+
+            return lista;
+        }
+
+        function preencherGraficos(g) {
+            atualizarGraficoRoteirista(chartPaisAvaliacao, 'linhaReferencia80',
+                pegarPaises(g.notaPais),
+                pegarNumeros(g.notaPais, 'nota_media', 1),
+                pegarMedia(g.notaPais, 'media_genero', 1));
+
+            atualizarGraficoRoteirista(chartGenerosRelacionados, 'pluginMediaHorizontal',
+                pegarTextos(g.generosAssociados, 'genero_associado').map(traduzirGenero),
+                pegarNumeros(g.generosAssociados, 'percentual', 1),
+                null);
+
+            atualizarGraficoRoteirista(chartElementosSinopse, 'pluginMediaHorizontal',
+                pegarTextos(g.palavras, 'palavra'),
+                pegarNumeros(g.palavras, 'ocorrencias', 1),
+                null);
+
+            atualizarGraficoRoteirista(chartDistribuicaoAvaliacoes, null,
+                chartDistribuicaoAvaliacoes.data.labels,
+                pegarFaixas(g.distribuicaoNotas),
+                null);
+        }
+
+        function carregarGenero() {
+            const genero = selectGenero.value;
+
+            graficosFiltrados.forEach(grafico => {
+                grafico.options.plugins.subtitle.text = nomeGeneroSelecionado();
+            });
+
+            // Trava o select enquanto carrega, para não misturar respostas de gêneros diferentes
+            selectGenero.disabled = true;
+
+            buscarDados('/dashboards/roteirista/especifica?genero=' + encodeURIComponent(genero))
+                .then(function (dados) {
+                    preencherKpis(dados.kpis);
+                    preencherGraficos(dados.graficos);
+                    selectGenero.disabled = false;
+                })
+                .catch(function (erro) {
+                    console.error('Erro ao carregar a dashboard específica do roteirista:', erro);
+                    setTexto('kpi-positivas-titulo', 'Erro ao carregar');
+                    setTexto('kpi-pais-titulo', 'Erro ao carregar');
+                    setTexto('kpi-palavra-titulo', 'Erro ao carregar');
+                    setTexto('kpi-associado-titulo', 'Erro ao carregar');
+                    selectGenero.disabled = false;
+                });
+        }
 
         const graficosFiltrados = [
             chartPaisAvaliacao,
@@ -665,21 +810,8 @@
             chartDistribuicaoAvaliacoes
         ];
 
-        function mudarGenero() {
-
-            const genero = selectGenero.value;
-
-            kpiRelacionado.innerText = `Relacionado a ${genero}`;
-
-            graficosFiltrados.forEach(grafico => {
-
-                grafico.options.plugins.subtitle.text = genero;
-
-                grafico.update();
-            });
-        }
-
-        selectGenero.addEventListener('change', mudarGenero);
+        selectGenero.addEventListener('change', carregarGenero);
+        carregarGenero();
 
     </script>
 

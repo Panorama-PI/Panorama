@@ -207,11 +207,147 @@ function produtorEspecifica(req, res, next) {
         });
 }
 
+// ---------------------------------------------------------------------
+// ROTEIRISTA
+// ---------------------------------------------------------------------
+
+// Quanto "valor" está acima de "base", em % (ex.: 8,4 vs 7,6 -> 10,5).
+// Devolve null quando não dá para calcular (base zerada ou ausente).
+function calcularVantagem(valor, base, casas) {
+    if (base === null || base === undefined || Number(base) <= 0) {
+        return null;
+    }
+
+    var fator = Math.pow(10, casas);
+    return Math.round((Number(valor) / Number(base) - 1) * 100 * fator) / fator;
+}
+
+function roteiristaEspecifica(req, res, next) {
+    var genero = req.query.genero;
+
+    if (!genero || typeof genero !== "string" || genero.trim() === "" || genero.length > 100) {
+        return next(new BadRequestError("Informe o gênero na query string (?genero=Action)."));
+    }
+
+    genero = genero.trim();
+
+    Promise.all([
+        dashboardsModel.roteiristaEspecificaNotaPais(genero, LIMITE_TOP),             // r[0]
+        dashboardsModel.roteiristaEspecificaGenerosAssociados(genero, LIMITE_TOP),    // r[1]
+        dashboardsModel.roteiristaEspecificaPalavras(genero, LIMITE_TOP),             // r[2]
+        dashboardsModel.roteiristaEspecificaDistribuicaoNotas(genero),                // r[3]
+        dashboardsModel.roteiristaEspecificaKpiPctPositivas(genero),                  // r[4]
+        dashboardsModel.roteiristaEspecificaPctPositivasReferencia(),                 // r[5]
+        dashboardsModel.roteiristaEspecificaKpiPaisMelhorNota(genero),                // r[6]
+        dashboardsModel.roteiristaEspecificaKpiPalavraRecorrente(genero),             // r[7]
+        dashboardsModel.roteiristaEspecificaKpiGeneroAssociado(genero)                // r[8]
+    ])
+        .then(function (r) {
+            var notaPais = r[0];
+            var generosAssociados = r[1];
+            var palavras = r[2];
+
+            var kpis = {
+                pctPositivas: null,
+                paisMelhorNota: null,
+                palavraMaisRecorrente: null,
+                generoAssociado: null
+            };
+
+            // KPI 1: % de filmes com avaliação positiva (compara com o % de todos os gêneros)
+            if (r[4].length > 0) {
+                var referencia = null;
+
+                if (r[5].length > 0 && r[5][0].pct_referencia !== null) {
+                    referencia = Number(r[5][0].pct_referencia);
+                }
+
+                kpis.pctPositivas = {
+                    pct_positivas: Number(r[4][0].pct_positivas),
+                    qtd_positivas: Number(r[4][0].qtd_positivas),
+                    qtd_filmes: Number(r[4][0].qtd_filmes),
+                    pct_referencia: referencia,
+                    vantagem_pct: calcularVantagem(r[4][0].pct_positivas, referencia, 0)
+                };
+            }
+
+            // KPI 2: país com melhor média (compara com o 2º colocado do gráfico)
+            if (r[6].length > 0) {
+                var segundoPais = null;
+                var vantagemPais = null;
+
+                if (notaPais.length > 1) {
+                    segundoPais = notaPais[1].pais;
+                    vantagemPais = calcularVantagem(r[6][0].nota_media, notaPais[1].nota_media, 1);
+                }
+
+                kpis.paisMelhorNota = {
+                    pais: r[6][0].pais,
+                    nota_media: Number(r[6][0].nota_media),
+                    segundo_pais: segundoPais,
+                    vantagem_pct: vantagemPais
+                };
+            }
+
+            // KPI 3: palavra mais recorrente (compara com o 2º colocado do gráfico)
+            if (r[7].length > 0) {
+                var segundaPalavra = null;
+                var vantagemPalavra = null;
+
+                if (palavras.length > 1) {
+                    segundaPalavra = palavras[1].palavra;
+                    vantagemPalavra = calcularVantagem(r[7][0].ocorrencias, palavras[1].ocorrencias, 1);
+                }
+
+                kpis.palavraMaisRecorrente = {
+                    palavra: r[7][0].palavra,
+                    ocorrencias: Number(r[7][0].ocorrencias),
+                    segunda_palavra: segundaPalavra,
+                    vantagem_pct: vantagemPalavra
+                };
+            }
+
+            // KPI 4: gênero mais associado (compara com o 2º colocado do gráfico)
+            if (r[8].length > 0) {
+                var segundoGenero = null;
+                var vantagemGenero = null;
+
+                if (generosAssociados.length > 1) {
+                    segundoGenero = generosAssociados[1].genero_associado;
+                    vantagemGenero = calcularVantagem(r[8][0].percentual, generosAssociados[1].percentual, 1);
+                }
+
+                kpis.generoAssociado = {
+                    genero: r[8][0].genero_associado,
+                    percentual: Number(r[8][0].percentual),
+                    segundo_genero: segundoGenero,
+                    vantagem_pct: vantagemGenero
+                };
+            }
+
+            res.json({
+                genero: genero,
+                kpis: kpis,
+                graficos: {
+                    notaPais: notaPais,
+                    generosAssociados: generosAssociados,
+                    palavras: palavras,
+                    distribuicaoNotas: r[3]
+                }
+            });
+        })
+        .catch(function (erro) {
+            console.log(erro);
+            next(erro);
+        });
+}
+
 
 
 
 
 module.exports = {
     produtorGeral,
-    produtorEspecifica
+    produtorEspecifica,
+    roteiristaEspecifica
 };
