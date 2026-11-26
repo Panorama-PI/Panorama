@@ -5,13 +5,21 @@ const httpErrorNames = {
   422: 'Unprocessable Entity',
   500: 'Internal Server Error',
   401: 'Unauthorized', // Adicionado para cobrir a classe que criamos
-  403: 'Forbidden'    // Adicionado para cobrir a classe que criamos
+  403: 'Forbidden',    // Adicionado para cobrir a classe que criamos
+  413: 'Payload Too Large',
+  415: 'Unsupported Media Type'
 };
 
 // Interceptor global de erros de requisições
 const errorHandler = (err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
+  // O Express/body-parser costuma preencher `status` (por exemplo, JSON
+  // malformado), enquanto os erros da aplicação usam `statusCode`.
+  const statusCode = Number(err.statusCode || err.status) || 500;
   const isProduction = process.env.AMBIENTE_PROCESSO === "producao";
+
+  if (res.headersSent) {
+    return next(err);
+  }
 
   console.error(`[${new Date().toISOString()}] Erro em ${req.method} ${req.originalUrl}:`, {
     message: err.message,
@@ -24,7 +32,9 @@ const errorHandler = (err, req, res, next) => {
     : (httpErrorNames[statusCode] || 'Internal Server Error');
 
   // Mensagem segura para o cliente
-  const errorMessage = err.isOperational || !isProduction
+  // Não exponha detalhes de falhas 5xx, mesmo quando encapsuladas em
+  // InternalServerError (que também é marcado como operacional).
+  const errorMessage = (!isProduction || (err.isOperational && statusCode < 500))
     ? err.message
     : 'Ocorreu um erro interno no servidor.';
 
@@ -32,7 +42,7 @@ const errorHandler = (err, req, res, next) => {
     statusCode,
     error: errorTitle,
     message: errorMessage,
-    ...(err.details && { details: err.details }),
+    ...(err.details && (!isProduction || statusCode < 500) && { details: err.details }),
     ...(!isProduction && {stack: err.stack}),
   });
 }

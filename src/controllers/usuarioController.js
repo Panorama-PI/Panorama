@@ -5,9 +5,8 @@ var tokenModel = require("../models/tokenModel");
 const { 
     BadRequestError, 
     NotFoundError, 
-    ConflictError, 
-    UnauthorizedError, 
-    ForbiddenError 
+    ConflictError,
+    UnauthorizedError
 } = require("../errors");
 
 // Token de convite: 4 a 64 caracteres (letras, números, _ e -).
@@ -141,7 +140,7 @@ function autenticar(req, res, next) { // <-- Adicionado 'next'
 
             // Nenhum usuário com os dados informados.
             if (resultadoAutenticar.length == 0) {
-                return next(new ForbiddenError("Email e/ou senha inválido(s)"));
+                return next(new UnauthorizedError("E-mail e/ou senha inválidos."));
             }
 
             // Vários usuários com os mesmos dados de login.

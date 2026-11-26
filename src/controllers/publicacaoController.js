@@ -138,9 +138,74 @@ function buscarRoteiristas(req, res, next) { // <-- Adicionado 'next'
         });
 }
 
+function obterIdProdutorNotificacao(req) {
+    const idProdutor = Number(req.params.idProdutor);
+    if (!Number.isSafeInteger(idProdutor) || idProdutor <= 0) {
+        throw new BadRequestError("O ID do produtor é inválido.");
+    }
+    return idProdutor;
+}
+
+function buscarNotificacaoProdutor(req, res, next) {
+    try {
+        const idProdutor = obterIdProdutorNotificacao(req);
+        publicacaoModel.buscarNotificacaoProdutor(idProdutor)
+            .then((resultado) => {
+                if (!resultado.length) return next(new NotFoundError("Produtor não encontrado."));
+                const dados = resultado[0];
+                return res.status(200).json({
+                    sucesso: true,
+                    notificacao: Number(dados.notificacao) === 1,
+                    preferencias: { horario_inicio: dados.horario_inicio, horario_fim: dados.horario_fim }
+                });
+            })
+            .catch(next);
+    } catch (erro) { next(erro); }
+}
+
+function atualizarNotificacaoProdutor(req, res, next) {
+    try {
+        const idProdutor = obterIdProdutorNotificacao(req);
+        const corpo = req.body || {};
+        const temAtivo = Object.prototype.hasOwnProperty.call(corpo, "ativo");
+        const temHorarios = Object.prototype.hasOwnProperty.call(corpo, "horario_inicio") ||
+            Object.prototype.hasOwnProperty.call(corpo, "horario_fim");
+        if (temAtivo === temHorarios) {
+            throw new BadRequestError("Informe a notificação ou os horários que deseja atualizar.");
+        }
+        if (temAtivo && typeof corpo.ativo !== "boolean") {
+            throw new BadRequestError("O campo ativo deve ser verdadeiro ou falso.");
+        }
+        if (temHorarios) {
+            const formato = /^([01]\d|2[0-3]):[0-5]\d$/;
+            if (typeof corpo.horario_inicio !== "string" || !formato.test(corpo.horario_inicio) ||
+                typeof corpo.horario_fim !== "string" || !formato.test(corpo.horario_fim) ||
+                corpo.horario_inicio >= corpo.horario_fim) {
+                throw new BadRequestError("Informe um intervalo de horários válido.");
+            }
+        }
+        publicacaoModel.atualizarNotificacaoProdutor(
+            idProdutor, temAtivo ? corpo.ativo : undefined,
+            corpo.horario_inicio, corpo.horario_fim
+        ).then(() => publicacaoModel.buscarNotificacaoProdutor(idProdutor))
+            .then((resultado) => {
+                if (!resultado.length) return next(new NotFoundError("Produtor não encontrado."));
+                const dados = resultado[0];
+                return res.status(200).json({
+                    sucesso: true,
+                    mensagem: temAtivo ? "Preferência de notificação atualizada com sucesso." : "Preferências salvas com sucesso.",
+                    notificacao: Number(dados.notificacao) === 1,
+                    preferencias: { horario_inicio: dados.horario_inicio, horario_fim: dados.horario_fim }
+                });
+            }).catch(next);
+    } catch (erro) { next(erro); }
+}
+
 module.exports = {
     buscarPublicacoes,
     salvarAvaliacao,
     buscarPublicacoesAnotacoes,
-    buscarRoteiristas
+    buscarRoteiristas,
+    buscarNotificacaoProdutor,
+    atualizarNotificacaoProdutor
 };
