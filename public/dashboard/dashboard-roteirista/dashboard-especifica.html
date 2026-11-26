@@ -701,7 +701,7 @@
                 setTexto('kpi-palavra-detalhe', '');
             } else {
                 setTexto('kpi-palavra-titulo', palavra.palavra);
-                setTexto('kpi-palavra-valor', palavra.aparicoes);
+                setTexto('kpi-palavra-valor', palavra.ocorrencias);
 
                 if (palavra.vantagem_pct !== null) {
                     setTexto('kpi-palavra-detalhe', comSinal(palavra.vantagem_pct, 1) + '% acima do 2º lugar (' + palavra.segunda_palavra + ')');
