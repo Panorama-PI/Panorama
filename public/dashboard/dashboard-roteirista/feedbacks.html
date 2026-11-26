@@ -119,20 +119,6 @@
 
                         </div>
 
-                        <div class="campo-preferencia">
-                            <label for="dia-resumo">Dia do resumo semanal</label>
-                            <select id="dia-resumo">
-                                <option value="">Selecione um dia</option>
-                                <option value="1">Segunda-feira</option>
-                                <option value="2">Terça-feira</option>
-                                <option value="3">Quarta-feira</option>
-                                <option value="4">Quinta-feira</option>
-                                <option value="5">Sexta-feira</option>
-                                <option value="6">Sábado</option>
-                                <option value="7">Domingo</option>
-                            </select>
-                        </div>
-
                         <button type="button" class="feedbacks-btn-principal" id="btn-salvar-preferencias">
                             Salvar preferências
                         </button>
@@ -160,7 +146,25 @@
                 <span class="feedbacks-contador" id="contador-feedbacks"></span>
             </div>
 
+
             <div class="feedbacks-filtros">
+
+                <div class="campo-filtro campo-filtro-pesquisa">
+                    <label for="filtro-pesquisa">Pesquisar</label>
+                    <input type="search" id="filtro-pesquisa" placeholder="Publicação ou produtor...">
+                </div>
+
+                <div class="campo-filtro">
+                    <label for="filtro-estrelas">Avaliação</label>
+                    <select id="filtro-estrelas">
+                        <option value="">Todas as avaliações</option>
+                        <option value="5">5 estrelas</option>
+                        <option value="4">4 estrelas</option>
+                        <option value="3">3 estrelas</option>
+                        <option value="2">2 estrelas</option>
+                        <option value="1">1 estrela</option>
+                    </select>
+                </div>
 
                 <div class="campo-filtro">
                     <label for="filtro-data-inicial">Data inicial</label>

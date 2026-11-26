@@ -85,14 +85,18 @@
 
 .feedbacks-filtros {
     display: grid;
-    grid-template-columns: minmax(9rem, 1fr) minmax(9rem, 1fr) minmax(12rem, 1.2fr) auto;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     align-items: end;
-    gap: 0.85rem;
+    gap: 1rem;
     margin-bottom: 1.25rem;
     padding: 1rem;
     background: #141416;
     border: 1px solid #303035;
     border-radius: 12px;
+}
+
+.campo-filtro-pesquisa {
+    grid-column: span 3;
 }
 
 .campo-filtro,
@@ -690,6 +694,10 @@
     .feedbacks-filtros {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .campo-filtro-pesquisa {
+        grid-column: span 2;
+    }
 }
 
 @media (max-width: 760px) {
@@ -711,6 +719,10 @@
 
     .feedbacks-filtros {
         grid-template-columns: minmax(0, 1fr);
+    }
+
+    .campo-filtro-pesquisa {
+        grid-column: span 1;
     }
 
     .feedbacks-filtros button {

@@ -4,36 +4,52 @@ var database = require("../database/config");
 function listarFeedbacks(idRoteirista) {
     var instrucao = `
         SELECT
-            f.id,
+            a.id AS id,
+            f.id AS id_feedback,
             f.texto,
-            f.criado_em,
+            a.criado_em,
             p.id AS publicacao_id,
             p.titulo AS titulo_publicacao,
-            u.nome AS nome_produtor
-        FROM feedback f
-        JOIN publicacao p ON p.id = f.publicacao_id
-        JOIN usuario u ON u.id = f.autor_id
+            u.nome AS nome_produtor,
+            a.texto AS avaliacao
+        FROM avaliacao a
+        JOIN publicacao p
+            ON p.id = a.publicacao_id
+        JOIN usuario u
+            ON u.id = a.autor_id
+        LEFT JOIN feedback f
+            ON f.publicacao_id = a.publicacao_id
+            AND f.autor_id = a.autor_id
         WHERE p.usuario_id = ${idRoteirista}
-        ORDER BY f.criado_em DESC, f.id DESC;
+        ORDER BY a.criado_em DESC, a.id DESC;
     `;
+
     return database.executar(instrucao);
 }
 
-function buscarFeedback(idFeedback, idRoteirista) {
+function buscarFeedback(idAvaliacao, idRoteirista) {
     var instrucao = `
         SELECT
-            f.id,
+            a.id AS id,
+            f.id AS id_feedback,
             f.texto,
-            f.criado_em,
+            a.criado_em,
             p.id AS publicacao_id,
             p.titulo AS titulo_publicacao,
-            u.nome AS nome_produtor
-        FROM feedback f
-        JOIN publicacao p ON p.id = f.publicacao_id
-        JOIN usuario u ON u.id = f.autor_id
-        WHERE f.id = ${idFeedback}
+            u.nome AS nome_produtor,
+            a.texto AS avaliacao
+        FROM avaliacao a
+        JOIN publicacao p
+            ON p.id = a.publicacao_id
+        JOIN usuario u
+            ON u.id = a.autor_id
+        LEFT JOIN feedback f
+            ON f.publicacao_id = a.publicacao_id
+            AND f.autor_id = a.autor_id
+        WHERE a.id = ${idAvaliacao}
           AND p.usuario_id = ${idRoteirista};
     `;
+
     return database.executar(instrucao);
 }
 
@@ -43,12 +59,12 @@ function buscarNotificacao(idRoteirista) {
             id,
             notificacao,
             horario_inicio,
-            horario_fim,
-            dia_resumo_semanal
+            horario_fim
         FROM usuario
         WHERE id = ${idRoteirista}
           AND perfil_id <> 1;
     `;
+
     return database.executar(instrucao);
 }
 
@@ -59,24 +75,24 @@ function atualizarNotificacao(idRoteirista, ativo) {
         WHERE id = ${idRoteirista}
           AND perfil_id <> 1;
     `;
+
     return database.executar(instrucao);
 }
 
 function atualizarPreferencias(
     idRoteirista,
     horarioInicio,
-    horarioFim,
-    diaResumoSemanal
+    horarioFim
 ) {
     var instrucao = `
         UPDATE usuario
         SET
             horario_inicio = '${horarioInicio}',
-            horario_fim = '${horarioFim}',
-            dia_resumo_semanal = ${diaResumoSemanal}
+            horario_fim = '${horarioFim}'
         WHERE id = ${idRoteirista}
           AND perfil_id <> 1;
     `;
+
     return database.executar(instrucao);
 }
 

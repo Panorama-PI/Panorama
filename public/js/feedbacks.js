@@ -22,14 +22,18 @@ var btnConfigurarPreferencias = document.getElementById("btn-configurar-preferen
 
 var horarioInicio = document.getElementById("horario-inicio");
 var horarioFim = document.getElementById("horario-fim");
-var diaResumo = document.getElementById("dia-resumo");
 var preferenciasMensagem = document.getElementById("preferencias-mensagem");
 var btnSalvarPreferencias = document.getElementById("btn-salvar-preferencias");
 
+var campoPesquisa = document.getElementById("filtro-pesquisa");
+var filtroEstrelas = document.getElementById("filtro-estrelas");
 var filtroDataInicial = document.getElementById("filtro-data-inicial");
 var filtroDataFinal = document.getElementById("filtro-data-final");
 var filtroSemana = document.getElementById("filtro-semana");
 var btnLimparFiltros = document.getElementById("btn-limpar-filtros");
+
+var ultimaDataInicialValida = filtroDataInicial.value;
+var ultimaDataFinalValida = filtroDataFinal.value;
 
 function formatarData(valor) {
     if (!valor) {
@@ -97,11 +101,29 @@ function mostrarEstado(estado) {
 }
 
 function obterFeedbacksFiltrados() {
+    var pesquisa = campoPesquisa.value.trim().toLowerCase();
+    var estrelasSelecionadas = filtroEstrelas.value;
     var dataInicial = filtroDataInicial.value;
     var dataFinal = filtroDataFinal.value;
 
     return feedbacksAtuais.filter(function (feedback) {
+        var tituloPublicacao = String(feedback.titulo_publicacao || "").toLowerCase();
+        var nomeProdutor = String(feedback.nome_produtor || "").toLowerCase();
+
         var dataFeedback = obterDataComparacao(feedback.criado_em);
+
+        var nota = Number(feedback.avaliacao);
+
+        if (pesquisa &&
+            !tituloPublicacao.includes(pesquisa) &&
+            !nomeProdutor.includes(pesquisa)) {
+            return false;
+        }
+
+        if (estrelasSelecionadas &&
+            nota !== Number(estrelasSelecionadas)) {
+            return false;
+        }
 
         if (dataInicial && dataFeedback < dataInicial) {
             return false;
@@ -187,10 +209,10 @@ function renderizarFeedbacks() {
 
     if (feedbacksAtuais.length == 0) {
         document.getElementById("estado-vazio-titulo").textContent =
-            "Você ainda não recebeu feedbacks";
+            "Você ainda não recebeu avaliações";
 
         document.getElementById("estado-vazio-texto").textContent =
-            "Quando um produtor enviar um feedback para uma das suas publicações, ele aparecerá aqui. Continue publicando seus projetos para receber feedbacks.";
+            "Quando um produtor avaliar uma das suas publicações, a avaliação aparecerá aqui.";
 
         mostrarEstado("vazio");
         return;
@@ -198,10 +220,10 @@ function renderizarFeedbacks() {
 
     if (feedbacksFiltrados.length == 0) {
         document.getElementById("estado-vazio-titulo").textContent =
-            "Nenhum feedback encontrado";
+            "Nenhuma avaliação encontrada";
 
         document.getElementById("estado-vazio-texto").textContent =
-            "Não encontramos feedbacks para o período selecionado. Altere os filtros para visualizar outros resultados.";
+            "Não encontramos avaliações com os filtros selecionados. Experimente alterar ou limpar os filtros.";
 
         mostrarEstado("vazio");
         return;
@@ -235,18 +257,55 @@ function renderizarFeedbacks() {
             meta.appendChild(document.createTextNode(" • " + data));
         }
 
-        var previa = document.createElement("p");
-        previa.className = "feedback-item-previa";
-        previa.textContent = feedback.texto || "";
+        var avaliacao = document.createElement("div");
+        avaliacao.className = "feedback-avaliacao";
+
+        var estrelas = document.createElement("span");
+        estrelas.className = "feedback-estrelas";
+
+        var nota = Number(feedback.avaliacao) || 0;
+
+        for (var j = 1; j <= 5; j++) {
+            var estrela = document.createElement("span");
+
+            if (j <= Math.round(nota)) {
+                estrela.textContent = "★";
+            } else {
+                estrela.textContent = "☆";
+                estrela.className = "estrela-vazia";
+            }
+
+            estrelas.appendChild(estrela);
+        }
+
+        var notaTexto = document.createElement("span");
+        notaTexto.textContent = nota.toFixed(1) + "/5";
+
+        avaliacao.appendChild(estrelas);
+        avaliacao.appendChild(notaTexto);
 
         corpo.appendChild(titulo);
         corpo.appendChild(meta);
-        corpo.appendChild(previa);
+        corpo.appendChild(avaliacao);
+
+        var temComentario =
+            typeof feedback.texto === "string" &&
+            feedback.texto.trim() !== "";
+
+        if (temComentario) {
+            var previa = document.createElement("p");
+            previa.className = "feedback-item-previa";
+            previa.textContent = feedback.texto;
+
+            corpo.appendChild(previa);
+        }
 
         var botao = document.createElement("button");
         botao.type = "button";
         botao.className = "feedbacks-btn-secundario";
-        botao.textContent = "Ver feedback";
+        botao.textContent = temComentario
+            ? "Ver feedback"
+            : "Ver avaliação";
 
         botao.addEventListener("click", (function (id) {
             return function () {
@@ -261,8 +320,8 @@ function renderizarFeedbacks() {
     }
 
     contador.textContent = feedbacksFiltrados.length == 1
-        ? "1 feedback"
-        : feedbacksFiltrados.length + " feedbacks";
+        ? "1 avaliação"
+        : feedbacksFiltrados.length + " avaliações";
 
     mostrarEstado("lista");
 }
@@ -277,7 +336,7 @@ function obterFeedbacks() {
                 return resposta.json();
             }
 
-            return lerErro(resposta, "Erro ao buscar feedbacks.");
+            return lerErro(resposta, "Erro ao buscar avaliações.");
         })
         .then(function (corpo) {
             feedbacksAtuais = corpo.feedbacks || [];
@@ -285,21 +344,21 @@ function obterFeedbacks() {
             renderizarFeedbacks();
         })
         .catch(function (erro) {
-            console.error("Erro ao obter feedbacks: " + erro.message);
+            console.error("Erro ao obter avaliações: " + erro.message);
             mostrarEstado("erro");
         });
 }
 
-function abrirDetalhe(idFeedback) {
+function abrirDetalhe(idAvaliacao) {
     esconderAviso();
 
-    fetch("/feedbacks/roteirista/" + idUsuario + "/" + idFeedback, { cache: "no-store" })
+    fetch("/feedbacks/roteirista/" + idUsuario + "/" + idAvaliacao, { cache: "no-store" })
         .then(function (resposta) {
             if (resposta.ok) {
                 return resposta.json();
             }
 
-            return lerErro(resposta, "Erro ao buscar o feedback.");
+            return lerErro(resposta, "Erro ao buscar a avaliação.");
         })
         .then(function (corpo) {
             var feedback = corpo.feedback;
@@ -316,8 +375,46 @@ function abrirDetalhe(idFeedback) {
             document.getElementById("detalhe-data").textContent =
                 formatarData(feedback.criado_em);
 
-            document.getElementById("detalhe-texto").textContent =
-                feedback.texto || "";
+            var nota = Number(feedback.avaliacao) || 0;
+            var avaliacaoDetalhe = document.getElementById("detalhe-avaliacao");
+
+            var estrelas = document.createElement("div");
+            estrelas.className = "feedback-estrelas";
+
+            avaliacaoDetalhe.innerHTML = "";
+
+            for (var i = 1; i <= 5; i++) {
+                var estrela = document.createElement("span");
+
+                if (i <= Math.round(nota)) {
+                    estrela.textContent = "★";
+                } else {
+                    estrela.textContent = "☆";
+                    estrela.className = "estrela-vazia";
+                }
+
+                estrelas.appendChild(estrela);
+            }
+
+            avaliacaoDetalhe.appendChild(estrelas);
+
+            var notaTexto = document.createElement("span");
+            notaTexto.textContent = " " + nota.toFixed(1) + "/5";
+
+            avaliacaoDetalhe.appendChild(notaTexto);
+
+            var textoDetalhe = document.getElementById("detalhe-texto");
+
+            var temComentario =
+                typeof feedback.texto === "string" &&
+                feedback.texto.trim() !== "";
+
+            if (temComentario) {
+                textoDetalhe.textContent = feedback.texto;
+            } else {
+                textoDetalhe.textContent =
+                    "O produtor avaliou esta publicação, mas não deixou um comentário.";
+            }
 
             telaLista.hidden = true;
             telaDetalhe.hidden = false;
@@ -325,7 +422,7 @@ function abrirDetalhe(idFeedback) {
             document.getElementById("detalhe-titulo").focus();
         })
         .catch(function (erro) {
-            console.error("Erro ao abrir feedback: " + erro.message);
+            console.error("Erro ao abrir avaliação: " + erro.message);
             mostrarAviso(erro.message);
             obterFeedbacks();
         });
@@ -361,10 +458,6 @@ function preencherPreferencias(preferencias) {
     horarioFim.value = preferencias.horario_fim
         ? String(preferencias.horario_fim).substring(0, 5)
         : "";
-
-    diaResumo.value = preferencias.dia_resumo_semanal == null
-        ? ""
-        : String(preferencias.dia_resumo_semanal);
 }
 
 function obterNotificacao() {
@@ -444,19 +537,12 @@ function alternarPreferencias() {
 function salvarPreferencias() {
     var inicio = horarioInicio.value;
     var fim = horarioFim.value;
-    var dia = diaResumo.value;
 
     preferenciasMensagem.textContent = "";
 
-    if (!inicio && !fim && !dia) {
+    if (!inicio || !fim) {
         preferenciasMensagem.textContent =
-            "Personalize as notificações preenchendo os horários e selecionando o dia do resumo semanal.";
-        return;
-    }
-
-    if (!inicio || !fim || !dia) {
-        preferenciasMensagem.textContent =
-            "Para salvar, preencha os dois horários e selecione o dia do resumo semanal.";
+            "Para salvar, preencha o horário inicial e o horário final.";
         return;
     }
 
@@ -475,8 +561,7 @@ function salvarPreferencias() {
         },
         body: JSON.stringify({
             horario_inicio: inicio,
-            horario_fim: fim,
-            dia_resumo_semanal: Number(dia)
+            horario_fim: fim
         })
     })
         .then(function (resposta) {
@@ -489,8 +574,7 @@ function salvarPreferencias() {
         .then(function (corpo) {
             preencherPreferencias(corpo.preferencias || {
                 horario_inicio: inicio,
-                horario_fim: fim,
-                dia_resumo_semanal: Number(dia)
+                horario_fim: fim
             });
 
             preferenciasMensagem.textContent =
@@ -498,6 +582,7 @@ function salvarPreferencias() {
         })
         .catch(function (erro) {
             console.error("Erro ao salvar preferências: " + erro.message);
+
             preferenciasMensagem.textContent =
                 "Não foi possível salvar as preferências. Tente novamente.";
         })
@@ -506,10 +591,19 @@ function salvarPreferencias() {
         });
 }
 
+function atualizarLimitesDatas() {
+    filtroDataInicial.max = filtroDataFinal.value || "";
+    filtroDataFinal.min = filtroDataInicial.value || "";
+}
+
 function aplicarFiltroSemana() {
     var inicio = filtroSemana.value;
 
     if (!inicio) {
+        ultimaDataInicialValida = filtroDataInicial.value;
+        ultimaDataFinalValida = filtroDataFinal.value;
+
+        atualizarLimitesDatas();
         renderizarFeedbacks();
         return;
     }
@@ -519,26 +613,58 @@ function aplicarFiltroSemana() {
     filtroDataInicial.value = inicio;
     filtroDataFinal.value = opcao.dataset.fim;
 
+    ultimaDataInicialValida = inicio;
+    ultimaDataFinalValida = opcao.dataset.fim;
+
+    atualizarLimitesDatas();
+    esconderAviso();
     renderizarFeedbacks();
 }
 
 function limparFiltros() {
+    campoPesquisa.value = "";
+    filtroEstrelas.value = "";
     filtroDataInicial.value = "";
     filtroDataFinal.value = "";
     filtroSemana.value = "";
 
+    ultimaDataInicialValida = "";
+    ultimaDataFinalValida = "";
+
+    atualizarLimitesDatas();
+    esconderAviso();
     renderizarFeedbacks();
 }
 
-function atualizarFiltroData() {
-    filtroSemana.value = "";
+function atualizarFiltroData(evento) {
+    var campoAlterado = evento.target;
 
-    if (filtroDataInicial.value && filtroDataFinal.value &&
-        filtroDataInicial.value > filtroDataFinal.value) {
-        mostrarAviso("A data inicial não pode ser posterior à data final.");
+    if (
+        filtroDataInicial.value &&
+        filtroDataFinal.value &&
+        filtroDataInicial.value > filtroDataFinal.value
+    ) {
+        if (campoAlterado === filtroDataInicial) {
+            filtroDataInicial.value = ultimaDataInicialValida;
+        } else {
+            filtroDataFinal.value = ultimaDataFinalValida;
+        }
+
+        atualizarLimitesDatas();
+
+        mostrarAviso(
+            "A data inicial não pode ser posterior à data final. Verifique o período selecionado."
+        );
+
         return;
     }
 
+    ultimaDataInicialValida = filtroDataInicial.value;
+    ultimaDataFinalValida = filtroDataFinal.value;
+
+    filtroSemana.value = "";
+
+    atualizarLimitesDatas();
     esconderAviso();
     renderizarFeedbacks();
 }
@@ -553,13 +679,25 @@ sinoBotao.addEventListener("click", alternarSino);
 
 btnSalvarPreferencias.addEventListener("click", salvarPreferencias);
 
+campoPesquisa.addEventListener("input", function () {
+    renderizarFeedbacks();
+});
+
+filtroEstrelas.addEventListener("change", function () {
+    renderizarFeedbacks();
+});
+
 filtroDataInicial.addEventListener("change", atualizarFiltroData);
 filtroDataFinal.addEventListener("change", atualizarFiltroData);
 filtroSemana.addEventListener("change", aplicarFiltroSemana);
+
 btnLimparFiltros.addEventListener("click", limparFiltros);
+
 btnConfigurarPreferencias.addEventListener("click", alternarPreferencias);
 
 preencherUsuario();
+
+atualizarLimitesDatas();
 
 if (ehProdutor) {
     sinoPainel.hidden = true;

@@ -54,22 +54,22 @@ function listarFeedbacks(req, res, next) {
 function buscarFeedback(req, res, next) {
     try {
         var idRoteirista = obterIdRoteirista(req);
-        var idFeedback = req.params.id;
+        var idAvaliacao = req.params.id;
 
-        if (!idValido(idFeedback)) {
+        if (!idValido(idAvaliacao)) {
             throw new BadRequestError(
-                "O ID do feedback é inválido."
+                "O ID da avaliação é inválido."
             );
         }
 
         feedbackRoteiristaModel.buscarFeedback(
-            Number(idFeedback),
+            Number(idAvaliacao),
             idRoteirista
         )
             .then((resultado) => {
                 if (resultado.length === 0) {
                     throw new NotFoundError(
-                        "Feedback não encontrado."
+                        "Avaliação não encontrada."
                     );
                 }
 
@@ -104,8 +104,7 @@ function buscarNotificacao(req, res, next) {
                     notificacao: Number(dados.notificacao) === 1,
                     preferencias: {
                         horario_inicio: dados.horario_inicio,
-                        horario_fim: dados.horario_fim,
-                        dia_resumo_semanal: dados.dia_resumo_semanal
+                        horario_fim: dados.horario_fim
                     }
                 });
             })
@@ -128,8 +127,7 @@ function atualizarNotificacao(req, res, next) {
 
         var camposPreferencia = [
             "horario_inicio",
-            "horario_fim",
-            "dia_resumo_semanal"
+            "horario_fim"
         ];
 
         var recebeuPreferencias = camposPreferencia.some(
@@ -154,7 +152,6 @@ function atualizarNotificacao(req, res, next) {
         var ativo = corpo.ativo;
         var horarioInicio = corpo.horario_inicio;
         var horarioFim = corpo.horario_fim;
-        var diaResumo = corpo.dia_resumo_semanal;
 
         if (possuiAtivo && typeof ativo !== "boolean") {
             throw new BadRequestError(
@@ -169,18 +166,6 @@ function atualizarNotificacao(req, res, next) {
             ) {
                 throw new BadRequestError(
                     "Informe horários válidos no formato HH:MM."
-                );
-            }
-
-            if (
-                diaResumo === null ||
-                diaResumo === "" ||
-                !Number.isInteger(Number(diaResumo)) ||
-                Number(diaResumo) < 1 ||
-                Number(diaResumo) > 7
-            ) {
-                throw new BadRequestError(
-                    "O dia do resumo semanal deve estar entre 1 e 7."
                 );
             }
 
@@ -209,8 +194,7 @@ function atualizarNotificacao(req, res, next) {
                 return feedbackRoteiristaModel.atualizarPreferencias(
                     idRoteirista,
                     horarioInicio,
-                    horarioFim,
-                    Number(diaResumo)
+                    horarioFim
                 );
             })
             .then(() => {
@@ -235,8 +219,7 @@ function atualizarNotificacao(req, res, next) {
                     notificacao: Number(dados.notificacao) === 1,
                     preferencias: {
                         horario_inicio: dados.horario_inicio,
-                        horario_fim: dados.horario_fim,
-                        dia_resumo_semanal: dados.dia_resumo_semanal
+                        horario_fim: dados.horario_fim
                     }
                 });
             })
