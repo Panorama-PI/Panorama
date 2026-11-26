@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.List;
 
 public class Main {
@@ -31,7 +32,7 @@ public class Main {
         }
     }
 
-    private static void importarPlanilha() throws IOException {
+    private static void importarPlanilha() throws IOException, SQLException {
         String bucket = System.getenv("S3_BUCKET");
         String chave = System.getenv("S3_OBJECT_KEY");
         String regiao = System.getenv("AWS_REGION");
