@@ -15,7 +15,7 @@ WORKDIR /app
 
 # Copia o JAR gerado no estágio anterior
 # (Substitua servico-javamail.jar pelo nome definido na tag <finalName> do seu pom.xml)
-COPY --from=builder /app/jar/servico-apache-poi.jar app.jar
+COPY --from=builder /app/target/servico-apache-poi.jar app.jar
 
 # Executa o fat JAR diretamente
 ENTRYPOINT ["java", "-jar", "app.jar"]
