@@ -1199,7 +1199,7 @@ SELECT
   ) AS periodo,
   lucro_medio_periodo
 FROM vw_prod_esp_base_janela_pico
-WHERE ranking = 1;
+ WHERE ranking = 1;
  
  
  
