@@ -1,12 +1,17 @@
 package com.panorama.cronjob.service;
 
+import com.panorama.cronjob.exceptions.NullValueException;
 import com.panorama.cronjob.model.PendenciaEmailEnvioCron;
+import com.panorama.cronjob.model.Publicacao;
+import com.panorama.cronjob.template.EmailTemplate;
 import com.panorama.mail.config.EmailConfig;
-import com.panorama.mail.dao.EmailDao;
+import com.panorama.cronjob.dao.CronDao;
 import com.panorama.mail.model.PendenciaEmailEnvio;
 import com.panorama.mail.service.EmailService;
 import io.github.cdimascio.dotenv.Dotenv;
+import jakarta.mail.MessagingException;
 
+import java.awt.desktop.PreferencesEvent;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -21,17 +26,16 @@ public class CronService {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final EmailConfig config;
     private final EmailService emailService;
-    private final EmailDao emailDao;
+    private final CronDao cronDao;
 
     public CronService() {
         this.config = new EmailConfig(
                 "smtp.gmail.com",
                 "587",
                 getEnv("EMAIL"),
-                getEnv("PASSWORD")
-        );
+                getEnv("PASSWORD"));
         this.emailService = new EmailService(config);
-        this.emailDao = new EmailDao();
+        this.cronDao = new CronDao();
     }
 
     public void start() {
@@ -50,15 +54,15 @@ public class CronService {
 
         scheduler.scheduleWithFixedDelay(() -> {
             try {
-                List<PendenciaEmailEnvio> pendentes = emailDao.verificarEmailPendente();
+                List<PendenciaEmailEnvioCron> pendentes = cronDao.verificarPublicacoes();
 
                 if (pendentes.isEmpty()) {
                     System.out.println("[DEBUG] Nenhum email pendente encontrado...");
                     return;
                 }
 
-                for (PendenciaEmailEnvio pendente : pendentes) {
-                    Boolean enviado = emailService.enviarEmail(pendente);
+                for (PendenciaEmailEnvioCron pendente : pendentes) {
+                    Boolean enviado = enviarEmail(pendente);
                     if (Boolean.TRUE.equals(enviado)) {
                         System.out.println("[DEBUG] Email enviado com sucesso");
                     }
@@ -70,13 +74,27 @@ public class CronService {
         }, 0, 15, TimeUnit.SECONDS);
     }
 
-    public boolean enviarEmail(PendenciaEmailEnvioCron pendente){
+    public boolean enviarEmail(PendenciaEmailEnvioCron pendente) {
 
+        if (pendente == null) {
+            throw new NullValueException("O email pendente está nulo");
+        }
+
+        String destinatario = pendente.getProdutor().getEmail();
+        String assunto = "Você tem publicações não avaliadas";
+        String htmlContent = EmailTemplate.htmlResumoPublicacoesPendentes(
+                pendente.getProdutor(),
+                pendente.getEmpresa(),
+                pendente.getPublicacoes());
+
+        try {
+            emailService.dispararEmail(destinatario, assunto, htmlContent);
+        } catch (MessagingException e) {
+            return false;
+        }
+
+        return true;
     }
-
-
-
-
 
     private static String getEnv(String key) {
         String val = dotenv.get(key);
