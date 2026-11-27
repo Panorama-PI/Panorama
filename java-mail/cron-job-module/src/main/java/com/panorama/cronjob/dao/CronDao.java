@@ -94,4 +94,10 @@ public class CronDao {
         });
     }
 
+    public void marcarResumoEnviado(Integer idProdutor) {
+        String sql = "UPDATE usuario SET ultimo_resumo_enviado = CURDATE() WHERE id = ?";
+
+        jdbcTemplate.update(sql, idProdutor);
+    }
+
 }
