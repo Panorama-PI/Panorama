@@ -2,6 +2,18 @@
 
 # Exemplo de leitura de arquivos excel utilizando a biblioteca Apache POI
 
+## Importação da planilha do S3
+
+O serviço ApachePOI baixa a planilha configurada no bucket S3 e a lê diretamente com o Apache POI. Configure `AWS_REGION`, `S3_BUCKET` e `S3_OBJECT_KEY` no `.env.docker`; a chave é o caminho do objeto dentro do bucket, sem `s3://`.
+
+O AWS SDK usa a cadeia padrão de credenciais. Em produção, dê ao ambiente uma role IAM com permissão `s3:GetObject` para o objeto. Em execução local pelo Compose, informe credenciais temporárias em `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` e `AWS_SESSION_TOKEN`, ou use outro provedor disponível para o container. Não coloque chaves AWS no código.
+
+Para executar a importação pelo Docker Compose:
+
+```sh
+docker compose --env-file .env.docker --profile import run --rm apachepoi
+```
+
 ## ⚙️ Configuração de Ambiente:
 
 ### Passo a passo da execução:

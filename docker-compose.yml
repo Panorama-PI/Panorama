@@ -25,11 +25,16 @@ services:
       dockerfile: Dockerfile
     profiles: ["import"]
     restart: "no"
-    working_dir: /data
     environment:
       DATABASE_URL: jdbc:mysql://db:3306/${DB_DATABASE:-filmes_db}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       DATABASE_USER: ${DB_USER:?Configure DB_USER em .env.docker}
       DATABASE_PASS: ${DB_PASSWORD:?Configure DB_PASSWORD em .env.docker}
+      AWS_REGION: ${AWS_REGION:?Configure AWS_REGION em .env.docker}
+      S3_BUCKET: ${S3_BUCKET:?Configure S3_BUCKET em .env.docker}
+      S3_OBJECT_KEY: ${S3_OBJECT_KEY:?Configure S3_OBJECT_KEY em .env.docker}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
     depends_on:
       db:
         condition: service_healthy
