@@ -567,6 +567,181 @@
         color: white;
     }
 
+/* Refinos da administração */
+.cards-superiores {
+    gap: 1.25rem;
+}
+
+.card-informacoes {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background: linear-gradient(145deg, #252529, #1b1b1f);
+}
+
+.titulo-informacoes {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.informacoes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .8rem;
+    margin-top: 1rem;
+}
+
+.informacao-empresa {
+    min-width: 0;
+    min-height: 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: .45rem;
+    margin: 0;
+    padding: .85rem 1rem;
+    background: rgba(255, 255, 255, .035);
+    border: 1px solid rgba(255, 255, 255, .06);
+    border-radius: 10px;
+}
+
+.informacao-empresa span {
+    font-size: .75rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.informacao-empresa strong {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.btn-reiniciar-token {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .35rem;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.btn-reiniciar-token:hover {
+    background: rgba(255, 255, 255, .08);
+}
+
+.btn-reiniciar-token img {
+    width: 1.3rem;
+    height: 1.3rem;
+}
+
+.btn-excluir {
+    min-width: 2.2rem;
+    min-height: 2.2rem;
+    padding: .35rem !important;
+    font-size: 1rem;
+}
+
+.card-funcionario {
+    gap: .5rem;
+}
+
+.card-funcionario > div {
+    min-width: 0;
+}
+
+.card-funcionario > div p {
+    overflow-wrap: anywhere;
+}
+
+.filtros-funcionarios input:focus,
+.filtros-funcionarios select:focus {
+    outline: 2px solid rgba(255, 56, 60, .55);
+    outline-offset: 1px;
+}
+
+.mensagem-status {
+    min-height: 1.2em;
+    margin: .55rem 0 0;
+    font-size: .85rem;
+}
+
+@media (max-width: 1100px) {
+    .sidebar {
+        width: 17rem;
+    }
+
+    .admin-content {
+        margin-left: 17rem;
+        padding: 1.75rem;
+    }
+
+    .cards-superiores {
+        flex-direction: column;
+    }
+
+    .card-codigo,
+    .card-informacoes {
+        width: 100%;
+    }
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        padding: 1rem;
+    }
+
+    .usuario-side img {
+        width: 4rem;
+        height: 4rem;
+    }
+
+    .usuario-side h2 {
+        font-size: 1.2rem;
+    }
+
+    .btns-side.menu-sair {
+        margin: .5rem 0 0;
+    }
+
+    .admin-content {
+        margin: 0;
+        padding: 1.25rem;
+        overflow-x: auto;
+    }
+
+    .informacoes {
+        grid-template-columns: 1fr;
+    }
+
+    .filtros-funcionarios {
+        flex-direction: column;
+    }
+
+    .filtros-funcionarios select {
+        width: 100%;
+    }
+
+    .cabecalho-funcionarios {
+        display: none;
+    }
+
+    .card-funcionario {
+        min-width: 660px;
+    }
+
+    #lista-funcionarios {
+        overflow-x: auto;
+    }
+}
+
 /* =========================
    MODAIS (EDITAR / EXCLUIR)
 ========================= */

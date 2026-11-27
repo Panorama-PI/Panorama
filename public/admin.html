@@ -64,7 +64,7 @@
                 </h2>
 
                 <div class="codigo-empresa">
-                  <a href="" onclick="solicitarEnvioToken(); return false;">  <img src="assets/icon/recarregar-icon.png" alt=""> </a>
+                  <button type="button" class="btn-reiniciar-token" onclick="reiniciarToken()" aria-label="Gerar outro código" title="Gerar outro código">  <img src="assets/icon/recarregar-icon.png" alt=""> </button>
                     <p id="codigo-empresa-texto">—</p>
                     <button class="btn-info-codigo">
                         <img src="assets/icon/info-icon.png" alt="">
@@ -108,9 +108,9 @@
             <h2>Funcionários cadastrados</h2>
 
             <div class="filtros-funcionarios">
-                <input type="text" placeholder="Pesquisar funcionário...">
+                <input type="search" id="busca-funcionarios" placeholder="Pesquisar funcionário..." aria-label="Pesquisar funcionário">
 
-                <select>
+                <select id="filtro-funcionarios" aria-label="Filtrar funcionários">
                     <option value="">Todos</option>
                     <option value="Produtor">Produtor</option>
                     <option value="Roteirista">Roteirista</option>
@@ -118,7 +118,7 @@
                     <option value="Inativo">Inativo</option>
                 </select>
 
-                <select>
+                <select id="ordenar-funcionarios" aria-label="Ordenar funcionários">
                     <option value="">Ordenar por</option>
                     <option value="nome">Nome (A-Z)</option>
                     <option value="nome-desc">Nome (Z-A)</option>

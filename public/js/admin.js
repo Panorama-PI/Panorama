@@ -18,6 +18,9 @@ const idEmpresa = sessionStorage.getItem(CHAVE_ID_EMPRESA);
 
 let usuarios = [];
 let indiceParaExcluir = null;
+const campoBusca = document.getElementById("busca-funcionarios");
+const filtroFuncionarios = document.getElementById("filtro-funcionarios");
+const ordenarFuncionarios = document.getElementById("ordenar-funcionarios");
 
 const listaFuncionarios = document.getElementById("lista-funcionarios");
 const containerInfos = document.querySelector(".informacoes");
@@ -80,6 +83,29 @@ btnInfo.onmouseleave = function () {
    INFORMAÇÕES DA EMPRESA
 ========================= */
 
+function formatarCnpj(valor) {
+    const cnpj = String(valor || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    if (cnpj.length !== 14) return valor || "—";
+    return `${cnpj.slice(0, 2)}.${cnpj.slice(2, 5)}.${cnpj.slice(5, 8)}/${cnpj.slice(8, 12)}-${cnpj.slice(12)}`;
+}
+
+function formatarTelefone(valor) {
+    const digitos = String(valor || "").replace(/\D/g, "");
+    if (digitos.length === 11) {
+        return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 7)}-${digitos.slice(7)}`;
+    }
+    if (digitos.length === 10) {
+        return `(${digitos.slice(0, 2)}) ${digitos.slice(2, 6)}-${digitos.slice(6)}`;
+    }
+    return valor || "—";
+}
+
+function converterData(data) {
+    const partes = String(data || "").split("/");
+    if (partes.length !== 3) return new Date(data).getTime();
+    return new Date(partes[2], partes[1] - 1, partes[0]).getTime();
+}
+
 function buscarEmpresa() {
     fetch("/empresas/buscar/" + idEmpresa)
         .then(tratarResposta)
@@ -100,11 +126,11 @@ function buscarEmpresa() {
                 </div>
                 <div class="informacao-empresa">
                     <span>CNPJ</span>
-                    <strong>${escapar(empresa.cnpj)}</strong>
+                    <strong>${escapar(formatarCnpj(empresa.cnpj))}</strong>
                 </div>
                 <div class="informacao-empresa">
                     <span>Telefone</span>
-                    <strong>${escapar(empresa.telefone)}</strong>
+                    <strong>${escapar(formatarTelefone(empresa.telefone))}</strong>
                 </div>
             `;
         })
@@ -125,6 +151,7 @@ function buscarFuncionarios() {
         .then(res => res.json())
         .then(dados => {
             usuarios = dados;
+            if (!Array.isArray(usuarios)) usuarios = [];
             listarFuncionarios();
         })
         .catch(err => {
@@ -136,33 +163,50 @@ function buscarFuncionarios() {
 function listarFuncionarios() {
     listaFuncionarios.innerHTML = "";
 
-    if (usuarios.length === 0) {
-        listaFuncionarios.innerHTML = `<p class="lista-vazia">Nenhum funcionário cadastrado ainda.</p>`;
+    const busca = campoBusca.value.trim().toLocaleLowerCase("pt-BR");
+    const filtro = filtroFuncionarios.value.toLocaleLowerCase("pt-BR");
+    let exibidos = usuarios.filter(usuario => {
+        const texto = `${usuario.nome} ${usuario.email} ${usuario.cargo} ${usuario.status}`.toLowerCase();
+        return texto.includes(busca) && (!filtro || String(usuario.cargo).toLowerCase() === filtro || String(usuario.status).toLowerCase() === filtro);
+    });
+
+    const ordem = ordenarFuncionarios.value;
+    exibidos.sort((a, b) => {
+        if (ordem === "nome") return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
+        if (ordem === "nome-desc") return String(b.nome || "").localeCompare(String(a.nome || ""), "pt-BR");
+        if (ordem === "data") return converterData(b.data) - converterData(a.data);
+        if (ordem === "data-antiga") return converterData(a.data) - converterData(b.data);
+        return 0;
+    });
+
+    if (exibidos.length === 0) {
+        listaFuncionarios.innerHTML = `<p class="lista-vazia">${usuarios.length ? "Nenhum funcionário corresponde à busca ou aos filtros." : "Nenhum funcionário cadastrado ainda."}</p>`;
         return;
     }
 
-    for (let i = 0; i < usuarios.length; i++) {
-        const foto = usuarios[i].foto || FOTO_PADRAO;
+    for (const usuario of exibidos) {
+        const i = usuarios.indexOf(usuario);
+        const foto = usuario.foto || FOTO_PADRAO;
 
         const card = document.createElement("div");
         card.classList.add("card-funcionario");
         card.innerHTML = `
             <div class="funcionario-nome">
                 <img src="${escapar(foto)}" alt="Foto do funcionário">
-                <h3>${escapar(usuarios[i].nome)}</h3>
+                <h3>${escapar(usuario.nome)}</h3>
             </div>
             <div>
-                <p>${escapar(usuarios[i].email)}</p>
+                <p>${escapar(usuario.email)}</p>
             </div>
             <div>
-                <p>${escapar(usuarios[i].cargo)}</p>
+                <p>${escapar(usuario.cargo)}</p>
             </div>
             <div>
-                <p>${escapar(usuarios[i].data)}</p>
+                <p>${escapar(usuario.data)}</p>
             </div>
             <div>
-                <p class="status ${escapar(String(usuarios[i].status).toLowerCase())}">
-                    ${escapar(usuarios[i].status)}
+                <p class="status ${escapar(String(usuario.status).toLowerCase())}">
+                    ${escapar(usuario.status)}
                 </p>
             </div>
             <div>
@@ -170,12 +214,15 @@ function listarFuncionarios() {
                     <img src="assets/icon/lapis-icon.png" alt="">
                     Editar
                 </button>
-                <button type="button" class="btn-excluir" onclick="abrirModalExcluir(${i})">Excluir</button>
+                <button type="button" class="btn-excluir" aria-label="Excluir ${escapar(usuario.nome)}" onclick="abrirModalExcluir(${i})"><span aria-hidden="true">🗑️</span> Excluir</button>
             </div>
         `;
         listaFuncionarios.appendChild(card);
     }
 }
+
+[campoBusca, filtroFuncionarios, ordenarFuncionarios].forEach(campo => campo.addEventListener("input", listarFuncionarios));
+[filtroFuncionarios, ordenarFuncionarios].forEach(campo => campo.addEventListener("change", listarFuncionarios));
 
 
 /* =========================
