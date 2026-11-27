@@ -1,5 +1,6 @@
 package com.panorama.cronjob.service;
 
+import com.panorama.cronjob.model.PendenciaEmailEnvioCron;
 import com.panorama.mail.config.EmailConfig;
 import com.panorama.mail.dao.EmailDao;
 import com.panorama.mail.model.PendenciaEmailEnvio;
@@ -69,7 +70,11 @@ public class CronService {
         }, 0, 15, TimeUnit.SECONDS);
     }
 
-    
+    public boolean enviarEmail(PendenciaEmailEnvioCron pendente){
+
+    }
+
+
 
 
 
